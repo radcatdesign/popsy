@@ -1,0 +1,20 @@
+name: Mirror Webflow CMS
+on:
+  push:
+    paths: [".github/mirror-trigger"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/mirror.sh
+      - run: |
+          git config user.name "popsy-mirror"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -b mirror-data
+          git add -f _mirror
+          git commit -m "Mirror Webflow CMS pages and assets"
+          git push -f origin mirror-data
