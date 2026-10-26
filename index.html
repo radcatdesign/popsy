@@ -47,7 +47,7 @@
   }
 </script>
 </head>
-<body data-nav-open="" data-filter="" class="p-home loadinge">
+<body data-nav-open="" data-filter="monsters" class="p-home loadinge">
   <div class="embed-style w-embed">
     <style>
 *,
@@ -2213,14 +2213,10 @@ a {
       text: text
     }
   });
-	// All Pieces Category
-  const filterListEl = document.getElementById('filter-list');  
-  const AllPiecesCat = document.createElement('div');
-  AllPiecesCat.dataset.filter = '';
-  AllPiecesCat.className = 'filter-btn w-dyn-item';
-  AllPiecesCat.role = 'listitem';
-  AllPiecesCat.innerHTML = 'Everything';
-  filterListEl.insertBefore(AllPiecesCat, filterListEl.firstChild);
+	// Filters: Monsters first (and selected by default via <body data-filter="monsters">)
+  const filterListEl = document.getElementById('filter-list');
+  const monstersCat = filterListEl.querySelector('[data-filter="monsters"]');
+  if (monstersCat) filterListEl.insertBefore(monstersCat, filterListEl.firstChild);
   const containerEl = document.getElementById('container');
 	function startGrid() {
     const gridConfig = {
@@ -2316,7 +2312,8 @@ a {
       filterListEl.querySelectorAll('[data-filter]').forEach(el => {
       	el.addEventListener('click', () => {
         	if (!containerEl.classList.contains('--is-loaded')) return;
-        	document.body.dataset.filter = document.body.dataset.filter == el.dataset.filter ? "" : el.dataset.filter;
+        	if (document.body.dataset.filter == el.dataset.filter) return;
+        	document.body.dataset.filter = el.dataset.filter;
           // navBtnText.innerHTML = el.dataset.filter == '' ? 'Filter' : el.innerText;
           document.body.dataset.navOpen = '';
           document.querySelectorAll('.product').forEach(product => {
@@ -2342,11 +2339,15 @@ a {
     	const columns = isVertical ? gridConfig.itemsPerColumn : gridConfig.columns;
     	const itemsPerColumn = isVertical ? gridConfig.columns : gridConfig.itemsPerColumn;
     	const arrSize = columns * itemsPerColumn;
-			const filteredItems = document.body.dataset.filter ? window.items.filter(p => p.category === document.body.dataset.filter) : window.items;
+			const filter = document.body.dataset.filter;
+      // Popsy logo appears once, in the center tile, and the filtered pieces fill the rest
+      const logoItem = window.items.find(p => p.id === 'popsy-wolf');
+      const filteredItems = window.items.filter(p => p.id !== 'popsy-wolf' && (!filter || p.category === filter));
       const productsArray = [];
       for (let i = 0; i < arrSize; i++) {
         productsArray.push(filteredItems[i % filteredItems.length]);
       }
+      if (logoItem && (!filter || logoItem.category === filter)) productsArray[centerPos] = logoItem;
       for (let i = 0; i < columns; i++) {
       	const start = itemsPerColumn * i;
         const end = start + itemsPerColumn;
