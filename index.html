@@ -238,6 +238,14 @@ a {
   .grid .product {
     will-change: transform;
   }
+  /* Cursor: open hand on the background, pointer on pieces, closed hand only while dragging */
+  .--is-loaded .grid .product > div {
+    cursor: pointer;
+  }
+  .--is-dragging .grid,
+  .--is-dragging .grid * {
+    cursor: grabbing !important;
+  }
   /* Hover video sits over the still image; it fades in on hover and fades out after its last loop */
   .grid .column .product video {
     display: block;
@@ -2177,9 +2185,18 @@ a {
       videoEl.dataset.hoverVideo = 'true';
       idEl.appendChild(imgEl);
       if (item.video) {
+        videoEl.playsInline = true;
         const sourceEl = document.createElement('source');
         sourceEl.src = item.video;
+        if (/\.webm$/i.test(item.video)) sourceEl.type = 'video/webm';
         videoEl.appendChild(sourceEl);
+        // MP4 fallback for browsers that can't play WebM (older Safari)
+        if (/^assets\/hover\/.+\.webm$/i.test(item.video)) {
+          const mp4El = document.createElement('source');
+          mp4El.src = item.video.replace(/\.webm$/i, '.mp4');
+          mp4El.type = 'video/mp4';
+          videoEl.appendChild(mp4El);
+        }
         idEl.appendChild(videoEl);
       }
       productEl.appendChild(idEl);
@@ -2436,13 +2453,17 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         trigger: this.grid,
         inertia: true,
         allowEventDefault: true,
+        cursor: 'grab',
+        activeCursor: 'grabbing',
         onDrag: follow,
         onThrowUpdate: follow,
         onDragStart: () => {
           this.isDragging = true
+          this.dom.classList.add('--is-dragging')
         },
         onDragEnd: () => {
           this.isDragging = false
+          this.dom.classList.remove('--is-dragging')
         }
       })[0]
     }
@@ -2472,7 +2493,9 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       if (this.measure()) this.render()
     }
     observeProducts() {
-      if (window.innerWidth < 1100) return; 
+      // Hover only on devices with a mouse/trackpad (any window width); touch screens skip it
+      const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+      if (!canHover && window.innerWidth < 1100) return;
       // Hover video: loops while hovered. On hover out it finishes the current loop,
       // then fades back to the still image.
       document.querySelectorAll('.product').forEach(product => {
