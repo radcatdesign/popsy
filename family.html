@@ -15,17 +15,17 @@
   <link href="images/webclip.jpg" rel="apple-touch-icon">
   <meta name="theme-color" content="#000000">
   <meta name="view-transition" content="same-origin">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet" type="text/css">
   <!--  React & ReactDOM  -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="assets/unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="assets/unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <!--  React Flow  -->
-  <script src="https://unpkg.com/reactflow@11.10.1/dist/umd/index.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/reactflow@11.10.1/dist/style.css">
+  <script src="assets/unpkg.com/reactflow@11.10.1/dist/umd/index.js"></script>
+  <link rel="stylesheet" href="assets/unpkg.com/reactflow@11.10.1/dist/style.css">
   <!--  ELKjs Layout Engine  -->
-  <script src="https://unpkg.com/elkjs@0.8.2/lib/elk.bundled.js"></script>
+  <script src="assets/unpkg.com/elkjs@0.8.2/lib/elk.bundled.js"></script>
   <!--  Babel (to transpile JSX)  -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="assets/unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
   body {
     margin: 0;
@@ -307,7 +307,7 @@
     inset: 0;
     z-index: 5;
     display: none;
-    cursor: url('https://cdn.prod.website-files.com/689e729c65f81373b9f2b204/68e053558b6beba1910d06c1_close-l.svg') 32 32, pointer;
+    cursor: url('assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68e053558b6beba1910d06c1_close-l.svg') 32 32, pointer;
 	}
   body.--is-details-showing #details-backdrop {
     display: block;  	
@@ -339,7 +339,7 @@
     .nav {
       border-image-outset: 1px;
       border-image-width: 30px;
-      border-image-source: url(https://cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+      border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
       border-image-slice: 25;
       border-image-repeat: stretch;
     }
@@ -347,7 +347,7 @@
       border: 1px solid transparent;
       border-image-outset: 3px;
       border-image-width: 30px;
-      border-image-source: url(https://cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.png);
+      border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.png);
       border-image-slice: 15;
       border-image-repeat: stretch;
       background: #000;
@@ -358,7 +358,7 @@
     .nav [data-filter] {
       border-image-outset: 1px;
       border-image-width: 30px;
-      border-image-source: url(https://cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+      border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
       border-image-slice: 25;
       border-image-repeat: stretch;
     }
@@ -373,7 +373,7 @@
   .nav-btn {
     border-image-outset: 1px;
     border-image-width: 30px;
-    border-image-source: url(https://cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+    border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
     border-image-slice: 25;
     border-image-repeat: stretch;
   }
@@ -411,7 +411,7 @@
     #btn-family, #btn-everything  {
       border-image-outset: 3px;
       border-image-width: 30px;
-      border-image-source: url(https://cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+      border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
       border-image-slice: 20;
       border-image-repeat: stretch;
       background: #000;
@@ -473,16 +473,393 @@
     </svg>
   </div>
   <div class="cms">
-    <div class="w-dyn-list">
-      <div role="list" class="w-dyn-items">
-        <div role="listitem" class="w-dyn-item">
-          <div class="w-embed w-script">
-            <script>
+    <div class="w-dyn-list"><div role="list" class="w-dyn-items"><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
 	window.items = window.items || [];
   window.items.push({
-  	id: ``,
-    name: decodeHTML(``),
-    image: ``,
+  	id: `hortencia`,
+    name: decodeHTML(`Hortencia Glimmerwick “The Show Before the Storm&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a33672d962870c86833_M_F-01.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Hortencia is living theater, always mid-gasp like the world’s about to end because someone finished the snacks. She thrives on spectacle, if there isn’t chaos, she’ll create it, complete with dramatic exits and teary toasts. She’s the archetype of “Romantic Chaos”: magnetic, glamorous, impossible to ignore, and exhausting in the best way. Janice calls her a masterpiece of performance; Ziggo just calls her a headache. Either way, no family gathering is complete without her latest production.`,
+    category: `monsters`,
+    parent: `janice`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `spatter`,
+    name: decodeHTML(`Spatter Roarborn &quot;The Overcorrection&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a5003094b86ada5bf25_M_F-02.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Spatter swears she’s not dramatic, which is, of course, the most dramatic thing you can say. She grew up surrounded by shouting (Bellowan, mostly), so now she’s overcompensating with what she calls “emotional restraint” and everyone else calls “weird tension.” She’s trying to be chill. She really is. But her version of chill looks like bottling everything up until it bursts out sideways, usually in the form of a monologue or an accidental public meltdown. The mess isn’t on purpose… it’s just hereditary. Still, there’s something deeply lovable about Spatter’s chaos. She’s the first to clean up a disaster, usually one she caused, and the last to leave a party she swore she wasn’t attending. Being `,
+    category: `monsters`,
+    parent: `bellowan`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `craig`,
+    name: decodeHTML(`Craig Dirtle “The Reliable Wildcard”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a65085a37dc8093cf64_M_F-03.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Craig will call you “family” before you even finish your drink the first time you meet him, and somehow, you’ll believe him. Son of Siddles, he inherited that Dirtle gift for connection, but somewhere along the way, it got tangled up with self-preservation. He’s magnetic, steady, and loyal until loyalty gets inconvenient. There’s a certain sparkle in his one eye that makes you feel seen, but also quietly evaluated. When Craig promises he’s got your back, he means it, he’s just also making sure you’re not standing too close to his. Still, for all his guardedness, you can’t stay mad. There’s something about him that makes every betrayal feel like an accident you almost forgive.
+`,
+    category: `monsters`,
+    parent: `siddles`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `murn`,
+    name: decodeHTML(`Murn Roarborn “The Hidden Flame”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a7d98928ab373b7c831_M_F-04.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Murn is all still water with dangerous undertow. Quiet, calculating, and impossible to read, he sits back while everyone else burns themselves out, only to drop one perfectly-timed remark that tilts the entire room. He doesn’t waste energy, but when he chooses to engage, it matters. People either love him for his insight or hate him for being right, but either way, they remember it. Murn is the monster archetype of hidden depth, reserved, mischievous, and sharper than you realize until it’s too late.`,
+    category: `monsters`,
+    parent: `cinder`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `plink`,
+    name: decodeHTML(`Plink Roarborn “The Sparkplug”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a9b48140221fc479edb_M_F-05.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Plink inherited Cinder’s fire but uses it like a sparkler at a house party, flashy, silly, and slightly dangerous if you’re not paying attention. He’s the type who starts ten things at once, forgets half of them, and still somehow pulls it off with charm. Endlessly entertaining, occasionally exhausting, Plink is the one who will make you laugh until you choke while also setting something on fire in the background. He’s the monster archetype of reckless joy, beloved, unpredictable, and impossible to ignore.`,
+    category: `monsters`,
+    parent: `cinder`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `janice`,
+    name: decodeHTML(`Janice Glimmerwick &quot;The Soft Howl&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ab7a0d92b92f0069c3d_M_F-06.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Janice is the matriarch of the Glimmerwicks, the first to turn raw feeling into performance and make heartbreak look like ritual. She feels deeper, hurts louder, loves harder turning it all into her art. Every dramatic descendant of hers still carries that echo, the hunger to turn pain into something that means something. She’s a beautiful mess, all soul, no filter, and about three feelings away from a breakdown or a revelation (sometimes both). Beneath all the color and noise, though, she’s soft. The kind who pretends she doesn’t care but secretly feels everything and everyone. She’ll tell you she’s fine, even when she’s falling apart, because that’s how she was raised, to keep singing through the ache and call it living. The rest of the monsters say she feels too much, but Janice swears that’s the point: “If you’re not breaking a little, you’re not alive.”`,
+    category: `monsters`,
+    parent: `popsy-wolf`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `druthal`,
+    name: decodeHTML(`Druthal Roarborn “The Reluctant Volcano”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ac99b40ad39ec82a081_M_F-07.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Druthal is one of the ancients, he and Veyla emerged as siblings from the primordial clay, and while Siddles became the family’s quiet root, Druthal burned into its firebrand. His branch runs hot: his children are loud, reckless, and spectacular, and he wouldn’t have it any other way. His face is carved from centuries of watching fools repeat the same mistakes, every crease a record of history’s stubborn loops. He doesn’t hand out wisdom so much as mutter strange fragments that sound profound, until you realize they might just be nonsense. Still, his presence carries weight, and the fire still burns steady.`,
+    category: `monsters`,
+    parent: `popsy-wolf`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `fratch`,
+    name: decodeHTML(`Fratch Glimmerwick “The Performing Storm”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52add5fe42fcabd1a38e6_M_F-08.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Fratch doesn’t process emotions, he performs them. Everything’s a bit, a story, a song that accidentally turns into a confession. He talks fast, laughs loud, and fills every silence like it’s an emergency. He calls it energy; Gush calls it avoidance. Still, there’s something magnetic about the way he keeps it all in motion, a blur of jokes, feelings, and half-finished projects, as if stopping might make everything hit at once. He’s chaos with a pulse, and somehow, it’s impossible not to love him for it.`,
+    category: `monsters`,
+    parent: `gush`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `gabbles`,
+    name: decodeHTML(`Gabbles Dirtle “The Family Megaphone”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b0abd91355ac9142f42_M_FP-09.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Gabbles can’t keep a secret to save her pot. She says it’s not gossip, it’s emotional circulation. She feels everything and everyone, like a satellite tuned to the family’s collective nervous system, then retells it all with a little extra flair (and a few incorrect details). It’s her way of trying to make sense of what’s happening around her, it’s not gossip, it’s processing. She swears it’s out of love, and honestly, it is. Her chatter keeps the Dirtles stitched together, even if it drives Stubbs to groan and Gush to leak. She’s the monster who’ll comfort you, quote you, and accidentally broadcast your breakdown by dessert, all with tears in her eyes and dirt under her nails.`,
+    category: `monsters`,
+    parent: `siddles`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `gribble`,
+    name: decodeHTML(`Gribble Dirtle “The Earnest Meddler”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b2fccc854a48bea86fc_M_FP-10.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Gribble is the family’s golden retriever of mischief, bright-eyed, helpful, and absolutely terrible at minding her own business. The second child of Gabbles, she inherited her urge to connect and Peepers’ curiosity, which is to say: trouble. Gribble is the one who “accidentally” forwards the group message, blurts out surprises too early, and then tries to fix it with snacks and apologies. The Dirtles keep her around because, somehow, her disasters always end up bringing everyone closer. Underneath the mud and manic grin, Gribble’s just trying to make sure no one ever feels left out, even if it means oversharing for the greater good.`,
+    category: `monsters`,
+    parent: `gabbles`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `moro`,
+    name: decodeHTML(`Moro Roarborn “The Self-Aware Wildfire”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b4d6f48d1c6740acd3a_M_F-11.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Moro swears she’s not like her father, less roar, more “intentional flame.” And yet, every time she promises to stay calm, something bursts into smoke. She’s the kind of monster who journals about patience, then yells at her reflection for not growing fast enough. Druthal says she’s his “lesson in humility,” though she suspects he means “karma.” Still, for all her dramatics, Moro burns with purpose. She’s learning, slowly, that fire isn’t just for destruction. Sometimes, it’s for light, warmth, or the occasional righteous meltdown.`,
+    category: `monsters`,
+    parent: `druthal`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `bellowan`,
+    name: decodeHTML(`Bellowan Roarborn &quot;The Echo Chamber&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b5cc82308a962bd91fb_M_F-12.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Bellowan doesn’t speak, he projects. Every sentence sounds like a public announcement, even if he’s just saying “good morning.” Subtlety? Never met her. Born from Druthal’s fiery line, he turned “roar” into a personality trait and hasn’t used an indoor voice since. He’s the kind of monster who thinks volume equals vulnerability, if he’s yelling, it must be heartfelt. He’s all passion, no pause button, and when he gets emotional (which is hourly), it’s everyone’s problem. Still, you can’t help but love him. He cheers too loud, laughs too hard, and somehow makes every room feel like a standing ovation. Bellowan’s chaos is exhausting, but it’s also kind of inspiring, proof that being too much is sometimes exactly enough.`,
+    category: `monsters`,
+    parent: `druthal`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `cinder`,
+    name: decodeHTML(`Cinder Roarborn “The Overheated Caregiver”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c288e19fe35fe917eb3_M_FC-14.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Cinder’s been “fine” for about three seconds in her entire life. She feels everything, too much, too loud, too soon, and somehow drags everyone else into it like it’s a group project. When she’s happy, she glows; when she’s angry, she radiates. The family stopped letting her near candles after The Incident (which she swears was “mostly experimental”). She inherited Druthal’s spark but none of his filter, and her idea of conflict resolution is usually to shout “I love you, but you’re wrong!” Still, she’s the first to show up when someone’s hurting, crying, defending, or both at once. Cinder doesn’t just bring the heat, she is the heat: unpredictable, loyal, and impossible to ignore.`,
+    category: `monsters`,
+    parent: `druthal`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `fennick`,
+    name: decodeHTML(`Fennick Dirtle “The Over-Observer”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c345be0d592d5f69b6e_M_F-15.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Fennick grew up convinced that if he just watched closely enough, nothing bad could happen. Raised under Craig’s “trust me, kid” brand of chaos, he learned early that paying attention was a survival skill. These days, he’s got an eye on everything, literally. He pops one out to keep tabs on the room, swearing it helps him “stay ahead of disappointment.” Fennick over-explains, over-thinks, and apologizes mid-sentence for things that haven’t gone wrong yet. Still, he’s sweet about it, more endearing than paranoid. Marnie says he inherited all of Craig’s nerves but none of his charm; Orbin just calls him “our family surveillance system.”`,
+    category: `monsters`,
+    parent: `craig`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `orbin`,
+    name: decodeHTML(`Orbin Dirtle “The Detached Charmer”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c4c9aba7881ec01c53f_M_F-16.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Orbin learned early that in the Dirtle family, the loudest feelings get the least attention. So he made detachment an art form. Where his sister Marnie spirals, Orbin shrugs; where others overshare, he cracks a joke and changes the subject. Raised by Craig, who called every broken promise “a learning experience,” Orbin built his personality around staying one emotional step removed. He’s funny, magnetic, and everyone thinks he’s fine… but that’s kind of the point. Underneath the calm exterior, he’s constantly managing how much of himself to show. Still, there’s something comforting about him, like he’s been through every storm already and decided to just hand you an umbrella instead of making it a big deal.`,
+    category: `monsters`,
+    parent: `craig`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `marnie`,
+    name: decodeHTML(`Marnie Dirtle “The Tender Overthinker”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c5dbc9faf057cf4ded5_M_F-17.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Marnie grew up learning that love could change its tone mid-sentence. Daughter of Craig, the Dirtle you want to trust but probably shouldn’t, she learned early to listen for the quiet shifts under people’s words. Now she feels everything twice: once for herself and once for whoever’s nearby. Marnie tries to make everyone comfortable, even when it knots her stomach; she smooths tension like it’s her job. She over-explains, over-apologizes, and then beats herself up for doing both. But here’s the thing, Marnie’s softness isn’t weakness; it’s survival that turned gentle. She’s chaos-resilient, heartbreak-fluent, and somehow still believes people mean well.
+`,
+    category: `monsters`,
+    parent: `craig`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `ziggo`,
+    name: decodeHTML(`Ziggo Glimmerwick &quot;The Shapeshift Kid&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c75a32b0fa93bbd6633_M_F-18.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Ziggo was born mid-transformation and just… never stopped. He’s got his mother Janice’s soul, but instead of crying about it, he paints it gold and sells tickets. Every day’s a new phase, a new persona, a new attempt at sincerity that somehow still ends up looking like art. He’s charming, weird, and exhausting in equal measure, the kind of monster who calls his breakdowns “creative direction” and means it. Beneath the showmanship, though, there’s a quiet kind of ache, the awareness that if you’re always becoming something new, you never really get to be. Still, Ziggo doesn’t mind. He says identity’s just another costume, and the trick is to wear it until it fits. The rest of the Glimmerwicks think he’s a genius or a lunatic (depending on the lighting), but everyone agrees on one thing: wherever Ziggo goes, reality bends a little to make room.`,
+    category: `monsters`,
+    parent: `janice`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `sunder`,
+    name: decodeHTML(`Sunder Roarborn “The Argument in Progress”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c85f17e6f6420f2c3e9_M_F-19.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Sunder was born mid-argument and just… never stopped. Two brains, one mouth, zero chance of peace. Every thought he has tries to come out at once, which means most of his sentences end in a frustrated growl or a dramatic sigh. He calls it “deep thinking” and no one really wants to correct him. Druthal says he inherited the family fire twice over, and it shows. He&#39;s passionate, loud, and somehow always a little singed. Still, it’s hard not to love him; he’ll debate you to the brink of madness, then hand you a snack like nothing happened. Sunder doesn’t argue to win, he argues because he can’t help it… though winning is definitely a bonus.
+`,
+    category: `monsters`,
+    parent: `druthal`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `droozle`,
+    name: decodeHTML(`Droozle Roarborn &quot;The Joy Emergency&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c94de22c7e30f40e5cd_M_F-20.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Droozle is the eternal optimist. He’ll gush about the weather, your haircut, or the way the chips taste today, grinning like everything’s a miracle. But every so often, the smile cracks, he’ll go wide-eyed, hiss “fuck olives,” or declare some random thing the worst abomination on earth. Then, just as fast, he’s back to sunshine and giggles, leaving everyone unsettled but strangely charmed. His dad Sunder pretends he doesn’t understand where Droozle gets it, but the family knows the answer: over-feeling runs deep in their branch.`,
+    category: `monsters`,
+    parent: `sunder`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `peepers`,
+    name: decodeHTML(`Peepers Dirtle “The Relentless Observer”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ca624f6247993caf2c4_M_F-21.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Peepers doesn’t just see everything, he collects it, like gossip is his inheritance. The son of Gabbles, he turned her habit of “processing out loud” into a full-blown art form. Every look, every slip-up, every side comment, it all goes into Peepers’ personal museum of family moments, ready to bring it back up at the worst possible time. Loud, stained, and proud of it, he swears he’s just “keeping the record straight,” but everyone knows he edits the story for drama. His wandering eye (literally) means the Dirtles never quite know when they’re being watched,  or worse, remembered.`,
+    category: `monsters`,
+    parent: `gabbles`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `ned`,
+    name: decodeHTML(`Ned Glimmerwick &quot;The Gentle Panic&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52cdff3599d418fe0e396_M_F-22.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Ned’s the kind of monster who says he’s “fine” while clearly holding back tears and blood pressure. Raised by Hortencia, who believes volume equals healing, he learned early how to manage chaos by apologizing to it. There’s something endlessly lovable about him, though: he’s nervous, sincere, and always trying to do the right thing, even if it means overthinking himself into a coma.He feels everything at once, pride, guilt, existential dread, and it all leaks out his nose a little. The family lets him talk through it because watching him spiral is half therapy, half performance art. Still, Ned’s the glue in the mess. He’s the one who checks in after every argument, makes sure everyone’s okay, and somehow still blames himself. The others tease him for being soft, but when the dust settles, Ned’s always the one sweeping it up, shaking, smiling, and saying, “It’s okay! It’s all part of the process!”`,
+    category: `monsters`,
+    parent: `hortencia`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `dax`,
+    name: decodeHTML(`Dax Glimmerwick “The Overthinker with Great Timing”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52cee085a37dc80942181_M_F-23.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Dax is a Glimmerwick with a mic and a moral compass that keeps recalibrating. Born with one foot in wisdom and the other in a mouth he can’t seem to close, he’s the monster who’ll make a full confession just to prove he’s self-aware. It’s oddly endearing, like watching someone trip on enlightenment. He’s got Janice’s soul-deep empathy but uses it for debates, self-reflection, and unsolicited advice. Every mistake becomes a “lesson,” every lesson becomes content, and somehow it all lands because, annoyingly, he means it. When the family’s losing it, Dax plays mediator-slash-mess. He’ll analyze your trauma with startling precision, then immediately step in it himself. Still, everyone loves having him around, he’s proof that even the most chaotic monster can grow… provided he’s narrating it in real time.`,
+    category: `monsters`,
+    parent: `janice`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v24`,
+    name: decodeHTML(`V24`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d254b51fe30c1af9064_M_F-24.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `monsters`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `pigpen`,
+    name: decodeHTML(`Pigpen Glimmerwick &quot;The Dirty Charmer&quot;`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d366f48d1c6740b104b_M_F-25.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Pigpen is what happens when passion forgets to shower. The most down-to-earth of the Glimmerwicks, he’s got a soul that hums like an old amp and a heart that leaks honesty. He doesn’t sparkle like his dad Ziggo or howl like Grandma Janice, he just shows up, plays the blues of his own making, and lets everyone else figure out what it means. He’s got a knack for making chaos look casual, the kind of monster who’ll give life advice that sounds like nonsense until six months later when you realize he was right. Quietly magnetic, surprisingly loyal, and never fully clean, Pigpen believes in two things: good company and better messes.`,
+    category: `monsters`,
+    parent: `ziggo`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `siddles`,
+    name: decodeHTML(`Siddles Dirtle &quot;The Calm Before Everyone Else”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d47f7eb7efd0114e0e7_M_F-26.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Siddles is the original root, the one who showed up first and somehow set the tone for everything that followed. He doesn’t need to brag, every monster swears they carry a piece of him anyway: Gribble’s manic spark, Gabbles’ endless stories, Gush’s tidal wave of feelings. Siddles doesn’t demand or scold, but his presence alone radiates a quiet “make me proud” that gets under everyone’s skin. He’s the archetype of steady gravity, the one you measure yourself against whether you want to or not. Loving, patient, but impossible to fool, Siddles is proof that even chaos has a backbone.`,
+    category: `monsters`,
+    parent: `popsy-wolf`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `stubbs`,
+    name: decodeHTML(`Stubbs Dirtle “The Blunt Caretaker”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68ca6d5753c5f7b1ee9ecb6f_M_AP-28.jpg`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Stubbs is built like a brick and twice as stubborn. He talks shit like it’s a love language, heckling everyone in reach, especially Gush, who he swears could turn into a puddle if you looked at him too hard. He swears he’s the foundation of the family, and honestly? He’s not wrong. Stubbs doesn’t do vulnerability; he does commentary. But beneath all that noise is someone who keeps everyone steady just by showing up. Siddles calls him his “favorite accident,” and the rest of the Rootkins know the truth: without Stubbs, the whole thing might actually fall apart.`,
+    category: `monsters`,
+    parent: `siddles`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `gush`,
+    name: decodeHTML(`Gush Glimmerwick “The Overwhelmed Empath”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d6e513520b6bbe4a208_M_FP-29.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Gush has no chill, none. He’s the type that soaks up everyone else’s tension like a sponge and then leaks it out in nervous sweat, sighs, or way-too-honest overshares. Gush is the monster equivalent of a “cry in the bathroom stall, then come back making jokes” archetype: deeply feeling, a little dramatic, and somehow still endearing. He’s the friend who insists he can carry your baggage… and then immediately trips over it, apologizing while still holding on. It’s exhausting, but it’s also what makes him magnetic: he cares even when he shouldn’t.`,
+    category: `monsters`,
+    parent: `janice`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v01`,
+    name: decodeHTML(`V01`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52e20f17e6f6420f2ea99_V_F-02.avif`,
     price: ``,
     color: ``,
     size: ``,
@@ -491,24 +868,12 @@
     parent: ``,
     label: ``,
   });
-</script>
-          </div>
-        </div>
-      </div>
-      <div class="w-dyn-empty">
-        <div>No items found.</div>
-      </div>
-    </div>
-    <div class="w-dyn-list">
-      <div role="list" class="w-dyn-items">
-        <div role="listitem" class="w-dyn-item">
-          <div class="w-embed w-script">
-            <script>
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
 	window.items = window.items || [];
   window.items.push({
-  	id: ``,
-    name: decodeHTML(``),
-    image: ``,
+  	id: `v05`,
+    name: decodeHTML(`V05`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52e6ffc99ad9993d3c100_V_B-05.avif`,
     price: ``,
     color: ``,
     size: ``,
@@ -517,24 +882,26 @@
     parent: ``,
     label: ``,
   });
-</script>
-          </div>
-        </div>
-      </div>
-      <div class="w-dyn-empty">
-        <div>No items found.</div>
-      </div>
-    </div>
-    <div class="w-dyn-list">
-      <div role="list" class="w-dyn-items">
-        <div role="listitem" class="w-dyn-item">
-          <div class="w-embed w-script">
-            <script>
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
 	window.items = window.items || [];
   window.items.push({
-  	id: ``,
-    name: decodeHTML(``),
-    image: ``,
+  	id: `v11`,
+    name: decodeHTML(`V11`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52edca3bd2d8325eb98a3_V_FP-11.avif`,
+    price: `300`,
+    color: ``,
+    size: `Big`,
+    description: `This bold red vase stands out with its vibrant hue, a perfect centerpiece to add passion and energy to any room. Its smooth surface and classic silhouette make it versatile, equally suited for modern interiors or traditional spaces, bringing warmth and a touch of drama wherever it is placed.`,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `33`,
+    name: decodeHTML(`V13`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52f6908a0af94ec3309f1_V_F-13.avif`,
     price: ``,
     color: ``,
     size: ``,
@@ -543,17 +910,992 @@
     parent: ``,
     label: ``,
   });
-</script>
-          </div>
-        </div>
-      </div>
-      <div class="w-dyn-empty">
-        <div>No items found.</div>
-      </div>
-    </div>
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `34`,
+    name: decodeHTML(`V14`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52f8aa37cab4485db3d92_V_FP-14.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v15`,
+    name: decodeHTML(`v15`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52fa497c5c95f435e6a3b_V_F-15.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v16`,
+    name: decodeHTML(`v16`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52fcd55c56a4153580ddc_V_F-16.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v17`,
+    name: decodeHTML(`v17`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ff38222f4be99e88c9a_V_FP-17.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v18`,
+    name: decodeHTML(`v18`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53042786e9601dfee444f_V_B-18.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `d1`,
+    name: decodeHTML(`D1`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c530c7afa82f97b076f0e0_D_F-01.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `40`,
+    name: decodeHTML(`D2`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c530efd8c56c63df81c45e_D_F-02.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `d3`,
+    name: decodeHTML(`D3`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5310c4ff61df057d1d98c_D_F-03.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `42`,
+    name: decodeHTML(`D4`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53129e83ded5e047d8a47_D_F-04.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v21`,
+    name: decodeHTML(`V21`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53143566efc0cf43862d4_V_F-21.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `v19`,
+    name: decodeHTML(`V19`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5316bf6811a2b55f2f618_V_F-19.jpg`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `45`,
+    name: decodeHTML(`v18`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5319383cf51eb4fc58855_V_F-18.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `d5`,
+    name: decodeHTML(`D5`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c531bc19032b1bb80ce45d_D_F-05.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `D6`,
+    name: decodeHTML(`D6`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c531db58b353ecd4d4f5b0_D_F-06.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `4d7`,
+    name: decodeHTML(`D7`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c531f446ec6241e8169fc8_D_F-07.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `d8`,
+    name: decodeHTML(`D8`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5320b693443a79bce0877_D_F-08.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `d9`,
+    name: decodeHTML(`D9`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5321eba71425f530e9d9e_D_F-09.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `d10`,
+    name: decodeHTML(`D10`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53237b95895d194b02ca9_D_F-10.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `52`,
+    name: decodeHTML(`Half Bowl Set`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5329c94d4d9cb1e58c78d_D_F-CupStA_ck.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `kitchen`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `53`,
+    name: decodeHTML(`Plate Set`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5327a36ebcb5a1127e3f7_D_F-PlA_teStA_ck.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `5d11`,
+    name: decodeHTML(`D11`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c532842646441b0d279ac9_D_F-11.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `55`,
+    name: decodeHTML(`Full Bowl Set`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c532b93205e441149ad2ce_D_F-CupStA_ck2.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p01`,
+    name: decodeHTML(`P01`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c532dcfc99ad9993d45415_P_B-01.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `plants`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p02`,
+    name: decodeHTML(`P2`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c533146d00d8cf43e82723_P_F-02.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p3`,
+    name: decodeHTML(`p3`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c533299229f5f0e5dd2faa_P_F-03.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `plants`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p4`,
+    name: decodeHTML(`P4`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5333f56e51d2626166cb8_P_F-04.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `plants`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p5`,
+    name: decodeHTML(`P5`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53360c7a2a82fcfa84ba9_P_F-05.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p6`,
+    name: decodeHTML(`P6`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5337bf7eb7efd0115d82c_P_F-06.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p7`,
+    name: decodeHTML(`P7`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5339882091e31c38bd6e5_P_F-07.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p8`,
+    name: decodeHTML(`P8`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c533aeaec39e36ca71dc0c_P_F-08.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p9`,
+    name: decodeHTML(`P9`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c533cae724789b678cfffb_P_F-09.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p10`,
+    name: decodeHTML(`P10`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c533dd6a5b3c93c9c0fca3_P_F-10.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p11`,
+    name: decodeHTML(`P11`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c533ee5b920c71828c3fac_P_F-11.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `p12`,
+    name: decodeHTML(`p12`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53406a1235944e69a498f_P_F-12.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a1`,
+    name: decodeHTML(`A1`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5343bc6402efc7fbec4e6_A_F-01.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a2`,
+    name: decodeHTML(`A2`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5346325c6a6c8dd50e233_A_F-02.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a3`,
+    name: decodeHTML(`A3`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5347dbce64aae0b39a213_A_F-03.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `kitchen`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a4`,
+    name: decodeHTML(`A4`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5349c5ed4bf0ddba0e197_A_F-04.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a5`,
+    name: decodeHTML(`A5`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c534b3513520b6bbe56ef0_A_F-05.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `b1`,
+    name: decodeHTML(`B1`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c534c8f8eeadead6346838_B_F-01.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a6`,
+    name: decodeHTML(`A6`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5350733b7296eb92bdf15_A_F-06.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `kitchen`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a7`,
+    name: decodeHTML(`A7`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53527918bdf72ba06ca05_A_F-07.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a8`,
+    name: decodeHTML(`A8`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5353f918bdf72ba06ccca_A_F-08.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `q9`,
+    name: decodeHTML(`A9`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5354edc31fb4667f17b66_A_F-09.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `set1`,
+    name: decodeHTML(`Set 1`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5356995543153b432b1e6_A_F-15161718.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a10`,
+    name: decodeHTML(`A10`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c535be876c240bfd897e2f_A_F-10.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a11`,
+    name: decodeHTML(`A11`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c535e63e66ed943079a892_A_F-12.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a2-5m50u`,
+    name: decodeHTML(`A12`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53608a7a0ef978d6051de_A_F-13.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a13`,
+    name: decodeHTML(`A13`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c53628e44a82aa4f1375de_A_F-14.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a14`,
+    name: decodeHTML(`A14`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5366080253efe732c0d04_A_F-19.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `84`,
+    name: decodeHTML(`A15`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5368c2f274b787a42c8fa_A_F-21.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a16`,
+    name: decodeHTML(`A16`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c536a78222f4be99e966e0_A_F-22.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a17`,
+    name: decodeHTML(`A17`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5350733b7296eb92bdf15_A_F-06.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a18`,
+    name: decodeHTML(`A18`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c536ef8555477e7a98ddc2_A_F-23.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a19`,
+    name: decodeHTML(`A19`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c537081eb5a797aeb355e3_A_F-24.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a20`,
+    name: decodeHTML(`A20`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5371fcf5cbcc2a5c2e898_A_F-29.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: ``,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `m30`,
+    name: decodeHTML(`M30`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5372f58b353ecd4d59a3c_A_F-2526.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `plants`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a22`,
+    name: decodeHTML(`A22`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c537498bc02fcf94ca586c_A_F-2728.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `kitchen`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `a23`,
+    name: decodeHTML(`A23`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c5371fcf5cbcc2a5c2e898_A_F-29.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `kitchen`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `popsy-wolf`,
+    name: decodeHTML(`Popsy`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68f19809d22920c2d8ce8df4_68c9d26538d9c84e74e5a1fb_popsy-logo.avif`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: ``,
+    category: `monsters`,
+    parent: ``,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `lola-doomsy-glimmerwisk`,
+    name: decodeHTML(`Lola &amp; Doomsy Glimmerwisk`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68f7ed63f2f1316a54a5134e_M_A-30.jpg`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Lola &amp; Doomsy are technically two monsters, but try telling them that. They share one nervous system and two wildly different moods, Lola’s all reckless optimism, Doomsy’s pure existential dread. Together, they balance out to something resembling “fine. They inherited their father Ziggo’s flair for drama and their grandmother Janice’s emotional range, which means every minor inconvenience becomes a full season arc. Lola believes everything’s a sign from the universe; Doomsy thinks the universe is out to get her. They both might be right. Family gatherings usually end with Lola crying happy tears and Doomsy crying regular ones, but they wouldn’t have it any other way. The Glimmerwicks call them “a lot,” but they prefer the term “collaborative masterpiece.”`,
+    category: ``,
+    parent: `ziggo`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `frillik`,
+    name: decodeHTML(`Frillik Dirtle “The Two-Thought Tango”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f0175d389acf89bd6515da_5-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Frillik is never having just one thought, and neither of them can agree on anything. One side scans for what could go wrong while the other rushes to smooth it over before it does, creating a kind of emotional choreography no one asked for. He was formed mid-compromise, somewhere between honesty and likability, and he has been negotiating with himself ever since. Frillik is the monster equivalent of saying “it’s all good” while internally hosting a full debate panel. The thing is, he notices everything. The shift in tone, the unsaid tension, the moment someone feels left out. It is exhausting, but it also means he cares in a way most creatures do not. If you watch closely, you will notice neither of him is leading, but somehow he still makes space for everyone else to feel held.`,
+    category: `monsters`,
+    parent: `peepers`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `noshik`,
+    name: decodeHTML(`Noshik Roarborn “The Backup Miracle”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f018b37e8faface2a89192_21-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Noshik believes in miracles. Fully. Wholeheartedly. No notes. He just also believes it would be irresponsible not to have a backup. Arms out, already offering, already insisting, he moves through life like things will work out, but only because he made sure they could. He was formed in that space between faith and practicality, which is why he shows up early, brings extra, and somehow has exactly what is needed before anyone asks. You say it will all come together and he agrees, while quietly setting up three ways it cannot fall apart. The truth is, he loves when a miracle happens. He just prefers to be the reason it does.`,
+    category: `monsters`,
+    parent: `plink`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `tav`,
+    name: decodeHTML(`Tav Roarborn`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f019faaba6b5564a51d31d_30-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Tav is not interested in keeping things comfortable. One hand stays close, steady, present, while the other makes it clear she is not here for the version of the story that sounds better than it is. She has a way of clocking what is off almost immediately, like your body told her before you did. You might try to smooth it over. You might joke. You might almost get away with it. She will let you try. She just will not let you skip it. She has a way of cutting through just enough to let something real breathe. The truth is, Tav does care. Deeply. She just knows that healing does not come from being handled gently all the time. Sometimes it starts the second you stop pretending you are fine.`,
+    category: `monsters`,
+    parent: `murn`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `tiv`,
+    name: decodeHTML(`Tiv Roarborn “The Gentle Undoing”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01a8b4e5faff514f89aa8_28-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Tiv does not say much, which is how people end up saying more than they planned. He listens with a kind of patience that feels almost suspicious, like he already knows there is something underneath what you are saying and is willing to wait for it. He was formed in stillness, the kind that does not rush to fill space, which is why being around him can feel both comforting and a little exposing. You start talking just to break the silence, and then keep going because he does not interrupt. The truth is, Tiv is not trying to get anything out of you. He just stays long enough for you to hear yourself clearly. And once you do, it is hard to pretend you did not.`,
+    category: `monsters`,
+    parent: `murn`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `darlene`,
+    name: decodeHTML(`Darlene &quot;gimme 5&quot; Dirtle `),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01b16f33ce27956ef4e62_2-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Darlene loves what she does. She really does. She just did not realize how much of herself it would take to keep doing it this way. She shows up, follows through, holds things together, and makes it look easier than it is, which is part of the problem. Somewhere along the way, being needed became the same thing as being okay, and she has been running on that math ever since. She is not resentful. She is just… tired in a way that does not get fixed by sleep. The truth is, Darlene does not need to care less. She just needs a moment where nothing is asking anything from her. And she might not take it unless someone reminds her she is allowed to.`,
+    category: `monsters`,
+    parent: `marnie`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `gumphrey`,
+    name: decodeHTML(`Gumphrey Glimmerwick “The Beautiful Detour”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01b90c3ff5c22c5a895a3_19-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Gumphrey does not need things to make perfect sense to get involved. In fact, he prefers a little confusion. He moves through life like the details will sort themselves out eventually, and honestly, they usually do. He was formed somewhere between curiosity and a refusal to overthink it, which is why he tends to say yes before fully understanding what he is agreeing to. It is not that he lacks awareness. It is that he does not believe everything needs to be solved before it can be enjoyed. The truth is, Gumphrey trusts that something good is happening, even if it is a little chaotic getting there. And more often than not, he ends up being right.`,
+    category: `monsters`,
+    parent: `pigpen`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `dremmel`,
+    name: decodeHTML(`Dremmel Dirtle “The Realization In Progress”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01ec98f815664271941a1_31-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Dremmel realizes things while they are already happening, which is both helpful and not. He moves through moments like a live commentary track, catching patterns just in time to notice them but not always in time to change them. He was formed in that exact space between reaction and awareness, which is why he is constantly mid-adjustment. It is not that he does not know better. It is that the knowing arrives a few seconds late and insists on being included anyway. The truth is, Dremmel is getting closer. Every time he notices, something shifts, even if it is small. And eventually, those small shifts start happening sooner.`,
+    category: `monsters`,
+    parent: `fennick`,
+    label: ``,
+  });
+</script></div></div><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `gorble`,
+    name: decodeHTML(`Gorble Roarborn “The Big Leap”`),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01f6c4bd1f77c68dc7308_25-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Gorble does not ease into things. He arrives already involved. He meets moments like they have been waiting for him specifically, which is how he ends up caring before it is entirely reasonable. He&#39;s the kinda monster who always says yes with his whole body and figures out the details later. It is not that he does not see the risks. It is that he does not believe they are a good enough reason to stay out of it. The truth is, Gorble lives a little ahead of certainty. And while that gets him into things quickly, it also lets him experience things most creatures never quite step into.`,
+    category: `monsters`,
+    parent: `droozle`,
+    label: ``,
+  });
+</script></div></div></div></div>
+    <div class="w-dyn-list"><div role="list" class="w-dyn-items"><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
+	window.items = window.items || [];
+  window.items.push({
+  	id: `tessik`,
+    name: decodeHTML(`Tessik “This Way or That” Glimmerwick `),
+    image: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f02149cf039fc4ea9773cc_20-Big.png`,
+    price: ``,
+    color: ``,
+    size: ``,
+    description: `Tessik sees more than one version of things at the same time, which makes moving forward both easier and harder than it should be. One eye tracks what is, the other what could be, and neither fully lets go. He lives in that space where two truths exist without canceling each other out, which is why he rarely feels certain but almost always feels aware. It is not that he cannot decide. It is that he understands what each path holds before taking it. Tessik does not need everything to resolve into one clean answer. He just carries both, and moves anyway.`,
+    category: `monsters`,
+    parent: `ned`,
+    label: ``,
+  });
+</script></div></div></div></div>
+    <div class="w-dyn-list"><div class="w-dyn-empty"><div>No items found.</div></div></div>
   </div>
   <div id="root" class="p-family__root"></div>
-  <a href="index.html" class="frame hide w-inline-block"><img src="images/popsy-logo.avif" loading="lazy" alt="" class="p-home__logo"></a>
+  <a href="/" class="frame hide w-inline-block"><img src="images/popsy-logo.avif" loading="lazy" alt="" class="p-home__logo"></a>
   <div id="details-backdrop"></div>
   <div class="details">
     <div id="details__title" class="details__title"></div>
@@ -601,17 +1943,13 @@
   </div>
   <div class="nav-wrapper">
     <div class="nav">
-      <div class="w-dyn-list">
-        <div id="filter-list" role="list" class="filter-list w-dyn-items">
-          <div data-filter="" role="listitem" class="filter-btn w-dyn-item">
-            <div class="w-dyn-bind-empty"></div>
-            <div class="embed-style w-embed">
-              <style>
+      <div class="w-dyn-list"><div id="filter-list" role="list" class="filter-list w-dyn-items"><div data-filter="plants" role="listitem" class="filter-btn w-dyn-item"><div>Plants</div><div class="embed-style w-embed"><style>
   @media screen and (min-width: 992px) {
-    body[data-filter=""] .nav #filter-list > div[data-filter=""] {
+    body[data-filter="plants"] .nav #filter-list > div[data-filter="plants"] {
       pointer-events: none;
     }
-    body[data-filter=""] .nav #filter-list > div:not([data-filter=""]) {
+
+    body[data-filter="plants"] .nav #filter-list > div:not([data-filter="plants"]) {
       border: 1px solid transparent;
       border-image-outset: 1px;
       border-image-width: 30px;
@@ -622,47 +1960,103 @@
       color: #000;
     }
   }
+  
   @media screen and (max-width: 991px) {
-    body[data-filter=""] .nav #filter-list > div[data-filter=""] {
+    body[data-filter="plants"] .nav #filter-list > div[data-filter="plants"] {
       background: #000;
       color: #fff;
     }  
   }
-</style>
-            </div>
-          </div>
-        </div>
-        <div class="w-dyn-empty">
-          <div>No items found.</div>
-        </div>
-      </div>
+</style></div></div><div data-filter="kitchen" role="listitem" class="filter-btn w-dyn-item"><div>Kitchen</div><div class="embed-style w-embed"><style>
+  @media screen and (min-width: 992px) {
+    body[data-filter="kitchen"] .nav #filter-list > div[data-filter="kitchen"] {
+      pointer-events: none;
+    }
+
+    body[data-filter="kitchen"] .nav #filter-list > div:not([data-filter="kitchen"]) {
+      border: 1px solid transparent;
+      border-image-outset: 1px;
+      border-image-width: 30px;
+      border-image-source: none;
+      border-image-slice: 25;
+      border-image-repeat: stretch;
+      background: transparent;
+      color: #000;
+    }
+  }
+  
+  @media screen and (max-width: 991px) {
+    body[data-filter="kitchen"] .nav #filter-list > div[data-filter="kitchen"] {
+      background: #000;
+      color: #fff;
+    }  
+  }
+</style></div></div><div data-filter="monsters" role="listitem" class="filter-btn w-dyn-item"><div>Monsters</div><div class="embed-style w-embed"><style>
+  @media screen and (min-width: 992px) {
+    body[data-filter="monsters"] .nav #filter-list > div[data-filter="monsters"] {
+      pointer-events: none;
+    }
+
+    body[data-filter="monsters"] .nav #filter-list > div:not([data-filter="monsters"]) {
+      border: 1px solid transparent;
+      border-image-outset: 1px;
+      border-image-width: 30px;
+      border-image-source: none;
+      border-image-slice: 25;
+      border-image-repeat: stretch;
+      background: transparent;
+      color: #000;
+    }
+  }
+  
+  @media screen and (max-width: 991px) {
+    body[data-filter="monsters"] .nav #filter-list > div[data-filter="monsters"] {
+      background: #000;
+      color: #fff;
+    }  
+  }
+</style></div></div></div></div>
     </div>
     <div id="nav-btn" class="nav-btn v--family">
       <div id="btn-family" class="btn-no-decor">Family Tree</div>
-      <a id="btn-everything" href="index.html" class="btn-no-decor">Everything</a>
+      <a id="btn-everything" href="/" class="btn-no-decor">Everything</a>
     </div>
   </div>
   <div class="about">
     <div class="about-link">about</div>
     <div class="about-popup-w">
       <div class="about-popup">
-        <div class="about-popup-c w-dyn-list">
-          <div role="list" class="about-popup-c w-dyn-items">
-            <div role="listitem" class="about-popup-content v--flex w-dyn-item">
-              <div class="about-popup-block v--img v--hide"><img src="https://d3e54v103j8qbb.cloudfront.net/plugins/Basic/assets/placeholder.60f9b1840c.svg" loading="lazy" alt="" class="about-popup-img w-dyn-bind-empty"></div>
-              <div class="about-popup-block v--scroll">
-                <div class="about-popup-block__grad"></div>
-                <div class="about-popup-block__grad v--bottom"></div>
-                <div class="about-popup-block__scroll v--scroll">
-                  <div class="about-space w-dyn-bind-empty"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="w-dyn-empty">
-            <div>No items found.</div>
-          </div>
-        </div>
+        <div class="about-popup-c w-dyn-list"><div role="list" class="about-popup-c w-dyn-items"><div role="listitem" class="about-popup-content v--flex w-dyn-item"><div class="about-popup-block v--img v--hide"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68e9924e072523dbebf9fb70_image8.jpeg" loading="lazy" alt="" class="about-popup-img"/></div><div class="about-popup-block v--scroll"><div class="about-popup-block__grad"></div><div class="about-popup-block__grad v--bottom"></div><div class="about-popup-block__scroll v--scroll"><div class="about-space">My therapist told me to get a hobby and Popsy Wolf was born. What started with weird plates, vases, and pots turned into a full-blown family of creatures: The Monsters.
+
+Each monster that crawls out of the kiln arrives with its own story, temperament, and let’s say… unique communication style. Together, they form a sprawling family of beautifully flawed little beings, loud ones, leaky ones, dramatic ones, and quiet ones pretending not to care.
+
+They aren’t just characters, they’re reflections. Each one carries a blend of chaos and sincerity, like the parts of us that are too weird, too sensitive, too much, but still have so much to offer. Their personalities mirror the beautifully messy humans we meet in the world, each with their own gifts, patterns, and blind spots. See yourself, feel the roast, and bask in the humanness of it all.
+
+But somewhere between the laughter and the clay, something else cracked open. The Monsters became little vessels for feeling, grief, love, confusion, whatever refused to stay tidy. They hold the emotions we can’t always name, turning them into something you can actually hold without breaking. They remind us that feeling too much doesn’t make you fragile, it makes you alive.
+
+At its core, Popsy Wolf is about the imperfection of life, the messiness of being human. The Monsters give each person who carries one a place to put their feelings when the world becomes… a lot. 
+
+“Let something else carry it all.” 
+
+It’s about finding the sacred in the stupid, the beautiful in the broken, and the real in the ridiculous.
+
+Every monster is a tiny myth about being human. Together, they remind us: grief and joy live in the same clay, family is messy, feelings are loud, and you’re not broken, you’re just handmade.
+
+*********
+THE MONSTER FAMILY 
+
+The Monsters are what happen when feelings grow limbs. Each one’s a little mirror, sculpted from clay, glazed in emotion, and carrying just enough chaos to feel familiar. Together, they make up a sprawling, dysfunctional, weirdly loving family.
+
+The lineage begins with three ancient elders:
+The Rootkins — descendants of Siddles, the quiet root. Grounded, patient, full of nervous love and unfinished thoughts. They carry the weight of “trying their best,” and somehow make it look good.
+
+The Roarborns — offspring of Druthal, the family’s resident fire hazard. Loud, impulsive, passionate, and occasionally right. They feel first, think later, and refuse to apologize for the smoke.
+
+The Glimmerwicks — children of Janice, the accidental matriarch. Performers, romantics, storytellers, and chaos magnets. They process emotions like it’s theater, and sometimes it actually is.
+
+Every monster has its own story, its own emotional weather system, but they’re all connected by one truth: feeling is messy, and that’s the point.
+
+They’re not here to fix you. They’re here to sit with you while you feel it, and maybe crack a little so you don’t have to. </div></div></div></div></div></div>
       </div>
       <div class="about-popup-bd">
         <div class="about-popup-close w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewbox="0 0 24 24" fill="none">
@@ -702,12 +2096,12 @@
 </script>
     </div>
   </div>
-  <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=689e729c65f81373b9f2b204" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="assets/d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
   <script src="js/webflow.js" type="text/javascript"></script>
-  <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js" type="text/javascript"></script>
-  <script src="https://cdn.prod.website-files.com/gsap/3.15.0/Flip.min.js" type="text/javascript"></script>
-  <script src="https://cdn.prod.website-files.com/gsap/3.15.0/SplitText.min.js" type="text/javascript"></script>
-  <script src="https://cdn.prod.website-files.com/gsap/3.15.0/Draggable.min.js" type="text/javascript"></script>
+  <script src="assets/cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js" type="text/javascript"></script>
+  <script src="assets/cdn.prod.website-files.com/gsap/3.15.0/Flip.min.js" type="text/javascript"></script>
+  <script src="assets/cdn.prod.website-files.com/gsap/3.15.0/SplitText.min.js" type="text/javascript"></script>
+  <script src="assets/cdn.prod.website-files.com/gsap/3.15.0/Draggable.min.js" type="text/javascript"></script>
   <script type="text/javascript">gsap.registerPlugin(Flip,SplitText,Draggable);</script>
   <script>
 	window.detailsEl = {

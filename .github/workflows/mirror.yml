@@ -1,20 +1,23 @@
-name: Mirror Webflow CMS
+name: Sync from Webflow
+# Run manually (Actions tab > Sync from Webflow > Run workflow) after editing CMS items in Webflow.
+# Pulls the published popsylovesyou.webflow.io pages, splices the CMS lists into index.html / family.html,
+# downloads every image locally into assets/, and commits to main (which redeploys on Vercel).
 on:
-  push:
-    paths: [".github/mirror-trigger"]
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  mirror:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: bash scripts/mirror.sh
+      - run: python3 scripts/splice.py _mirror
       - run: |
-          git config user.name "popsy-mirror"
+          rm -rf _mirror
+          git config user.name "popsy-sync"
           git config user.email "actions@users.noreply.github.com"
-          git checkout -b mirror-data
-          git add -f _mirror
-          git commit -m "Mirror Webflow CMS pages and assets"
-          git push -f origin mirror-data
+          git add -A
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "Sync CMS content from Webflow"
+          git push
