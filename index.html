@@ -238,6 +238,16 @@ a {
   .grid .product {
     will-change: transform;
   }
+  /* Hover video sits over the still image; it fades in on hover and fades out after its last loop */
+  .grid .column .product video {
+    display: block;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .grid .column .product[data-video-state="on"] video,
+  .grid .column .product[data-video-state="ending"] video {
+    opacity: 1;
+  }
   /* Every tile draws its divider lines so the seams match where the grid wraps */
   .grid .column .product::before {
     content: '';
@@ -2109,6 +2119,18 @@ a {
   const centerPos = window.innerWidth < window.innerHeight ? 49 : 54;
   window.items = window.items.toSpliced(centerPos, 0, window.popsyLogoItem);
   // Insert new properties inside items
+  // Hover videos live in assets/hover and are matched to pieces by image filename:
+  // M_F-01 -> M_A-01, M_FP-09 -> M_AP-09, M_FC-14 -> M_AC-14 (falls back to M_A / M_AC / M_AP of the same number)
+  const HOVER_VIDEOS = ['M_A-01','M_A-02','M_A-03','M_A-04','M_A-05','M_A-06','M_A-07','M_A-08','M_A-11','M_A-12','M_A-13','M_A-14','M_A-15','M_A-16','M_A-19','M_A-20','M_A-22','M_A-24','M_A-25','M_A-26','M_A-30','M_AC-04','M_AC-0405','M_AC-05','M_AC-12','M_AC-13','M_AC-14','M_AC-23','M_AP-09','M_AP-10','M_AP-28','M_AP-29'];
+  function hoverVideoFor(img) {
+    const m = (img || '').match(/(M_[A-Z]*)-(\d+)\.[a-z0-9]+$/i);
+    if (!m) return '';
+    const num = m[2];
+    const names = [m[1].replace(/^M_F/, 'M_A') + '-' + num, 'M_A-' + num, 'M_AC-' + num, 'M_AP-' + num];
+    const hit = names.find(n => HOVER_VIDEOS.includes(n));
+    return hit ? `assets/hover/${hit}.webm` : '';
+  }
+  window.items = window.items.map(item => ({ ...item, video: hoverVideoFor(item.img) || item.video }));
   window.items = window.items.map(item => {
   	let text = '';
     if (item.price) text += `<span>$${item.price}</span>`;
@@ -2451,24 +2473,42 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     }
     observeProducts() {
       if (window.innerWidth < 1100) return; 
+      // Hover video: loops while hovered. On hover out it finishes the current loop,
+      // then fades back to the still image.
       document.querySelectorAll('.product').forEach(product => {
         const video = product.querySelector('[data-hover-video]');
+        if (!video || product.dataset.hoverBound) return;
+        product.dataset.hoverBound = 't';
+        const finish = () => {
+          product.dataset.videoState = '';
+          window.setTimeout(() => {
+            if (product.dataset.videoState) return;
+            video.pause();
+            video.currentTime = 0;
+          }, 450);
+        };
+        video.addEventListener('ended', () => {
+          if (product.dataset.videoState === 'ending') finish();
+        });
         product.addEventListener('mouseenter', () => {
-          if (video) video.play();
-          product.dataset.hover = 'true';
+          video.loop = true;
+          product.dataset.videoState = 'on';
+          video.play().catch(() => {});
         });
         product.addEventListener('mouseleave', () => {
-          window.setTimeout(() => {
-            product.dataset.hover = 'false';
-            if (video) video.pause();
-          	if (video) video.currentTime = 0;
-          }, 500);
+          if (product.dataset.videoState !== 'on') return;
+          video.loop = false;
+          product.dataset.videoState = 'ending';
+          if (video.paused || video.ended) finish();
         });
       });
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.target === this.currentProduct) return
           if (entry.isIntersecting) {
+            // Buffer hover videos for tiles on screen so playback starts instantly
+            const v = entry.target.querySelector('video')
+            if (v && v.preload !== 'auto') v.preload = 'auto'
             gsap.to(entry.target, {
               // scale: 1,
               opacity: 1,

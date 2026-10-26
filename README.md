@@ -13,4 +13,4 @@ Pieces are still managed in the Webflow CMS. After publishing changes in Webflow
 **Actions > Sync from Webflow > Run workflow** on GitHub. It pulls the published CMS content and
 images into this repo and commits to `main`, which redeploys on Vercel.
 
-Hover videos stream from the R2 bucket referenced in the CMS `video` field.
+Hover videos live in `assets/hover/` and pair with pieces by image filename (`M_F-01` plays `M_A-01.webm`, `M_FP-09` plays `M_AP-09.webm`, `M_FC-14` plays `M_AC-14.webm`). To add one, drop the `.webm` in that folder and add its name to `HOVER_VIDEOS` in `index.html`.
