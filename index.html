@@ -230,9 +230,32 @@ a {
   .--is-loaded {
     overflow: hidden;
     .grid {
-      transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
       cursor: grab;
     }
+  }
+  /* Infinite grid: columns and tiles are repositioned with transforms as they wrap */
+  .grid .column,
+  .grid .product {
+    will-change: transform;
+  }
+  /* Every tile draws its divider lines so the seams match where the grid wraps */
+  .grid .column .product::before {
+    content: '';
+    display: block;
+    position: absolute;
+    border-right: 1px solid #ddd;
+    top: -2.5vw;
+    bottom: -2.5vw;
+    right: -2.5vw;
+  }
+  .grid .product::after {
+    content: '';
+    display: block;
+    position: absolute;
+    border-bottom: 1px solid #ddd;
+    left: -2.5vw;
+    right: -2.5vw;
+    bottom: -2.5vw;
   }
   .column {
     display: flex;
@@ -2130,11 +2153,13 @@ a {
       videoEl.preload = 'metadata';
       videoEl.muted = true;
       videoEl.dataset.hoverVideo = 'true';
-      const sourceEl = document.createElement('source');
-      sourceEl.src = item.video;
-      videoEl.appendChild(sourceEl);
       idEl.appendChild(imgEl);
-      idEl.appendChild(videoEl);
+      if (item.video) {
+        const sourceEl = document.createElement('source');
+        sourceEl.src = item.video;
+        videoEl.appendChild(sourceEl);
+        idEl.appendChild(videoEl);
+      }
       productEl.appendChild(idEl);
       /* Title */
       /*
@@ -2315,38 +2340,87 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         }
       })
     }
+    // Infinite grid: the grid element stays put. A pan offset moves every column (x)
+    // and every tile (y), and each one wraps to the opposite edge once it leaves the tiled area,
+    // so the same ~110 tiles repeat forever in every direction.
+    measure() {
+      const cols = [...this.grid.children].filter(c => c.classList.contains('column'))
+      if (cols.length < 2 || cols[0].children.length < 2) return false
+      const colStep = cols[1].offsetLeft - cols[0].offsetLeft
+      const rowStep = cols[0].children[1].offsetTop - cols[0].children[0].offsetTop
+      const rows = cols[0].children.length
+      const gap = colStep - cols[0].offsetWidth
+      const W = colStep * cols.length
+      const H = rowStep * rows
+      // Pan offset that matches the original centered layout (Popsy logo in the middle)
+      const homeX = (window.innerWidth - (W - gap)) / 2
+      const homeY = (window.innerHeight - (H - (rowStep - cols[0].children[0].offsetHeight))) / 2
+      this.layout = {
+        cols,
+        colProducts: cols.map(col => [...col.children]),
+        colStep, rowStep, W, H, homeX, homeY,
+        wrapX: gsap.utils.wrap(homeX - colStep / 2, homeX - colStep / 2 + W),
+        wrapY: gsap.utils.wrap(homeY - rowStep / 2, homeY - rowStep / 2 + H),
+      }
+      return true
+    }
+    render() {
+      const L = this.layout
+      if (!L) return
+      const ox = this.offset.x
+      const oy = this.offset.y
+      for (let c = 0; c < L.cols.length; c++) {
+        const base = c * L.colStep
+        L.cols[c].style.transform = `translate3d(${L.wrapX(base + ox) - base}px,0,0)`
+        const prods = L.colProducts[c]
+        for (let r = 0; r < prods.length; r++) {
+          const rb = r * L.rowStep
+          prods[r].style.transform = `translate3d(0,${L.wrapY(rb + oy) - rb}px,0)`
+        }
+      }
+    }
+    panTo(x, y) {
+      if (!this.quickX) {
+        this.quickX = gsap.quickTo(this.offset, 'x', { duration: 0.45, ease: 'power3.out', onUpdate: () => this.render() })
+        this.quickY = gsap.quickTo(this.offset, 'y', { duration: 0.45, ease: 'power3.out', onUpdate: () => this.render() })
+      }
+      this.quickX(x)
+      this.quickY(y)
+    }
     centerGrid() {
-      const gridWidth = this.grid.offsetWidth
-      const gridHeight = this.grid.offsetHeight
-      const windowWidth = window.innerWidth
-      const windowHeight = window.innerHeight
-      const centerX = (windowWidth - gridWidth) / 2
-      const centerY = (windowHeight - gridHeight) / 2
-      gsap.set(this.grid, {
-        x: centerX,
-        y: centerY
-      })
+      this.offset = this.offset || { x: 0, y: 0 }
+      gsap.set(this.grid, { x: 0, y: 0 })
+      if (!this.measure()) return
+      const { homeX, homeY } = this.layout
+      if (this.quickX) {
+        this.quickX(homeX, homeX)
+        this.quickY(homeY, homeY)
+      }
+      this.offset.x = homeX
+      this.offset.y = homeY
+      if (this.proxy) {
+        gsap.set(this.proxy, { x: homeX, y: homeY })
+        if (this.draggable) this.draggable.update()
+      }
+      this.render()
     }
     setupDraggable() {
       this.dom.classList.add("--is-loaded")
-      this.draggable = Draggable.create(this.grid, {
+      this.proxy = document.createElement('div')
+      gsap.set(this.proxy, { x: this.offset.x, y: this.offset.y })
+      const follow = () => this.panTo(this.draggable.x, this.draggable.y)
+      this.draggable = Draggable.create(this.proxy, {
         type: "x,y",
-        bounds: {
-          minX: -(this.grid.offsetWidth - window.innerWidth) - 200,
-          maxX: 200,
-          minY: -(this.grid.offsetHeight - window.innerHeight) - 100,
-          maxY: 100
-        },
+        trigger: this.grid,
         inertia: true,
         allowEventDefault: true,
-        edgeResistance: 0.9,
+        onDrag: follow,
+        onThrowUpdate: follow,
         onDragStart: () => {
           this.isDragging = true
-          // this.grid.classList.add("--is-dragging")
         },
         onDragEnd: () => {
           this.isDragging = false
-          // this.grid.classList.remove("--is-dragging")
         }
       })[0]
     }
@@ -2354,21 +2428,11 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       /* window.addEventListener("wheel", (e) => { */
       document.getElementById('container').addEventListener("wheel", (e) => {
         e.preventDefault()
-        const deltaX = -e.deltaX * 7
-        const deltaY = -e.deltaY * 7
-        const currentX = gsap.getProperty(this.grid, "x")
-        const currentY = gsap.getProperty(this.grid, "y")
-        const newX = currentX + deltaX
-        const newY = currentY + deltaY
-        const bounds = this.draggable.vars.bounds
-        const clampedX = Math.max(bounds.minX, Math.min(bounds.maxX, newX))
-        const clampedY = Math.max(bounds.minY, Math.min(bounds.maxY, newY))
-        gsap.to(this.grid, {
-          x: clampedX,
-          y: clampedY,
-          duration: 0.3,
-          ease: "power3.out"
-        })
+        const newX = this.draggable.x - e.deltaX * 7
+        const newY = this.draggable.y - e.deltaY * 7
+        gsap.set(this.proxy, { x: newX, y: newY })
+        this.draggable.update()
+        this.panTo(newX, newY)
       }, { passive: false })
       window.addEventListener("resize", () => {
         this.updateBounds()
@@ -2382,14 +2446,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       }
     }
     updateBounds() {
-      if (this.draggable) {
-        this.draggable.vars.bounds = {
-          minX: -(this.grid.offsetWidth - window.innerWidth) - 50,
-          maxX: 50,
-          minY: -(this.grid.offsetHeight - window.innerHeight) - 50,
-          maxY: 50
-        }
-      }
+      // Tile sizes are in vw, so re-measure the wrap area on resize
+      if (this.measure()) this.render()
     }
     observeProducts() {
       if (window.innerWidth < 1100) return; 
