@@ -92,6 +92,31 @@
       --details-title: 54px;  
     }
   }
+  /* Family tree: hover videos sit over each monster's photo */
+  .node-media {
+    position: relative;
+  }
+  .node-media video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    filter: brightness(1.05);
+  }
+  .node-media[data-video-state="on"] video,
+  .node-media[data-video-state="ending"] video,
+  .node-media[data-video-state="auto"] video {
+    opacity: 1;
+  }
+  /* Tree stays hidden until the build-in animation takes over */
+  body:not([data-tree-ready]) .react-flow__node,
+  body:not([data-tree-ready]) .react-flow__edges {
+    opacity: 0;
+  }
   .back-link {
     z-index: 20;
     cursor: pointer;
@@ -1956,6 +1981,17 @@
   	if (item.hasChild || item.parent) return true;
     return false;
   });
+  // Hover videos (same files and filename pairing as the grid)
+  const HOVER_VIDEOS = ['M_A-01','M_A-02','M_A-03','M_A-04','M_A-05','M_A-06','M_A-07','M_A-08','M_A-11','M_A-12','M_A-13','M_A-14','M_A-15','M_A-16','M_A-19','M_A-20','M_A-22','M_A-24','M_A-25','M_A-26','M_A-30','M_AC-04','M_AC-0405','M_AC-05','M_AC-12','M_AC-13','M_AC-14','M_AC-23','M_AP-09','M_AP-10','M_AP-28','M_AP-29'];
+  function hoverVideoFor(img) {
+    const m = (img || '').match(/(M_[A-Z]*)-(\d+)\.[a-z0-9]+$/i);
+    if (!m) return '';
+    const num = m[2];
+    const names = [m[1].replace(/^M_F/, 'M_A') + '-' + num, 'M_A-' + num, 'M_AC-' + num, 'M_AP-' + num];
+    const hit = names.find(n => HOVER_VIDEOS.includes(n));
+    return hit ? `assets/hover/${hit}.webm` : '';
+  }
+  window.items = window.items.map(item => ({ ...item, video: hoverVideoFor(item.image) || item.video || '' }));
   window.filteredItems = window.items;
 </script>
   </div>
@@ -2151,6 +2187,104 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
     if (fromHome) { e.preventDefault(); history.back(); }
   });
 </script>
+  <script>
+  // Family tree intro: logo first, then the branches draw down one generation at a time,
+  // and each monster pops in as its branch reaches it.
+  window.familyIntro = function (edges) {
+    const items = window.filteredItems || [];
+    const byId = Object.fromEntries(items.map(i => [i.id, i]));
+    const depthCache = {};
+    const depth = (id, guard = 0) => {
+      if (id in depthCache) return depthCache[id];
+      const it = byId[id];
+      const d = it && it.parent && byId[it.parent] && guard < 50 ? depth(it.parent, guard + 1) + 1 : 0;
+      return (depthCache[id] = d);
+    };
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const STEP = 0.55, LINE = 0.6, START = 0.5;
+    const tl = gsap.timeline({ onComplete: () => window.startFamilyAmbient() });
+    if (reduce) tl.timeScale(5);
+    document.querySelectorAll('.react-flow__node').forEach(n => {
+      const inner = n.querySelector('.w-40') || n;
+      const lv = depth(n.dataset.id);
+      gsap.set(inner, { opacity: 0, scale: lv === 0 ? 0.9 : 0.6 });
+      tl.to(inner, { opacity: 1, scale: 1, duration: lv === 0 ? 0.8 : 0.6, ease: lv === 0 ? 'power2.out' : 'back.out(1.7)' },
+        lv === 0 ? 0 : START + (lv - 1) * STEP + LINE * 0.85);
+    });
+    edges.forEach(e => {
+      const g = document.querySelector(`[data-testid="rf__edge-${CSS.escape(e.id)}"]`);
+      const path = g && g.querySelector('.react-flow__edge-path');
+      if (!path) return;
+      const L = path.getTotalLength();
+      gsap.set(path, { strokeDasharray: `${L} ${L}`, strokeDashoffset: L });
+      tl.to(path, { strokeDashoffset: 0, duration: LINE, ease: 'power2.inOut',
+        onComplete: () => { path.style.strokeDasharray = ''; path.style.strokeDashoffset = ''; } },
+        START + depth(e.source) * STEP);
+    });
+    document.body.dataset.treeReady = 't';
+  };
+
+  // Hover: a monster's video loops while hovered; on hover out it finishes its loop, then fades back
+  (function () {
+    const rootEl = document.getElementById('root');
+    const mediaOf = el => el && el.closest && el.closest('.react-flow__node') && el.closest('.react-flow__node').querySelector('.node-media');
+    const finish = media => {
+      media.dataset.videoState = '';
+      const v = media.querySelector('video');
+      window.setTimeout(() => { if (!media.dataset.videoState && v) { v.pause(); v.currentTime = 0; } }, 450);
+    };
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (canHover) {
+      rootEl.addEventListener('mouseover', e => {
+        const node = e.target.closest('.react-flow__node');
+        if (!node || node.contains(e.relatedTarget)) return;
+        const media = node.querySelector('.node-media'); const v = media && media.querySelector('video');
+        if (!v) return;
+        v.loop = true; v.preload = 'auto';
+        media.dataset.videoState = 'on';
+        v.play().catch(() => {});
+      });
+      rootEl.addEventListener('mouseout', e => {
+        const node = e.target.closest('.react-flow__node');
+        if (!node || node.contains(e.relatedTarget)) return;
+        const media = node.querySelector('.node-media'); const v = media && media.querySelector('video');
+        if (!v || media.dataset.videoState !== 'on') return;
+        v.loop = false;
+        media.dataset.videoState = 'ending';
+        if (v.paused || v.ended) finish(media);
+      });
+    }
+    rootEl.addEventListener('ended', e => {
+      const media = e.target.closest && e.target.closest('.node-media');
+      if (media && (media.dataset.videoState === 'ending' || media.dataset.videoState === 'auto')) finish(media);
+    }, true);
+
+    // Random plays to catch your eye while you're not hovering
+    window.startFamilyAmbient = function () {
+      window.clearTimeout(window.__familyAmbient);
+      const tick = () => {
+        window.__familyAmbient = window.setTimeout(tick, 1400 + Math.random() * 1800);
+        if (document.hidden || document.body.classList.contains('--is-details-showing')) return;
+        if (rootEl.querySelector('.node-media[data-video-state="on"]')) return;
+        if (rootEl.querySelectorAll('.node-media[data-video-state^="auto"]').length >= 2) return;
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const pool = [...rootEl.querySelectorAll('.node-media')].filter(m => {
+          if (m.dataset.videoState || !m.querySelector('video')) return false;
+          const r = m.getBoundingClientRect();
+          return r.width > 20 && r.right > 0 && r.left < vw && r.bottom > 0 && r.top < vh;
+        });
+        if (!pool.length) return;
+        const media = pool[Math.floor(Math.random() * pool.length)];
+        const v = media.querySelector('video');
+        media.dataset.videoState = 'auto-wait';
+        v.loop = false; v.preload = 'auto'; v.currentTime = 0;
+        v.play().then(() => { if (media.dataset.videoState === 'auto-wait') media.dataset.videoState = 'auto'; })
+          .catch(() => { if (media.dataset.videoState === 'auto-wait') media.dataset.videoState = ''; });
+      };
+      window.__familyAmbient = window.setTimeout(tick, 800);
+    };
+  })();
+</script>
   <script type="text/babel">
 	function moveFilterSVG() {
   	const defs = document.querySelector('svg.react-flow__edges.react-flow__container defs');
@@ -2188,15 +2322,19 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
         <div className="w-40 text-center">
           <div> { /* <div className="p-3"> */ }
             { data.image && (
+              <div className="node-media">
                 <img
                   src={data.image}
                   alt={data.name}
                   className="w-25 h-25 object-cover mx-auto"
-                  onError={(e) => {
-                    e.target.onerror = null; 
-                    e.target.src = `https://placehold.co/100x100/cccccc/FFFFFF?text=Error`;
-                  }}
                 />
+                { data.video && (
+                  <video ref={el => { if (el) el.muted = true; }} muted playsInline preload="metadata" data-hover-video="true">
+                    <source src={data.video} type="video/webm" />
+                    { /^assets\/hover\/.+\.webm$/i.test(data.video) && <source src={data.video.replace(/\.webm$/i, '.mp4')} type="video/mp4" /> }
+                  </video>
+                ) }
+              </div>
             ) }
             <p className="text-sm font-bold text-stone-800">{data.name}</p>
           </div>
@@ -2287,34 +2425,37 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
               setEdges(reactFlowEdges);
               setIsLayouting(false);
               document.body.dataset.loaded = 't';
-              window.setTimeout(() => {
-                const rootNodes = layoutedGraph.children.filter(node => {
-                  const originalItem = window.items.find(item => item.id === node.id);
-                  return originalItem && !originalItem.parent;
-                });
-                if (rootNodes.length > 0) {
-                	/*
-                	const minX = Math.min(...rootNodes.map(n => n.x));
-                	const maxX = Math.max(...rootNodes.map(n => n.x + n.width));
-                	const minY = Math.min(...rootNodes.map(n => n.y));
-                	const centerX = minX + (maxX - minX) / 2;
-                	const topY = minY + (170 / 2); // 170 is node height
-                	setCenter(centerX, topY, { zoom: 1.25, duration: 800 });
-                  */
-                  const highestNode = rootNodes.reduce((prev, current) => (prev.y < current.y ? prev : current));
-                  const centerX = highestNode.x + (highestNode.width / 2);
-                  const centerY = highestNode.y + (highestNode.height / 2) + (window.innerHeight / 4);
-                  const zoomP = window.innerWidth < 600 ? 1 : 1.15;
-                	setCenter(centerX, centerY, { zoom: zoomP, duration: 1500 });
-                }                      
-                //  zoomTo, setCenter, getViewport
-              }, 700);
+              // Open centered on the Popsy logo (the root of the tree), then build the tree in
+              const rootNodes = layoutedGraph.children.filter(node => {
+                const originalItem = window.items.find(item => item.id === node.id);
+                return originalItem && !originalItem.parent;
+              });
+              const highestNode = rootNodes.length ? rootNodes.reduce((prev, current) => (prev.y < current.y ? prev : current)) : null;
+              const centerOnLogo = () => {
+                if (!highestNode) return;
+                // zoomed out enough to watch the branches spread and cascade down from the logo
+                const zoomP = window.innerWidth < 600 ? 0.6 : Math.max(0.5, Math.min(1.15, window.innerWidth / 2900));
+                const nodeEl = document.querySelector(`.react-flow__node[data-id="${highestNode.id}"]`);
+                const media = nodeEl && nodeEl.querySelector('.node-media');
+                // center on the logo image itself (the node also holds a name label under it)
+                const mediaOffset = media ? (media.offsetTop + media.offsetHeight / 2) : highestNode.height / 2;
+                setCenter(highestNode.x + highestNode.width / 2, highestNode.y + mediaOffset, { zoom: zoomP, duration: 0 });
+              };
+              const waitForTree = (tries = 0) => {
+                const drawn = document.querySelectorAll('.react-flow__edge-path').length;
+                if ((drawn < reactFlowEdges.length || !document.querySelector('.react-flow__node')) && tries < 120) {
+                  return requestAnimationFrame(() => waitForTree(tries + 1));
+                }
+                centerOnLogo();
+                if (window.familyIntro) window.familyIntro(reactFlowEdges);
+              };
+              requestAnimationFrame(() => waitForTree());
           })
           .catch(console.error);
       }, [filteredItems, setCenter]);
       if (isLayouting) {
             return (
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif', color: '#888', backgroundColor: '#fafafa' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif', color: '#888', backgroundColor: '#fff' }}>
                   Initializing...
               </div>
           );
@@ -2330,8 +2471,6 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
                 attributionPosition="bottom-left"
                 nodesDraggable={false}
                 onNodeClick={onNodeClick}
-                fitView
-                fitViewOptions={{ minZoom: 0.1 }}
                 minZoom={0.1}
             >
                 {window.innerWidth > 600 && <MiniMap zoomable pannable nodeStrokeWidth={3} />}
@@ -2361,7 +2500,7 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
       }, [isReady]);
       if (!isReady) {
           return (
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif', color: '#888', backgroundColor: '#fafafa' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif', color: '#888', backgroundColor: '#fff' }}>
                   Initializing...
               </div>
           );
