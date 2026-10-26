@@ -2475,6 +2475,12 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.centerGrid()
       gsap.set(this.products, { opacity: 0 })
       this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      // Full draw-in plays once per browser session; coming back (e.g. from the family tree) is quick
+      this.quickIntro = false
+      try {
+        this.quickIntro = sessionStorage.getItem('popsy-intro-seen') === '1'
+        sessionStorage.setItem('popsy-intro-seen', '1')
+      } catch (err) {}
       const overlay = document.querySelector('.intro-logo')
       this.logoDiv = this.grid.querySelector('[data-id="popsy-wolf"]')
       if (!overlay || !this.logoDiv) {
@@ -2493,7 +2499,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       })
       const start = () => {
         overlay.classList.add('--ready')
-        const DRAW = this.reduceMotion ? 0.05 : 2.0
+        const DRAW = (this.reduceMotion || this.quickIntro) ? 0.05 : 2.0
         const tl = gsap.timeline({ onComplete: () => this.finishDraw(overlay) })
         let t = 0.2
         paths.forEach((p, i) => {
@@ -2527,6 +2533,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const reach = Math.hypot(vw, vh) / 2 + 60
       const tl = gsap.timeline({ onComplete: () => this.afterIntro() })
       if (this.reduceMotion) tl.timeScale(4)
+      else if (this.quickIntro) tl.timeScale(2.5)
       this.grid.querySelectorAll('.product').forEach(pr => {
         const r = pr.getBoundingClientRect()
         const k = Math.min(Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy) / reach, 1.1)
