@@ -729,6 +729,55 @@ a {
       font-size: 14px;
     }
   }
+  /* Filter icons */
+  .nav.v--new .filter-list > .filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .filter-icon {
+    display: block;
+    width: 32px;
+    height: 32px;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  @media screen and (max-width: 991px) {
+    .filter-icon { width: 28px; height: 28px; }
+  }
+  /* Intro: logo draws in on white, then the grid builds out around it */
+  .intro-logo {
+    position: fixed;
+    z-index: 5;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .intro-logo.--ready { visibility: visible; }
+  .intro-logo svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .grid .column .product::before,
+  .grid .product::after {
+    opacity: var(--lo, 1);
+  }
+  body:not([data-started]) .grid .product { --lo: 0; }
+  .about-link, .family-link { transition: opacity 0.6s ease; }
+  html body:not([data-started]) .nav.v--new,
+  html body:not([data-started]) .about-link,
+  html body:not([data-started]) .family-link {
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* Ambient: a monster plays its video once on its own */
+  .grid .column .product[data-video-state="auto"] video { opacity: 1; }
 </style>
   </div>
   <main>
@@ -736,6 +785,7 @@ a {
     <div id="container" class="container">
       <div id="grid" class="grid"></div>
     </div>
+    <div class="intro-logo" aria-hidden="true"><svg viewBox="0 0 800 833" preserveAspectRatio="xMidYMid slice"><defs><mask id="intro-logo-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="833"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><path d="M47 128L56 128L61 133" stroke-width="28"/><path d="M61 133L53 140" stroke-width="28"/><path d="M74 133L64 143L62 152L57 159L48 167" stroke-width="40"/><path d="M61 133L74 131" stroke-width="44"/><path d="M75 133L84 144" stroke-width="40"/><path d="M103 98L95 104L90 115L75 131" stroke-width="54"/><path d="M90 83L103 97" stroke-width="41"/><path d="M131 75L120 86L104 97" stroke-width="43"/><path d="M108 209L116 233L144 251" stroke-width="58"/><path d="M118 60L131 74" stroke-width="39"/><path d="M126 165L137 173L144 175" stroke-width="46"/><path d="M132 74L138 73L145 68" stroke-width="44"/><path d="M133 54L145 67" stroke-width="41"/><path d="M145 183L148 241" stroke-width="56"/><path d="M148 243L145 251" stroke-width="56"/><path d="M161 103L155 110L145 139L145 174" stroke-width="44"/><path d="M146 182L164 180" stroke-width="46"/><path d="M145 252L152 310L155 316L159 348L166 373L165 401" stroke-width="56"/><path d="M149 242L183 239L190 234L199 232L232 209L248 192L256 189" stroke-width="56"/><path d="M209 132L211 141" stroke-width="46"/><path d="M146 67L165 61L221 58L251 65L274 81" stroke-width="53"/><path d="M211 143L212 156" stroke-width="46"/><path d="M223 268L219 277L218 297L222 304L230 309" stroke-width="54"/><path d="M224 268L234 275" stroke-width="28"/><path d="M244 255L230 258L224 267" stroke-width="30"/><path d="M231 309L236 306L260 305L266 302" stroke-width="53"/><path d="M245 255L249 260L254 279L263 288" stroke-width="38"/><path d="M245 254L248 249L252 248L270 247L275 249" stroke-width="32"/><path d="M264 289L267 297" stroke-width="57"/><path d="M258 189L275 204L279 222" stroke-width="37"/><path d="M275 250L272 280L264 288" stroke-width="38"/><path d="M275 82L277 95L281 102L281 133L276 156L265 174L260 178L257 188" stroke-width="43"/><path d="M268 297L283 296" stroke-width="57"/><path d="M266 302L278 315L294 348" stroke-width="51"/><path d="M275 81L283 74L293 74L296 76" stroke-width="38"/><path d="M276 249L296 250L306 257L307 262" stroke-width="32"/><path d="M307 263L296 283L284 295" stroke-width="42"/><path d="M301 217L297 223" stroke-width="22"/><path d="M284 296L293 303L308 303L321 306" stroke-width="44"/><path d="M312 178L303 204L302 216" stroke-width="24"/><path d="M303 217L323 222" stroke-width="28"/><path d="M308 263L319 267L324 272L327 285" stroke-width="31"/><path d="M324 223L323 230" stroke-width="27"/><path d="M327 287L325 301L322 305" stroke-width="34"/><path d="M330 214L324 221" stroke-width="28"/><path d="M328 286L334 285" stroke-width="28"/><path d="M367 230L360 258L361 316L366 342" stroke-width="40"/><path d="M365 198L363 223L367 229" stroke-width="40"/><path d="M368 229L387 227L401 222L417 225L425 231L434 234L446 245L459 263" stroke-width="40"/><path d="M367 342L389 343L410 341L429 334L448 320L458 294" stroke-width="41"/><path d="M459 264L458 292" stroke-width="30"/><path d="M459 293L468 299" stroke-width="30"/><path d="M460 263L467 258L480 257L488 250L509 241" stroke-width="55"/><path d="M527 217L515 226L509 241" stroke-width="55"/><path d="M518 324L525 332" stroke-width="38"/><path d="M520 195L520 207L527 215" stroke-width="42"/><path d="M509 241L519 261L532 271L553 280" stroke-width="50"/><path d="M528 216L545 213" stroke-width="44"/><path d="M556 199L546 212" stroke-width="34"/><path d="M526 333L556 333L566 330L576 324L583 305" stroke-width="46"/><path d="M568 265L554 279" stroke-width="42"/><path d="M546 213L557 216L574 207L579 202" stroke-width="38"/><path d="M554 281L571 290L580 298L583 304" stroke-width="47"/><path d="M584 304L601 295L616 295" stroke-width="50"/><path d="M598 171L614 173" stroke-width="38"/><path d="M617 152L621 157L621 165L615 173" stroke-width="38"/><path d="M615 174L618 183L626 192L633 211L648 267L655 275L665 280" stroke-width="55"/><path d="M745 90L742 97L742 107L738 113L734 130L734 142L716 182L699 241L692 248L684 269L667 280" stroke-width="54"/><path d="M75 331L89 347" stroke-width="44"/><path d="M92 323L97 330L97 337L90 347" stroke-width="44"/><path d="M90 348L94 462L100 507L102 559L119 575" stroke-width="48"/><path d="M153 477L159 473L174 474" stroke-width="45"/><path d="M229 415L207 418L195 425L184 435L178 450L175 473" stroke-width="44"/><path d="M220 400L230 411" stroke-width="33"/><path d="M175 475L176 482L192 501L202 507L221 513L237 513L271 501L281 488" stroke-width="43"/><path d="M231 415L243 418L250 433L273 446L284 467L285 473L282 487" stroke-width="37"/><path d="M230 310L235 336L240 348L246 352L258 352L283 381L294 384L309 380L325 369L326 364" stroke-width="57"/><path d="M283 488L292 497" stroke-width="33"/><path d="M306 410L306 416" stroke-width="26"/><path d="M318 355L326 363" stroke-width="30"/><path d="M306 418L306 422L319 448L323 452L327 465L349 497" stroke-width="38"/><path d="M322 307L326 319L331 353L327 363" stroke-width="35"/><path d="M349 498L343 504L341 510" stroke-width="32"/><path d="M350 498L369 499" stroke-width="40"/><path d="M369 500L368 512" stroke-width="43"/><path d="M366 343L365 357L368 395L374 419L379 424L390 428L401 439" stroke-width="40"/><path d="M395 455L377 496L370 499" stroke-width="44"/><path d="M382 442L395 455" stroke-width="42"/><path d="M401 439L400 447L395 455" stroke-width="43"/><path d="M419 409L412 424L401 439" stroke-width="42"/><path d="M414 394L416 401L420 405" stroke-width="33"/><path d="M430 393L420 405" stroke-width="33"/><path d="M435 510L428 517" stroke-width="34"/><path d="M421 408L430 413L445 414L451 419" stroke-width="38"/><path d="M449 451L442 459L440 465L436 485L436 509" stroke-width="40"/><path d="M451 420L450 450" stroke-width="43"/><path d="M457 388L454 397L458 406" stroke-width="31"/><path d="M458 407L456 415L452 419" stroke-width="37"/><path d="M451 451L475 448L484 442" stroke-width="42"/><path d="M437 510L447 514L464 513L475 509L484 502L496 499L511 489" stroke-width="34"/><path d="M459 406L492 397" stroke-width="32"/><path d="M469 338L473 339L483 332" stroke-width="28"/><path d="M478 434L484 441" stroke-width="24"/><path d="M492 397L498 403" stroke-width="24"/><path d="M485 441L507 430" stroke-width="27"/><path d="M492 397L514 386" stroke-width="25"/><path d="M484 332L524 333" stroke-width="38"/><path d="M511 424L508 429" stroke-width="22"/><path d="M514 478L511 488" stroke-width="31"/><path d="M508 430L520 433" stroke-width="23"/><path d="M512 489L518 490L527 496L544 515L569 528L575 535" stroke-width="39"/><path d="M547 410L559 410" stroke-width="61"/><path d="M570 397L563 402L560 410" stroke-width="57"/><path d="M571 397L586 411" stroke-width="45"/><path d="M599 371L579 383L573 389L571 396" stroke-width="50"/><path d="M560 411L570 432L595 450L627 481L638 507" stroke-width="55"/><path d="M600 371L610 380" stroke-width="38"/><path d="M618 354L605 357L600 370" stroke-width="38"/><path d="M628 425L628 436" stroke-width="25"/><path d="M638 509L628 536" stroke-width="45"/><path d="M639 508L648 509L656 517L662 519" stroke-width="48"/><path d="M666 281L667 296L659 351L655 359L643 410L640 414L630 419L628 423" stroke-width="64"/><path d="M120 575L155 568L162 563L201 550L218 550" stroke-width="43"/><path d="M213 756L201 762L195 768L190 781" stroke-width="38"/><path d="M197 590L201 589L205 592L220 595" stroke-width="42"/><path d="M215 756L224 766L223 771" stroke-width="37"/><path d="M218 550L227 561L229 574L229 584L221 595" stroke-width="42"/><path d="M221 596L232 617L244 627L256 631" stroke-width="52"/><path d="M256 649L251 675L235 705L233 715L226 727L225 735L221 739L214 755" stroke-width="50"/><path d="M218 550L232 546L245 546L255 535L258 535" stroke-width="35"/><path d="M257 632L256 648" stroke-width="63"/><path d="M257 649L275 666" stroke-width="52"/><path d="M300 577L276 620L270 626L258 631" stroke-width="52"/><path d="M311 542L317 553L303 567L301 575" stroke-width="42"/><path d="M302 576L314 587L324 588L332 594" stroke-width="39"/><path d="M332 606L325 613L324 640" stroke-width="32"/><path d="M333 595L333 605" stroke-width="31"/><path d="M325 641L333 642L345 639L356 631" stroke-width="34"/><path d="M333 606L357 620" stroke-width="31"/><path d="M368 565L353 573L333 594" stroke-width="34"/><path d="M357 621L357 630" stroke-width="30"/><path d="M358 631L366 634" stroke-width="26"/><path d="M359 554L368 564" stroke-width="31"/><path d="M367 635L367 641" stroke-width="24"/><path d="M358 620L368 609L384 609" stroke-width="28"/><path d="M369 565L375 563" stroke-width="34"/><path d="M368 634L378 633L393 622" stroke-width="26"/><path d="M323 642L322 656L324 664L332 677L344 689L354 693L394 694L410 685L426 666L436 638L439 621" stroke-width="39"/><path d="M385 609L394 617" stroke-width="28"/><path d="M395 622L401 628" stroke-width="27"/><path d="M376 563L393 566L416 580L420 584L424 595" stroke-width="36"/><path d="M402 628L409 626" stroke-width="21"/><path d="M423 596L415 604L404 608L394 617" stroke-width="34"/><path d="M425 596L431 601L439 621" stroke-width="40"/><path d="M439 621L472 621L476 619" stroke-width="53"/><path d="M486 532L487 546L477 562L475 570L476 619" stroke-width="48"/><path d="M476 619L479 630L480 653L498 687L505 691L525 694" stroke-width="48"/><path d="M525 695L521 710" stroke-width="39"/><path d="M526 694L535 694L542 691L561 674" stroke-width="49"/><path d="M544 657L561 674" stroke-width="49"/><path d="M550 572L567 589" stroke-width="50"/><path d="M560 548L567 547" stroke-width="23"/><path d="M572 667L567 672L561 674" stroke-width="58"/><path d="M568 548L568 569L566 572L567 580L570 583L568 589" stroke-width="52"/><path d="M575 536L568 546" stroke-width="38"/><path d="M568 590L573 666" stroke-width="66"/><path d="M574 667L589 679L594 694" stroke-width="58"/><path d="M593 695L589 700L589 712L596 742" stroke-width="37"/><path d="M576 536L606 539L627 537" stroke-width="38"/><path d="M594 695L611 708L613 716" stroke-width="36"/><path d="M628 537L640 549" stroke-width="38"/></g></mask></defs><image href="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68f19809d22920c2d8ce8df4_68c9d26538d9c84e74e5a1fb_popsy-logo.avif" width="800" height="833" mask="url(#intro-logo-mask)"/></svg></div>
     <div class="details">
       <div id="details__title" class="details__title"></div>
       <div class="details__body">
@@ -2367,6 +2417,25 @@ a {
     });
   }
   filterBtn();
+  // Filter buttons show hand-drawn icons instead of words (names stay for screen readers + tooltip)
+  const FILTER_ICONS = {
+    monsters: '<svg class="filter-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 9.2 6.8 4.6M23.4 9 25.6 4.8"/><path d="M6.6 14.2c-.4-4.6 3.4-7.9 9.2-8 5.9-.1 9.9 3.2 9.6 8.4l-.3 6.9c-.2 3.7-1.3 6.4-1.9 7.1-.7-.9-1.6-1.5-2.4-.1-.8-1.3-1.9-1.4-2.6.1-.8-1.4-2-1.5-2.7 0-.8-1.4-1.9-1.4-2.6.1-.7-1.3-1.7-1.3-2.4-.1-.8-1-1.7-3.7-1.9-7.3Z"/><circle cx="12.2" cy="13.6" r="2.4"/><circle cx="20.6" cy="13.2" r="1.6"/><path d="M10.9 19.3c1.5 2.1 7.5 2.5 10.4-.3"/><path d="M13.6 20.4v1.6M17.3 20.6v1.5"/></svg>',
+    plants: '<svg class="filter-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.8 18.6h18.6l-2.2 9.6c-.1.4-.4.6-.8.6H9.7c-.4 0-.7-.2-.8-.6L6.8 18.6Z"/><path d="M15.9 18.4c.2-4.3-.3-8.2-1.6-11.4"/><path d="M15.6 13.3c-3.7.9-7.7-1.2-8.4-5.6 4.1-.8 7.6 1.2 8.4 5.6Z"/><path d="M16.4 10.6c.5-3.9 3.8-6.6 8.4-6-.4 4.2-3.9 6.6-8.4 6Z"/></svg>',
+    kitchen: '<svg class="filter-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.2 13.4h16.4l-1 11.2c-.2 2.1-1.9 3.6-4 3.6h-6.4c-2.1 0-3.8-1.5-4-3.6L6.2 13.4Z"/><path d="M22.4 15.9c2.6-.6 4.6.6 4.3 3-.3 2.5-2.5 3.6-5.3 3.3"/><path d="M11.1 9.8c-1.3-1.5.8-2.6-.3-4.4M15.6 9.6c-1.3-1.6.9-2.8-.2-4.7"/></svg>',
+  };
+  function iconizeFilters() {
+    document.querySelectorAll('#filter-list > [data-filter]').forEach(btn => {
+      const key = btn.dataset.filter;
+      const label = btn.firstElementChild;
+      if (!FILTER_ICONS[key] || !label || btn.querySelector('.filter-icon')) return;
+      const name = label.textContent.trim();
+      label.innerHTML = FILTER_ICONS[key] + `<span class="sr-only">${name}</span>`;
+      btn.title = name;
+      btn.setAttribute('role', 'button');
+      btn.setAttribute('aria-label', name);
+    });
+  }
+  iconizeFilters();
 </script>
   </div>
   <div class="embed-script w-embed w-script">
@@ -2400,44 +2469,121 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.cross = document.querySelector(".cross")
       this.isDragging = false
     }
-    init() {
-      this.intro()
-    }
-    intro() {
+    // Intro, step 1: on a blank white page, the Popsy logo draws itself in (brush strokes
+    // traced from the logo reveal it letter by letter) right where its grid tile sits.
+    prepareIntro() {
       this.centerGrid()
-      const headerEl = document.querySelectorAll('.frame, .nav-btn');
-      gsap.to(headerEl, {
-        opacity: 1,
-        duration: 0.5,
-        ease: "power2.out"
+      gsap.set(this.products, { opacity: 0 })
+      this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const overlay = document.querySelector('.intro-logo')
+      this.logoDiv = this.grid.querySelector('[data-id="popsy-wolf"]')
+      if (!overlay || !this.logoDiv) {
+        if (overlay) overlay.remove()
+        this.drawDone = true
+        return
+      }
+      const r = this.logoDiv.getBoundingClientRect()
+      Object.assign(overlay.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' })
+      const paths = [...overlay.querySelectorAll('path')]
+      const lens = paths.map(p => p.getTotalLength())
+      const total = lens.reduce((a, b) => a + b, 0) || 1
+      paths.forEach((p, i) => {
+        p.style.strokeDasharray = `${lens[i]} ${lens[i]}`
+        p.style.strokeDashoffset = lens[i]
       })
-      const timeline = gsap.timeline()
-      timeline.set(this.dom, { scale: .5 })
-      timeline.set(this.products, {
-        // scale: 0.5,
-        opacity: 0,
+      const start = () => {
+        overlay.classList.add('--ready')
+        const DRAW = this.reduceMotion ? 0.05 : 2.0
+        const tl = gsap.timeline({ onComplete: () => this.finishDraw(overlay) })
+        let t = 0.2
+        paths.forEach((p, i) => {
+          const d = Math.max(0.015, DRAW * lens[i] / total)
+          tl.to(p, { strokeDashoffset: 0, duration: d, ease: 'none' }, t)
+          t += d * 0.9
+        })
+        tl.to({}, { duration: 0.25 })
+      }
+      const img = new Image()
+      img.onload = img.onerror = start
+      img.src = overlay.querySelector('image').getAttribute('href')
+    }
+    finishDraw(overlay) {
+      gsap.set(this.logoDiv, { opacity: 1 })
+      overlay.remove()
+      this.drawDone = true
+      this.maybeReveal()
+    }
+    maybeReveal() {
+      if (!this.drawDone || !this.imagesReady || this.revealed) return
+      this.revealed = true
+      this.reveal()
+    }
+    // Intro, step 2: grid lines and monsters build outward from the logo
+    reveal() {
+      const vw = window.innerWidth, vh = window.innerHeight
+      const lr = this.logoDiv ? this.logoDiv.getBoundingClientRect() : null
+      const cx = lr ? lr.left + lr.width / 2 : vw / 2
+      const cy = lr ? lr.top + lr.height / 2 : vh / 2
+      const reach = Math.hypot(vw, vh) / 2 + 60
+      const tl = gsap.timeline({ onComplete: () => this.afterIntro() })
+      if (this.reduceMotion) tl.timeScale(4)
+      this.grid.querySelectorAll('.product').forEach(pr => {
+        const r = pr.getBoundingClientRect()
+        const k = Math.min(Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy) / reach, 1.1)
+        tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.6, ease: 'power2.out' }, k * 0.65)
+        const div = pr.firstElementChild
+        if (!div || div === this.logoDiv) return
+        tl.fromTo(div, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)' }, 0.2 + k * 0.8)
       })
-      timeline.to(this.products, {
-        // scale: 1,
-        opacity: 1,
-        duration: 0.4,
-        ease: "power3.out",
-        stagger: {
-          amount: 0.8,
-          from: "random"
-        }
-      })
-      timeline.to(this.dom, {
-        scale: 1,
-        duration: 1.2,
-        ease: "power3.inOut",
-        onComplete: () => {
-          this.setupDraggable()
-          this.addEvents()
-          this.observeProducts()
-          this.handleDetails()
-          document.body.dataset.started = 'true';
-        }
+    }
+    afterIntro() {
+      this.setupDraggable()
+      this.addEvents()
+      this.observeProducts()
+      this.handleDetails()
+      document.body.dataset.started = 'true';
+      gsap.to('.frame', { opacity: 1, duration: 0.5, ease: 'power2.out' })
+      this.startAmbient()
+    }
+    // Ambient: while you're not hovering, a random on-screen monster plays its video once
+    startAmbient() {
+      const tick = () => {
+        this.ambientTimer = window.setTimeout(tick, 1400 + Math.random() * 1800)
+        if (document.hidden || this.SHOW_DETAILS) return
+        if (this.grid.querySelectorAll('.product[data-video-state^="auto"]').length >= 2) return
+        if (this.grid.querySelector('.product[data-video-state="on"]')) return
+        const vw = window.innerWidth, vh = window.innerHeight
+        const pool = [...this.grid.querySelectorAll('.product')].filter(pr => {
+          if (pr.dataset.videoState || !pr.querySelector('video')) return false
+          const r = pr.getBoundingClientRect()
+          return r.right > 0 && r.left < vw && r.bottom > 0 && r.top < vh - 80
+        })
+        if (pool.length) this.playOnce(pool[Math.floor(Math.random() * pool.length)])
+      }
+      window.clearTimeout(this.ambientTimer)
+      this.ambientTimer = window.setTimeout(tick, 900)
+    }
+    playOnce(pr) {
+      const v = pr.querySelector('video')
+      if (!v) return
+      pr.dataset.videoState = 'auto-wait'
+      v.loop = false
+      v.preload = 'auto'
+      v.currentTime = 0
+      const onEnd = () => {
+        if (pr.dataset.videoState !== 'auto') return
+        pr.dataset.videoState = ''
+        window.setTimeout(() => {
+          if (pr.dataset.videoState) return
+          v.pause()
+          v.currentTime = 0
+        }, 450)
+      }
+      v.addEventListener('ended', onEnd, { once: true })
+      v.play().then(() => {
+        if (pr.dataset.videoState === 'auto-wait') pr.dataset.videoState = 'auto'
+      }).catch(() => {
+        if (pr.dataset.videoState === 'auto-wait') pr.dataset.videoState = ''
       })
     }
     // Infinite grid: the grid element stays put. A pan offset moves every column (x)
@@ -2452,15 +2598,29 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const gap = colStep - cols[0].offsetWidth
       const W = colStep * cols.length
       const H = rowStep * rows
-      // Pan offset that matches the original centered layout (Popsy logo in the middle)
-      const homeX = (window.innerWidth - (W - gap)) / 2
-      const homeY = (window.innerHeight - (H - (rowStep - cols[0].children[0].offsetHeight))) / 2
+      const colW = cols[0].offsetWidth
+      const rowH = cols[0].children[0].offsetHeight
+      // Offset that centers the whole tile on screen; the wrap window is built around it
+      const gridX = (window.innerWidth - (W - gap)) / 2
+      const gridY = (window.innerHeight - (H - (rowStep - rowH))) / 2
+      // Start position: Popsy logo tile dead center when it's in this view
+      let homeX = gridX, homeY = gridY
+      const logoEl = this.grid.querySelector('[data-id="popsy-wolf"]')
+      const logoProduct = logoEl && logoEl.closest('.product')
+      if (logoProduct) {
+        const c0 = cols.indexOf(logoProduct.parentElement)
+        const r0 = [...logoProduct.parentElement.children].indexOf(logoProduct)
+        if (c0 >= 0 && r0 >= 0) {
+          homeX = window.innerWidth / 2 - colW / 2 - c0 * colStep
+          homeY = window.innerHeight / 2 - rowH / 2 - r0 * rowStep
+        }
+      }
       this.layout = {
         cols,
         colProducts: cols.map(col => [...col.children]),
         colStep, rowStep, W, H, homeX, homeY,
-        wrapX: gsap.utils.wrap(homeX - colStep / 2, homeX - colStep / 2 + W),
-        wrapY: gsap.utils.wrap(homeY - rowStep / 2, homeY - rowStep / 2 + H),
+        wrapX: gsap.utils.wrap(gridX - colStep / 2, gridX - colStep / 2 + W),
+        wrapY: gsap.utils.wrap(gridY - rowStep / 2, gridY - rowStep / 2 + H),
       }
       return true
     }
@@ -2794,8 +2954,11 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     }
   }
   const grid = new Grid();
+  // Logo starts drawing right away; the grid builds out once the drawing and all images are ready
+  grid.prepareIntro();
   imagesLoaded('.grid img', () => {
-    grid.init();
+    grid.imagesReady = true;
+    grid.maybeReveal();
     document.body.classList.remove('loading');
     /* window.setTimeout(() => {
 	    if (window.innerWidth > 991) document.body.dataset.navOpen = 't';
