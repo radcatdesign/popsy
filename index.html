@@ -663,6 +663,72 @@ a {
   body:not([data-nav-open="t"]) .nav-btn__icon__img[data-nav-btn-icon="x"] { display: none; }
   body[data-nav-open="t"] .nav-btn__icon__img[data-nav-btn-icon="h"] { display: none; }
   .details__text-w { flex: 1; }
+  /* Family tree link: top right, mirrors "about" top left */
+  .family-link {
+    z-index: 20;
+    cursor: pointer;
+    font-size: 20px;
+    position: fixed;
+    top: 30px;
+    right: 30px;
+  }
+  /* Filters live in the bottom pill, always visible (no filter icon) */
+  body .nav.v--new {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%);
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 13px;
+    padding: 12px;
+    border-image-outset: 1px;
+    border-image-width: 30px;
+    border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+    border-image-slice: 25;
+    border-image-repeat: stretch;
+  }
+  body:not([data-nav-open="t"]) .nav.v--new {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body:has(#container.--is-details-showing) .nav.v--new {
+    pointer-events: none;
+  }
+  .nav.v--new .filter-list {
+    flex-flow: row;
+    gap: 8px;
+    font-size: 18px;
+  }
+  .nav.v--new .filter-list > .filter-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  @media screen and (max-width: 991px) {
+    body .nav.v--new {
+      bottom: 20px;
+      padding: 8px;
+      max-width: calc(100vw - 20px);
+    }
+    .nav.v--new .filter-list {
+      gap: 4px;
+      font-size: 16px;
+    }
+    .nav.v--new .filter-list > .filter-btn {
+      padding: 8px 10px;
+      font-size: 16px;
+      border: 1px solid transparent;
+      border-image-source: none;
+    }
+  }
+  @media screen and (max-width: 479px) {
+    .nav.v--new .filter-list > .filter-btn {
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+  }
 </style>
   </div>
   <main>
@@ -766,14 +832,8 @@ a {
   }
 </style></div></div></div></div>
       </div>
-      <div id="nav-btn" class="nav-btn v--family v--no-transition">
-        <a id="btn-family" href="/family" class="btn-no-decor">Family Tree</a>
-        <div id="btn-everything" class="btn-no-decor">Everything</div>
-      </div>
     </div>
-    <div id="menu-btn" class="menu-btn">
-      <div class="nav-btn__icon"><img src="images/h.png" loading="lazy" data-nav-btn-icon="h" alt="" class="nav-btn__icon__img"><img src="images/x.png" loading="lazy" data-nav-btn-icon="x" alt="" class="nav-btn__icon__img"></div>
-    </div>
+    <a href="/family" class="family-link btn-no-decor">family tree</a>
   </main>
   <div class="cms">
     <div class="w-dyn-list"><div role="list" class="w-dyn-items"><div role="listitem" class="w-dyn-item"><div class="w-embed w-script"><script>
@@ -2159,7 +2219,7 @@ a {
   AllPiecesCat.dataset.filter = '';
   AllPiecesCat.className = 'filter-btn w-dyn-item';
   AllPiecesCat.role = 'listitem';
-  AllPiecesCat.innerHTML = 'All';
+  AllPiecesCat.innerHTML = 'Everything';
   filterListEl.insertBefore(AllPiecesCat, filterListEl.firstChild);
   const containerEl = document.getElementById('container');
 	function startGrid() {
@@ -2334,7 +2394,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.products = [...document.querySelectorAll(".product div")]
       this.details = document.querySelector(".details")
       this.detailsThumb = this.details.querySelector(".details__thumb")
-      this.fixedEls = document.querySelectorAll('.frame, .nav, .about-link');
+      this.fixedEls = document.querySelectorAll('.frame, .nav, .about-link, .family-link');
       this.fixedEls2 = document.querySelectorAll('.nav-btn');
       this.cross = document.querySelector(".cross")
       this.isDragging = false
