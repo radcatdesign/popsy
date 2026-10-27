@@ -868,6 +868,25 @@ a {
   .filter-toggle .ft-dots { display: flex; flex-direction: column; gap: 3px; }
   .filter-toggle .ft-dots i { display: block; width: 5px; height: 5px; border-radius: 50%; border: 1.3px solid #000; transition: background-color .25s ease; }
   .filter-toggle .ft-dots i.--on { background: #000; }
+  .vt-icon { display: block; }
+  /* Desktop: smaller bottom pills, and the buttons respond on hover */
+  @media screen and (min-width: 992px) {
+    body .nav.v--new, .view-nav { padding: 6px; }
+    .view-btn, .nav.v--new .filter-list > .filter-toggle { padding: 6px 8px; border-radius: 8px; transition: background-color .2s ease; }
+    .nav.v--new .filter-list > .filter-toggle { gap: 6px; }
+    .view-icon, .filter-toggle .ft-icon, .filter-toggle .filter-icon { width: 22px; height: 22px; }
+    .filter-toggle .ft-dots { gap: 2px; }
+    .filter-toggle .ft-dots i { width: 4px; height: 4px; border-width: 1.1px; }
+    .vt-icon, .filter-toggle .ft-icon { transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+  }
+  @media screen and (min-width: 992px) and (hover: hover) {
+    .view-btn:hover, html body .nav #filter-list > div.filter-toggle:hover { background-color: #efefef; }
+    .view-btn:hover .vt-icon, .filter-toggle:hover .ft-icon { transform: scale(1.18) rotate(-8deg); }
+    .view-btn:active .vt-icon, .filter-toggle:active .ft-icon { transform: scale(.9); transition-duration: .1s; }
+    /* the dot for the category a tap would go to fills in halfway */
+    .filter-toggle:hover .ft-dots i.--on + i,
+    .filter-toggle:hover .ft-dots i:first-child:not(.--on):has(~ i.--on:last-child) { background: #999; }
+  }
   @media screen and (max-width: 991px) {
     body .nav.v--new { gap: 4px; left: 30px; bottom: 20px; }
     .view-nav { right: 30px; bottom: 20px; padding: 8px; }
@@ -2794,7 +2813,7 @@ a {
       btn.dataset.view = next;
       btn.setAttribute('aria-label', 'Switch to ' + labels[next].toLowerCase() + ' view');
       btn.title = labels[next];
-      btn.innerHTML = icons[next];
+      btn.innerHTML = '<span class="vt-icon">' + icons[next] + '</span>';
     };
     paint();
     const flip = () => {
@@ -2803,10 +2822,10 @@ a {
       const view = prev === 'grid' ? other : 'grid';
       document.body.dataset.view = view;
       // icon spins out and the next one spins in
-      const icon = btn.firstElementChild;
+      const icon = btn.querySelector('.view-icon');
       gsap.timeline()
         .to(icon, { rotate: 90, scale: 0.4, opacity: 0, duration: 0.16, ease: 'power2.in' })
-        .add(() => { paint(); gsap.fromTo(btn.firstElementChild, { rotate: -90, scale: 0.4, opacity: 0 }, { rotate: 0, scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2)' }); });
+        .add(() => { paint(); gsap.fromTo(btn.querySelector('.view-icon'), { rotate: -90, scale: 0.4, opacity: 0 }, { rotate: 0, scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2)' }); });
       if (view === 'scroll') return window.ScrollView && window.ScrollView.show();
       if (prev === 'scroll') {
         window.ScrollView && window.ScrollView.hide();
