@@ -2753,7 +2753,9 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         cols, isShelf, colW, rowH,
         colProducts: cols.map(col => [...col.children]),
         colStep, rowStep, W, H, homeX, homeY,
-        wrapX: gsap.utils.wrap(gridX - colStep / 2, gridX - colStep / 2 + W),
+        // shelf: keep just two pieces in reserve off the left edge so the row runs a long way
+        // to the right of the first piece before it loops back around
+        wrapX: isShelf ? gsap.utils.wrap(-2 * colStep, -2 * colStep + W) : gsap.utils.wrap(gridX - colStep / 2, gridX - colStep / 2 + W),
         wrapY: rows > 1 ? gsap.utils.wrap(gridY - rowStep / 2, gridY - rowStep / 2 + H) : (v => v),
       }
       return true
