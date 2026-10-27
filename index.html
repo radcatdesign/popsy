@@ -853,6 +853,93 @@ a {
     .view-btn { padding: 6px 6px; }
     .view-icon { width: 24px; height: 24px; }
   }
+  /* Phone scroll feed */
+  .scroll-view {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: y proximity;
+    background: #fff;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+  }
+  .scroll-view.--open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease, visibility 0s;
+  }
+  .sv-list { padding: 84px 0 120px; }
+  .sv-item {
+    min-height: 74svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 30px;
+    scroll-snap-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  .sv-item:last-child { border-bottom: 0; }
+  .sv-media {
+    position: relative;
+    width: min(80vw, 420px);
+    aspect-ratio: 1;
+  }
+  .sv-media img,
+  .sv-media video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .sv-media video { opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+  .sv-item.--playing .sv-media video { opacity: 1; }
+  .sv-caption {
+    margin-top: 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-height: 120px;
+  }
+  .sv-caption > * {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .sv-item.--in .sv-caption > * {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.55s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sv-item.--in .sv-caption > :nth-child(2) { transition-delay: 0.07s; }
+  .sv-item.--in .sv-caption > :nth-child(3) { transition-delay: 0.14s; }
+  .sv-item.--in .sv-caption > :nth-child(4) { transition-delay: 0.21s; }
+  .sv-name { font-size: 26px; line-height: 1.1; margin: 0; font-weight: normal; }
+  .sv-nick { font-size: 17px; margin: 0; }
+  .sv-size { font-size: 16px; margin: 0; color: #444; }
+  .sv-btn {
+    appearance: none;
+    font: inherit;
+    font-size: 18px;
+    margin-top: 10px;
+    padding: 8px 24px;
+    border-radius: 8px;
+    background: #000;
+    color: #fff;
+    border: 1px solid transparent;
+    border-image-outset: 3px;
+    border-image-width: 30px;
+    border-image-slice: 15;
+    border-image-repeat: stretch;
+    border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.png);
+  }
   /* Feature tiles: a 2x2 monster. The big piece overflows its cell; the three cells it covers
      are see-through and click-through, and the grid lines inside the block are hidden. */
   .grid .column .product.--big > div {
@@ -2487,6 +2574,7 @@ a {
         	document.body.dataset.filter = el.dataset.filter;
           document.body.dataset.navOpen = '';
           rebuildGrid();
+          if (document.body.dataset.view === 'scroll' && window.ScrollView) window.ScrollView.render();
         });
       });
     }
@@ -2615,27 +2703,114 @@ a {
     };
     const wrap = document.createElement('div');
     wrap.className = 'view-toggle';
-    ['grid', 'shelf'].forEach(view => {
+    icons.scroll = '<svg class="view-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.2 4.6c4.6-.3 9.2-.3 13.8 0 .3 3.4.3 6.8 0 10.2-4.6.3-9.2.3-13.8 0-.3-3.4-.3-6.8 0-10.2Z"/><path d="M7.3 19.2c4.6-.2 9.1-.2 13.7.1"/><path d="M7.4 23.6c4.5-.2 9-.2 13.5.1"/><path d="M26.2 6.4c.3 6.5.3 13 0 19.4"/><path d="M24.2 22.8c.7 1.1 1.3 2.1 2 3.1.7-1.1 1.4-2.1 2.1-3"/></svg>';
+    // phones get grid + a vertical scroll feed; larger screens get grid + shelf
+    const isPhone = window.matchMedia('(max-width: 767px)').matches;
+    const labels = { grid: 'Grid', shelf: 'Shelf', scroll: 'Scroll' };
+    (isPhone ? ['grid', 'scroll'] : ['grid', 'shelf']).forEach(view => {
       const btn = document.createElement('div');
       btn.className = 'view-btn' + (document.body.dataset.view === view ? ' --active' : '');
       btn.dataset.view = view;
       btn.setAttribute('role', 'button');
-      btn.setAttribute('aria-label', view === 'grid' ? 'Grid view' : 'Shelf view');
-      btn.title = view === 'grid' ? 'Grid' : 'Shelf';
+      btn.setAttribute('aria-label', labels[view] + ' view');
+      btn.title = labels[view];
       btn.innerHTML = icons[view];
       btn.addEventListener('click', () => {
         if (!document.getElementById('container').classList.contains('--is-loaded')) return;
-        if (document.body.dataset.view === view) return;
+        const prev = document.body.dataset.view;
+        if (prev === view) return;
         document.body.dataset.view = view;
         wrap.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('--active', b.dataset.view === view));
+        if (view === 'scroll') return window.ScrollView && window.ScrollView.show();
+        if (prev === 'scroll') {
+          window.ScrollView && window.ScrollView.hide();
+          if (view === 'grid') return; // the grid stayed built underneath
+        }
         if (view === 'shelf' && window.lineUpToShelf) window.lineUpToShelf();
         else window.rebuildGrid && window.rebuildGrid();
       });
       wrap.appendChild(btn);
     });
+    // (scroll feed lives in window.ScrollView, below)
     // its own pill in the bottom-right corner (filters sit bottom-left)
     wrap.classList.add('view-nav');
     document.body.appendChild(wrap);
+  })();
+
+  // Phone scroll feed: one big piece per screen, scrolling vertically. As a piece settles into
+  // view its name, size and a Details button rise up under it (and its video plays); they drop
+  // away again as you scroll past.
+  window.ScrollView = (function () {
+    let el, list, observer;
+    const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const plain = html => { const d = document.createElement('div'); d.innerHTML = html || ''; return d.textContent; };
+    function build() {
+      el = document.createElement('div');
+      el.className = 'scroll-view';
+      el.innerHTML = '<div class="sv-list"></div>';
+      list = el.firstChild;
+      document.body.appendChild(el);
+      observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          const sec = e.target;
+          const v = sec.querySelector('video');
+          if (e.intersectionRatio >= 0.6) {
+            sec.classList.add('--in');
+            if (v && el.classList.contains('--open')) {
+              v.loop = true; v.preload = 'auto';
+              v.play().then(() => sec.classList.add('--playing')).catch(() => {});
+            }
+          } else if (sec.classList.contains('--in')) {
+            sec.classList.remove('--in');
+            if (v && !v.paused) {
+              // let the current loop finish, then fade back to the photo
+              v.loop = false;
+              v.addEventListener('ended', () => { if (!sec.classList.contains('--in')) sec.classList.remove('--playing'); }, { once: true });
+            }
+          }
+        });
+      }, { root: el, threshold: [0, 0.6] });
+      el.addEventListener('click', e => {
+        const btn = e.target.closest('.sv-btn');
+        if (!btn || !window.PiecePopup) return;
+        const item = window.items.find(i => i.id === btn.dataset.id);
+        if (item) window.PiecePopup.open(item);
+      });
+    }
+    function render() {
+      if (!el) build();
+      observer.disconnect();
+      const filter = document.body.dataset.filter;
+      const items = window.items.filter(p => p.id !== 'popsy-wolf' && (!filter || p.category === filter));
+      list.innerHTML = items.map(item => {
+        const name = plain(item.name);
+        const m = name.match(/^(.*?)\s*([“"].*[”"])\s*$/);
+        const title = m ? m[1] : name, nick = m ? m[2] : '';
+        const video = item.video ? '<video muted playsinline preload="none"><source src="' + esc(item.video) + '" type="video/webm">' +
+          (/^assets\/hover\/.+\.webm$/i.test(item.video) ? '<source src="' + esc(item.video.replace(/\.webm$/i, '.mp4')) + '" type="video/mp4">' : '') + '</video>' : '';
+        return '<section class="sv-item">' +
+          '<div class="sv-media"><img src="' + esc(item.img) + '" alt="' + esc(name) + '" loading="lazy">' + video + '</div>' +
+          '<div class="sv-caption">' +
+          '<h3 class="sv-name">' + esc(title) + '</h3>' +
+          (nick ? '<p class="sv-nick">' + esc(nick) + '</p>' : '') +
+          (item.size ? '<p class="sv-size">' + esc(item.size) + '</p>' : '') +
+          '<button class="sv-btn" type="button" data-id="' + esc(item.id) + '">Details</button>' +
+          '</div></section>';
+      }).join('');
+      list.querySelectorAll('video').forEach(v => { v.muted = true; });
+      list.querySelectorAll('.sv-item').forEach(sec => observer.observe(sec));
+      el.scrollTop = 0;
+    }
+    function show() {
+      render();
+      requestAnimationFrame(() => el.classList.add('--open'));
+    }
+    function hide() {
+      if (!el) return;
+      el.classList.remove('--open');
+      list.querySelectorAll('video').forEach(v => v.pause());
+    }
+    return { show, hide, render };
   })();
 </script>
   </div>
@@ -2761,7 +2936,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     startAmbient() {
       const tick = () => {
         this.ambientTimer = window.setTimeout(tick, 1400 + Math.random() * 1800)
-        if (document.hidden || this.SHOW_DETAILS) return
+        if (document.hidden || this.SHOW_DETAILS || document.body.dataset.view === 'scroll') return
         if (this.grid.querySelectorAll('.product[data-video-state^="auto"]').length >= 2) return
         if (this.grid.querySelector('.product[data-video-state="on"]')) return
         const vw = window.innerWidth, vh = window.innerHeight
@@ -2894,7 +3069,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.updateFocus()
     }
     updateFocus() {
-      if (!this.layout || document.body.dataset.started !== 'true' || this.SHOW_DETAILS) return
+      if (!this.layout || document.body.dataset.started !== 'true' || this.SHOW_DETAILS || document.body.dataset.view === 'scroll') return
       const cx = window.innerWidth / 2
       const cy = this.layout.isShelf ? this.offset.y + this.layout.rowH / 2 : window.innerHeight / 2
       let best = null, bd = Infinity
