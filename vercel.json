@@ -30,7 +30,7 @@
    ]
   },
   {
-   "source": "/assets/popsy-logo.svg",
+   "source": "/assets/(popsy-logo-v2.svg|intro/.*)",
    "headers": [
     {
      "key": "Cache-Control",

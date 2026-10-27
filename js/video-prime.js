@@ -117,5 +117,5 @@
     });
   }
 
-  window.PopsyVideo = { prime: prime, watch: watch, pick: pick, fileFor: fileFor, preloadAll: preloadAll };
+  window.PopsyVideo = { prime: prime, watch: watch, pick: pick, fileFor: fileFor, preloadAll: preloadAll, load: load };
 })();
