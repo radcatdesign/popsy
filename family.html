@@ -2467,8 +2467,16 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
                 const media = nodeEl && nodeEl.querySelector('.node-media');
                 // center on the logo image itself (the node also holds a name label under it)
                 const mediaOffset = media ? (media.offsetTop + media.offsetHeight / 2) : highestNode.height / 2;
-                // phones: logo sits in the upper part of the screen so more of the tree shows below it
-                const raise = window.innerWidth < 600 ? (0.5 - 0.3) * window.innerHeight / zoomP : 0;
+                // phones: logo sits up in the top row, level with "about" and "back",
+                // so the tree fills the screen below it
+                let raise = 0;
+                if (window.innerWidth < 600) {
+                  const about = document.querySelector('.about-link');
+                  const rowY = about ? about.getBoundingClientRect().top + about.offsetHeight / 2 : 42;
+                  // never let the top of the logo touch the screen edge
+                  const halfLogo = (media ? media.offsetHeight : 160) * zoomP / 2;
+                  raise = (window.innerHeight / 2 - Math.max(rowY, halfLogo + 10)) / zoomP;
+                }
                 setCenter(highestNode.x + highestNode.width / 2, highestNode.y + mediaOffset + raise, { zoom: zoomP, duration: 0 });
               };
               const waitForTree = (tries = 0) => {
