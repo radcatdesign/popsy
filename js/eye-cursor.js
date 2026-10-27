@@ -184,13 +184,31 @@
         var wnx = m00 * nx + m01 * ny + m02 * nz, wny = m10 * nx + m11 * ny + m12 * nz, wnz = m20 * nx + m21 * ny + m22 * nz;
         var nl = Math.hypot(wnx, wny, wnz) || 1; wnx /= nl; wny /= nl; wnz /= nl;
         // keep the outline round: lean the silhouette normals toward the sphere
-        var k = 1 - wz * wz; wnx += (wx - wnx) * k * 0.6; wny += (wy - wny) * k * 0.6; wnz += (wz - wnz) * k * 0.6;
+        var k = 1 - wz * wz; k = k * k * 0.5; wnx += (wx - wnx) * k; wny += (wy - wny) * k; wnz += (wz - wnz) * k;
         if (shadow) { col[0] *= 1 - shadow; col[1] *= 1 - shadow * 1.05; col[2] *= 1 - shadow * 1.1; }
-        shade(wnx, wny, wnz, SHP[t + 3] > LID_EDGE ? 0.5 : 0.6, col, 0.72);
+        glaze(wnx, wny, wnz, COL[t + 3] / 255, col, 0.68);
         px[o] = col[0]; px[o + 1] = col[1]; px[o + 2] = col[2]; px[o + 3] = alpha * 255;
       }
     }
     ctx.putImageData(img, 0, 0);
+  }
+
+  // Glazed clay: the gloss map decides how tight and bright the shine is; a window-shaped
+  // reflection (like the white streaks in the photos) breaks up over the bumps, which is
+  // most of what makes the surface read as 3D.
+  function glaze(nx, ny, nz, g, out, amb) {
+    var diff = nx * L[0] + ny * L[1] + nz * L[2]; if (diff < 0) diff = 0;
+    var k = amb + (1.1 - amb) * diff;
+    var sh = nx * H[0] + ny * H[1] + nz * H[2];
+    var spec = sh > 0 ? Math.pow(sh, 30 + 160 * g) * (0.15 + 0.85 * g) + Math.pow(sh, 10) * 0.05 : 0;
+    // mirror direction for a viewer straight ahead
+    var rx = 2 * nz * nx, ry = 2 * nz * ny;
+    var ex = Math.abs(rx + 0.4) - 0.2, ey = Math.abs(ry - 0.46) - 0.13, soft = 0.035 + 0.05 * (1 - g);
+    var win = Math.max(0, Math.min(1, -ex / soft)) * Math.max(0, Math.min(1, -ey / soft));
+    if (win > 0) { var bar = Math.abs(rx + 0.4); if (bar < 0.018) win *= bar / 0.018; }   // the window's middle bar
+    spec += win * (0.25 + 0.6 * g) * (nz > 0 ? 1 : 0);
+    var rim = 1 - nz; rim = rim * rim * rim * 0.22 * g;                                  // glaze sheen at the edge
+    out[0] = out[0] * k + 255 * (spec + rim); out[1] = out[1] * k + 255 * (spec + rim); out[2] = out[2] * k + 250 * (spec + rim);
   }
 
   function render() {
