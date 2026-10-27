@@ -2187,6 +2187,7 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
   </div>
   <script src="assets/d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
   <script src="js/webflow.js" type="text/javascript"></script>
+  <script src="js/video-prime.js"></script>
   <script src="js/eye-cursor.js"></script>
   <script src="js/piece-popup.js"></script>
   <script src="js/about-popup.js"></script>
@@ -2243,7 +2244,10 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
     };
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const STEP = 0.55, LINE = 0.6, START = 0.5;
-    const tl = gsap.timeline({ onComplete: () => window.startFamilyAmbient() });
+    const tl = gsap.timeline({ onComplete: () => {
+      if (window.PopsyVideo) window.PopsyVideo.watch(document.querySelectorAll('.node-media'));
+      window.startFamilyAmbient();
+    } });
     if (reduce) tl.timeScale(5);
     document.querySelectorAll('.react-flow__node').forEach(n => {
       const inner = n.querySelector('.w-40') || n;

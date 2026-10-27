@@ -175,12 +175,16 @@
     imgEl.src = item.img || item.image || '';
     imgEl.alt = name;
     videoEl.classList.remove('--playing');
+    videoEl.pause();
+    videoEl.removeAttribute('src');
+    delete videoEl.dataset.primed;
     videoEl.innerHTML = '';
     if (item.video) {
       videoEl.innerHTML = '<source src="' + esc(item.video) + '" type="video/webm">' +
         (/^assets\/hover\/.+\.webm$/i.test(item.video) ? '<source src="' + esc(item.video.replace(/\.webm$/i, '.mp4')) + '" type="video/mp4">' : '');
       videoEl.load();
-      videoEl.play().catch(function () {});
+      if (window.PopsyVideo) window.PopsyVideo.prime(videoEl).then(function () { videoEl.play().catch(function () {}); });
+      else videoEl.play().catch(function () {});
     }
     form.reset();
     form.querySelector('[name="message"]').value = 'Hi Brandon, I’m interested in ' + name + '.';
