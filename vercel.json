@@ -1,33 +1,42 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "headers": [
+ "cleanUrls": true,
+ "trailingSlash": false,
+ "headers": [
+  {
+   "source": "/assets/hover/(.*)",
+   "headers": [
     {
-      "source": "/assets/hover/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400, stale-while-revalidate=604800"
-        }
-      ]
-    },
-    {
-      "source": "/assets/cdn.prod.website-files.com/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400, stale-while-revalidate=604800"
-        }
-      ]
-    },
-    {
-      "source": "/assets/unpkg.com/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=604800, immutable"
-        }
-      ]
+     "key": "Cache-Control",
+     "value": "public, max-age=86400, stale-while-revalidate=604800"
     }
-  ]
+   ]
+  },
+  {
+   "source": "/assets/cdn.prod.website-files.com/(.*)",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=86400, stale-while-revalidate=604800"
+    }
+   ]
+  },
+  {
+   "source": "/assets/unpkg.com/(.*)",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=604800, immutable"
+    }
+   ]
+  },
+  {
+   "source": "/assets/popsy-logo.svg",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=86400, stale-while-revalidate=604800"
+    }
+   ]
+  }
+ ]
 }

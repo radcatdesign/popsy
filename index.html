@@ -2439,6 +2439,8 @@ a {
   */
   // TEMP - END
   window.popsyLogoItem = window.items.find(item => item.id === 'popsy-wolf');
+  // the center logo tile uses the traced vector, so it matches the intro and stays sharp
+  if (window.popsyLogoItem) window.popsyLogoItem.img = 'assets/popsy-logo.svg';
   // SORT ARRAY
   window.items = window.items
   	.map(value => ({ value, sort: Math.random() }))
@@ -2888,7 +2890,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         const mouth = overlay.querySelector('.intro-mouth')
         const mcx = +mouth.getAttribute('cx'), mcy = +mouth.getAttribute('cy'), mr = +mouth.dataset.r
         const mx = c + (mcx * sv - c) * ls, my = c + ((mcy - 16.5) * sv - c) * ls
-        const Z = Math.max(2.5, Math.min(7, 0.42 * Math.min(window.innerWidth, window.innerHeight) / (2 * mr * sv * ls)))
+        const Z = Math.max(1.7, Math.min(3, 0.22 * Math.min(window.innerWidth, window.innerHeight) / (2 * mr * sv * ls)))
         if (!this.reduceMotion) gsap.set(overlay, { transformOrigin: `${mx}px ${my}px`, x: c - mx, y: c - my, scale: Z })
         // a letter draws stroke by stroke; its eye dot lands partway through, not after
         const drawGroup = (g, at, dur) => {
@@ -2924,9 +2926,23 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         ;['Y', 'O2', 'U'].forEach(g => { drawGroup(g, t, 0.15); t += 0.14 })
         tl.to({}, { duration: 0.15 })
       }
-      const img = new Image()
-      img.onload = img.onerror = start
-      img.src = overlay.querySelector('image').getAttribute('href')
+      // Draw the traced vector version of the logo so the close-up stays sharp at any zoom
+      // (the AVIF is only 914px wide and goes soft when the camera is in tight)
+      const raster = overlay.querySelector('image')
+      const useRaster = () => {
+        const img = new Image()
+        img.onload = img.onerror = start
+        img.src = raster.getAttribute('href')
+      }
+      fetch('assets/popsy-logo.svg').then(r => r.ok ? r.text() : Promise.reject(r.status)).then(txt => {
+        const m = txt.match(/\sd="([^"]+)"/)
+        if (!m) throw new Error('no path')
+        const vec = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        vec.setAttribute('d', m[1])
+        vec.setAttribute('mask', 'url(#intro-logo-mask)')
+        raster.replaceWith(vec)
+        start()
+      }).catch(useRaster)
     }
     finishDraw(overlay) {
       gsap.set(this.logoDiv, { opacity: 1 })
