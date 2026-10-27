@@ -14,10 +14,10 @@
     if (!list.length) return null;
     var mp4 = list.filter(function (s) { return /mp4/.test(s.type) || /\.mp4$/i.test(s.src); })[0];
     var webm = list.filter(function (s) { return /webm/.test(s.type) || /\.webm$/i.test(s.src); })[0];
-    var canWebm = webm && v.canPlayType('video/webm; codecs="vp8"');
-    if (preferMp4 && mp4) return mp4.src;
-    if (canWebm) return webm.src;
-    return (mp4 || list[0]).src;
+    var okWebm = webm && v.canPlayType('video/webm; codecs="vp9"');
+    if (preferMp4 && mp4) return hd(mp4.src);
+    if (okWebm) return hd(webm.src);
+    return hd((mp4 || list[0]).src);
   }
 
   var progressFns = new Map(); // url -> fn(bytesSoFar, totalBytes)
@@ -46,11 +46,21 @@
 
   // Which file this browser will actually play for a .webm hover video (same choice as pick())
   var probe = document.createElement('video');
-  var canWebm = !!probe.canPlayType('video/webm; codecs="vp8"');
+  var canWebm = !!probe.canPlayType('video/webm; codecs="vp9"');
+  // Pieces with a sharper 960px cut (name-hd.webm / name-hd.mp4). Tiles, the big 2x2 tiles and
+  // the shelf are drawn well past 480px on desktop and tablet, so those screens get it; phones
+  // keep the lighter 480px file.
+  var HD = ['darlene', 'dremmel', 'frillick', 'gorble', 'gumphrey', 'marnie', 'noshik', 'peepers', 'tav', 'tiv', 'ziggo'];
+  var wantHd = !!(window.matchMedia && window.matchMedia('(min-width: 768px)').matches);
+  function hd(url) {
+    if (!wantHd || !url) return url;
+    var m = url.match(/\/([a-z]+)\.(webm|mp4)$/i);
+    return m && HD.indexOf(m[1].toLowerCase()) > -1 ? url.replace(/\.(webm|mp4)$/i, '-hd.$1') : url;
+  }
   function fileFor(webm) {
     var mp4 = webm.replace(/\.webm$/i, '.mp4');
-    if (preferMp4 || !canWebm) return mp4;
-    return webm;
+    if (preferMp4 || !canWebm) return hd(mp4);
+    return hd(webm);
   }
 
   // Download a whole set up front. onProgress(0..1) as bytes arrive; failures count as done

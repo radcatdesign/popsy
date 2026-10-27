@@ -1036,10 +1036,23 @@ a {
   .grid.--shelf .product div {
     width: min(52svh, 36vw);
   }
+  .shelf-logo {
+    position: fixed; top: 12px; left: 50%; width: 76px; height: 76px; margin-left: -38px; z-index: 20;
+    opacity: 0; transform: translateY(-10px); pointer-events: none;
+    transition: opacity .4s ease, transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .shelf-logo img, .shelf-logo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .shelf-logo.--moving img { opacity: 0; }
+  body[data-view="shelf"][data-started] .shelf-logo { opacity: 1; transform: none; }
+  body[data-view="shelf"]:has(#container.--is-details-showing) .shelf-logo { opacity: 0; }
   .grid .product .shelf-cap { display: none; }
+  /* shelf: no grid lines, just the pieces */
+  .grid.--shelf .column::before,
+  .grid.--shelf .column .product::before,
+  .grid.--shelf .product::after { display: none !important; }
   .grid.--shelf .product .shelf-cap {
     display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
-    position: absolute; left: 0; right: 0; top: calc(100% + 2.5vw + 18px); pointer-events: none;
+    position: absolute; left: 0; right: 0; top: calc(100% + 2px); pointer-events: none;
   }
   .grid.--shelf .shelf-cap > * {
     opacity: 0; transform: translateY(22px);
@@ -1052,8 +1065,10 @@ a {
   .grid.--shelf .product.--cap-in .shelf-cap > :nth-child(2) { transition-delay: 0.07s; }
   .grid.--shelf .product.--cap-in .shelf-cap > :nth-child(3) { transition-delay: 0.14s; }
   .grid.--shelf .product.--cap-in .shelf-cap > :nth-child(4) { transition-delay: 0.21s; }
-  .grid.--shelf .product.--cap-in .shelf-cap .sv-btn { pointer-events: auto; cursor: pointer; }
-  .grid.--shelf .shelf-cap .sv-btn { margin-top: 8px; }
+  .grid.--shelf .shelf-cap .sv-btn { margin-top: 18px; }
+  /* only the piece in the middle offers Details */
+  .grid.--shelf .product.--cap-in:not(.--mid) .shelf-cap .sv-btn { opacity: 0; transform: translateY(12px); transition-delay: 0s; }
+  .grid.--shelf .product.--cap-in.--mid .shelf-cap .sv-btn { pointer-events: auto; cursor: pointer; }
   @media (hover: hover) {
     .grid.--shelf .shelf-cap .sv-btn:hover { background: #333; }
   }
@@ -1452,7 +1467,7 @@ a {
   window.items.push({
   	id: `dax`,
     name: decodeHTML(`Dax Glimmerwick “The Overthinker with Great Timing”`),
-    img: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52cee085a37dc80942181_M_F-23.avif`,
+    img: `assets/thumbs/dax-glimmerwick_M_F-23.jpg`,
     price: ``,
     color: ``,
     size: ``,
@@ -2875,7 +2890,7 @@ a {
     if (!nav || nav.querySelector('.view-toggle')) return;
     const icons = {
       grid: '<svg class="view-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.4 6.8c2.5-.3 5-.2 7.4 0 .3 2.4.2 4.9 0 7.3-2.4.2-4.9.3-7.3 0-.3-2.4-.3-4.9-.1-7.3Z"/><path d="M18.2 6.6c2.5-.2 4.9-.1 7.4.1.2 2.5.2 4.9 0 7.4-2.5.2-4.9.2-7.4 0-.2-2.5-.2-5 0-7.5Z"/><path d="M6.5 18.2c2.4-.2 4.9-.2 7.3 0 .3 2.4.3 4.9.1 7.3-2.5.3-4.9.3-7.4.1-.2-2.5-.2-5 0-7.4Z"/><path d="M18.3 18c2.4-.2 4.9-.1 7.3.1.2 2.5.2 4.9 0 7.4-2.4.2-4.9.2-7.3 0-.3-2.5-.3-5-.0-7.5Z"/></svg>',
-      shelf: '<svg class="view-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.6 24.6c8.3-.4 16.5-.4 24.8.1"/><path d="M5.4 24.2c-.3-3.4-.2-6.7.2-10 1.9-.3 3.8-.3 5.7 0 .3 3.3.4 6.6.1 9.9"/><path d="M13.6 24.2c-.4-4.6-.2-9.1.3-13.6 1.8-.4 3.7-.4 5.5 0 .5 4.5.6 9 .2 13.5"/><path d="M21.7 24.1c-.4-2.6-.3-5.1.2-7.6 1.6-.3 3.3-.3 4.9.1.4 2.5.4 5 0 7.4"/></svg>',
+      shelf: '<svg class="view-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 9.6c2.3-.2 4.5-.2 6.8 0 .3 4.3.3 8.6 0 12.8-2.3.2-4.5.2-6.8 0-.3-4.2-.3-8.5 0-12.8Z"/><path d="M12.6 9.4c2.3-.2 4.6-.1 6.9.1.3 4.3.3 8.6 0 12.9-2.3.2-4.6.2-6.9 0-.3-4.3-.3-8.7 0-13Z"/><path d="M22.6 9.6c2.3-.2 4.5-.2 6.8.1.3 4.2.3 8.5 0 12.7-2.2.2-4.5.2-6.8 0-.3-4.2-.3-8.5 0-12.8Z"/></svg>',
     };
     const wrap = document.createElement('div');
     wrap.className = 'view-toggle';
@@ -2924,6 +2939,25 @@ a {
     document.body.appendChild(wrap);
   })();
 
+  // Shelf view: the logo sits small at the top centre (the moving loop when it's available)
+  (function shelfLogo() {
+    const el = document.createElement('div');
+    el.className = 'shelf-logo';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<img src="assets/popsy-logo-v2.svg" alt="">';
+    document.body.appendChild(el);
+    const tryLoop = () => {
+      if (!window.PopsyLogoLoop || el.querySelector('video')) return;
+      const v = document.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true;
+      el.appendChild(v);
+      window.PopsyLogoLoop.then(url => { v.src = url; return v.play(); })
+        .then(() => el.classList.add('--moving')).catch(() => v.remove());
+    };
+    // start it the first time shelf view opens
+    new MutationObserver(() => { if (document.body.dataset.view === 'shelf') tryLoop(); })
+      .observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
+  })();
   // Phone scroll feed: one big piece per screen, scrolling vertically. As a piece settles into
   // view its name, size and a Details button rise up under it (and its video plays); they drop
   // away again as you scroll past.
@@ -3329,6 +3363,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       if (!L) return
       const ox = this.offset.x
       const oy = this.offset.y
+      let mid = null, midD = Infinity
       for (let c = 0; c < L.cols.length; c++) {
         const base = c * L.colStep
         if (L.isShelf) {
@@ -3342,6 +3377,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
             const left = L.gridLeft + x, vis = Math.min(left + L.colW, window.innerWidth) - Math.max(left, 0)
             const on = vis >= L.colW * 0.6
             if (on !== pr.classList.contains('--cap-in')) pr.classList.toggle('--cap-in', on)
+            const d = Math.abs(left + L.colW / 2 - window.innerWidth / 2)
+            if (d < midD) { midD = d; mid = pr }
           }
           continue
         }
@@ -3351,6 +3388,11 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
           const rb = r * L.rowStep
           prods[r].style.transform = `translate3d(0,${L.wrapY(rb + oy) - rb}px,0)`
         }
+      }
+      if (L.isShelf && mid !== this.midProduct) {
+        if (this.midProduct) this.midProduct.classList.remove('--mid')
+        if (mid) mid.classList.add('--mid')
+        this.midProduct = mid
       }
       this.scheduleFocus()
     }
