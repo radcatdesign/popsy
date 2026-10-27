@@ -3202,13 +3202,16 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     let onScreen = [...grid.grid.querySelectorAll('.product > div')]
       .map(d => ({ d, id: d.dataset.id, r: d.getBoundingClientRect() }))
       .filter(o => o.id !== 'popsy-wolf' && o.r.width > 0 && o.r.right > 0 && o.r.left < vw && o.r.bottom > 0 && o.r.top < vh)
-    // first = the piece closest to the middle of the screen (where you are on the canvas);
-    // the rest line up to its right, nearest pieces first
+    // first = the piece closest to the middle of the screen (where you are on the canvas),
+    // picked from those at or left of center so it only ever moves right; the rest follow
+    // in left-to-right order, which keeps every piece moving right as the row assembles
     const dist = (a, x, y) => Math.hypot(mid(a)[0] - x, mid(a)[1] - y)
-    const anchor = onScreen.slice().sort((a, b) => dist(a, vw / 2, vh / 2) - dist(b, vw / 2, vh / 2))[0]
+    const byCenter = (a, b) => dist(a, vw / 2, vh / 2) - dist(b, vw / 2, vh / 2)
+    const leftOfMid = onScreen.filter(o => mid(o)[0] <= vw / 2 + 2)
+    const anchor = (leftOfMid.length ? leftOfMid : onScreen).slice().sort(byCenter)[0]
     if (anchor) {
-      const [ax, ay] = mid(anchor)
-      onScreen = [anchor].concat(onScreen.filter(o => o !== anchor).sort((a, b) => dist(a, ax, ay) - dist(b, ax, ay)))
+      onScreen = [anchor].concat(onScreen.filter(o => o !== anchor)
+        .sort((a, b) => (a.r.left - b.r.left) || (a.r.top - b.r.top)))
     }
     const lineup = [], extras = []
     onScreen.forEach(o => {
@@ -3238,9 +3241,16 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         window.setTimeout(() => grid.observeProducts(), 300)
       }
     })
+    const firstX = cols[0] ? cols[0].getBoundingClientRect().left : 0
     lineup.forEach((o, k) => {
       const target = cols[k] && cols[k].querySelector('.product > div')
       if (!target) return
+      // slots far enough along the looping shelf wrap round to the left; those pieces
+      // don't fly (that would be leftward) and just fade out with the old grid
+      if (k > 0 && target.getBoundingClientRect().left <= firstX) {
+        o.d.style.opacity = ''
+        return
+      }
       placed.add(target)
       // fly above the other tiles (their photos have white backgrounds)
       cols[k].style.zIndex = String(200 - k)
