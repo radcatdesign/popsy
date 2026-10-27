@@ -4,8 +4,10 @@
    a little over things you can click. Mouse / trackpad devices only.
 
    No 3D library: at cursor size the ball is only ~70x70 real pixels, so a small canvas
-   ray-traces two spheres (the lid shell and the slightly smaller ball inside it) every frame
-   it moves, with glaze-like lighting and speckle textures made from noise. */
+   ray-traces it every frame it moves. The look comes from the clay eyeball model (Meshy), baked
+   into two small sphere maps: its colours (eye-colour.webp) and its surface shape (eye-shape.webp:
+   surface direction in RGB, how far the surface stands out in alpha, which is what tells the
+   raised lid from the ball). Until those load, a drawn stand-in with the same proportions shows. */
 (function () {
   if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -125,12 +127,79 @@
     out[0] = out[0] * k + 255 * spec; out[1] = out[1] * k + 255 * spec; out[2] = out[2] * k + 255 * spec;
   }
 
+  /* ---------- the clay model, baked to sphere maps ---------- */
+  var MW = 512, MH = 256, COL = null, SHP = null;
+  var LID_EDGE = 134;                                // shape alpha above this = the raised lid
+  var LID_MAX = 64 * Math.PI / 180;                  // how far the lid slides down for a full blink
+  (function loadModel() {
+    var base = (document.currentScript && document.currentScript.src) ? document.currentScript.src.replace(/js\/eye-cursor\.js.*$/, '') : '/';
+    var got = 0, imgs = [new Image(), new Image()];
+    imgs.forEach(function (im, k) {
+      im.decoding = 'async';
+      im.onload = function () {
+        var c = document.createElement('canvas'); c.width = MW; c.height = MH;
+        var g = c.getContext('2d', { willReadFrequently: true });
+        g.drawImage(im, 0, 0, MW, MH);
+        var data = g.getImageData(0, 0, MW, MH).data;
+        if (k === 0) COL = data; else SHP = data;
+        if (++got === 2) dirty = true;
+      };
+      im.src = base + 'assets/eye/' + (k === 0 ? 'eye-colour.webp' : 'eye-shape.webp');
+    });
+  })();
+  var TWO_PI = Math.PI * 2;
+  function texel(x, y, z) {
+    var u = (Math.atan2(x, z) / TWO_PI + 0.5) * MW, v = (0.5 - Math.asin(y > 1 ? 1 : y < -1 ? -1 : y) / Math.PI) * MH;
+    var iu = u | 0, iv = v | 0; if (iu >= MW) iu = MW - 1; if (iv >= MH) iv = MH - 1;
+    return (iv * MW + iu) * 4;
+  }
+  function renderModel(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+    var edge = N / 2 - 0.5, inv = 1 / edge;
+    var a = lid * LID_MAX, ca = Math.cos(a), sa = Math.sin(a);
+    var a2 = a + 0.09, ca2 = Math.cos(a2), sa2 = Math.sin(a2);
+    for (var j = 0; j < N; j++) {
+      var wy = (edge - j) * inv;
+      for (var i = 0; i < N; i++) {
+        var wx = (i - edge) * inv, r2 = wx * wx + wy * wy, o = (j * N + i) * 4;
+        if (r2 > 1.02) { px[o + 3] = 0; continue; }
+        var alpha = Math.max(0, Math.min(1, (1 - Math.sqrt(r2)) * edge * 1.2 + 0.5));
+        var wz = Math.sqrt(1 - Math.min(r2, 1));
+        // the ball's own direction for this pixel
+        var dx = m00 * wx + m10 * wy + m20 * wz, dy = m01 * wx + m11 * wy + m21 * wz, dz = m02 * wx + m12 * wy + m22 * wz;
+        var t = texel(dx, dy, dz), fromLid = false, shadow = 0;
+        if (a > 0.001) {
+          // blinking: the lid slides down, so look up where this spot sat on the lid before it moved
+          var ly = dy * ca + dz * sa, lz = -dy * sa + dz * ca;
+          var tl = texel(dx, ly, lz);
+          if (SHP[tl + 3] > LID_EDGE) { t = tl; fromLid = true; }
+          else {
+            var ly2 = dy * ca2 + dz * sa2, lz2 = -dy * sa2 + dz * ca2;
+            if (SHP[texel(dx, ly2, lz2) + 3] > LID_EDGE) shadow = 0.32;   // tucked just under the moving lid
+          }
+        }
+        col[0] = COL[t]; col[1] = COL[t + 1]; col[2] = COL[t + 2];
+        // the model's own surface direction, turned with the ball (and the lid, if it came from there)
+        var nx = SHP[t] / 127.5 - 1, ny = SHP[t + 1] / 127.5 - 1, nz = SHP[t + 2] / 127.5 - 1;
+        if (fromLid) { var ny2 = ny * ca - nz * sa; nz = ny * sa + nz * ca; ny = ny2; }
+        var wnx = m00 * nx + m01 * ny + m02 * nz, wny = m10 * nx + m11 * ny + m12 * nz, wnz = m20 * nx + m21 * ny + m22 * nz;
+        var nl = Math.hypot(wnx, wny, wnz) || 1; wnx /= nl; wny /= nl; wnz /= nl;
+        // keep the outline round: lean the silhouette normals toward the sphere
+        var k = 1 - wz * wz; wnx += (wx - wnx) * k * 0.6; wny += (wy - wny) * k * 0.6; wnz += (wz - wnz) * k * 0.6;
+        if (shadow) { col[0] *= 1 - shadow; col[1] *= 1 - shadow * 1.05; col[2] *= 1 - shadow * 1.1; }
+        shade(wnx, wny, wnz, SHP[t + 3] > LID_EDGE ? 0.5 : 0.6, col, 0.72);
+        px[o] = col[0]; px[o + 1] = col[1]; px[o + 2] = col[2]; px[o + 3] = alpha * 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
   function render() {
     // rotation matrix (local -> world); its transpose takes a world point back to the ball's own frame
     var w = q[0], x = q[1], y = q[2], z = q[3];
     var m00 = 1 - 2 * (y * y + z * z), m01 = 2 * (x * y - w * z), m02 = 2 * (x * z + w * y);
     var m10 = 2 * (x * y + w * z), m11 = 1 - 2 * (x * x + z * z), m12 = 2 * (y * z - w * x);
     var m20 = 2 * (x * z - w * y), m21 = 2 * (y * z + w * x), m22 = 1 - 2 * (x * x + y * y);
+    if (COL && SHP) return renderModel(m00, m01, m02, m10, m11, m12, m20, m21, m22);
     tilt = REST_TILT + (SHUT_TILT - REST_TILT) * lid; ct = Math.cos(tilt); st = Math.sin(tilt);
     var edge = N / 2 - 0.5, inv = 1 / edge;
     for (var j = 0; j < N; j++) {
