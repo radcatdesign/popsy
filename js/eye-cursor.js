@@ -26,6 +26,11 @@
     '.eye-cursor-el .ec-size { position: relative; width: 100%; height: 100%; transition: transform .25s cubic-bezier(.34,1.56,.64,1); transform-origin: 50% 50%; }',
     '.eye-cursor-el.--hover .ec-size { transform: scale(1.35); }',
     '.eye-cursor-el canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }',
+    /* phones (iPhone): a little tag under the eye until motion access is allowed */
+    '.eye-cursor-el .ec-hint { position: absolute; left: 50%; top: 100%; margin-top: 8px; transform: translateX(-50%); white-space: nowrap;',
+    '  font: 14px/1 Uglydave, sans-serif; background: #fff; color: #000; border: 1px solid #000; border-radius: 8px; padding: 6px 9px 5px;',
+    '  opacity: 0; transition: opacity .3s ease; }',
+    '.eye-cursor-el.--ask .ec-hint { opacity: 1; }',
     /* a soft contact shadow so it reads as a ball sitting just above the page */
     '.eye-cursor-el .ec-shadow { position: absolute; left: 12%; right: 4%; top: 62%; height: 46%; border-radius: 50%;',
     '  background: radial-gradient(closest-side, rgba(60,30,20,.28), rgba(60,30,20,0)); transform: translate(3px, 2px); }'
@@ -35,7 +40,7 @@
   var el = document.createElement('div');
   el.className = 'eye-cursor-el';
   el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = '<div class="ec-size"><div class="ec-shadow"></div><canvas></canvas></div>';
+  el.innerHTML = '<div class="ec-size"><div class="ec-shadow"></div><canvas></canvas></div>' + (TILT ? '<div class="ec-hint">tap to let me roll</div>' : '');
   var canvas = el.querySelector('canvas');
   var ctx = canvas.getContext('2d');
   var N = Math.min(104, Math.round(SIZE * Math.min(3, window.devicePixelRatio || 1) * 1.3)); // a little supersampled for smooth edges
@@ -310,16 +315,17 @@
   }
 
   /* ---------- phones: a loose ball that rolls with the tilt of the device ---------- */
-  var bx = 0, by = 0, vx = 0, vy = 0, gx = 0, gy = 0, base = null, slowSince = 0;
+  var bx = 0, by = 0, vx = 0, vy = 0, gx = 0, gy = 0, base = null;
   if (TILT) {
     bx = ex = window.innerWidth / 2; by = ey = window.innerHeight * 0.6;
     window.addEventListener('deviceorientation', function (e) {
       if (e.beta == null || e.gamma == null) return;
       var b = e.beta, g = e.gamma;
-      // "level" is however you're holding the phone; it drifts slowly toward your grip so a
-      // relaxed hold doesn't pin the ball to one edge, while a tilt sends it rolling
+      sensing = true; el.classList.remove('--ask');
+      // "level" is how you're holding the phone when it first wakes up; after that, tilting
+      // keeps it rolling like a marble (it only creeps toward your grip over half a minute or so)
       if (!base) base = { b: b, g: g };
-      base.b += (b - base.b) * 0.004; base.g += (g - base.g) * 0.004;
+      base.b += (b - base.b) * 0.0005; base.g += (g - base.g) * 0.0005;
       var dX = Math.sin((g - base.g) * Math.PI / 180), dY = Math.sin((b - base.b) * Math.PI / 180);
       var ang = (screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : (window.orientation || 0);
       if (ang === 90) { gx = dY; gy = -dX; }
@@ -327,13 +333,17 @@
       else if (ang === 180) { gx = -dX; gy = -dY; }
       else { gx = dX; gy = dY; }
     });
-    // iPhone / iPad: motion sensors need the visitor's OK, and Safari only asks after a tap
-    var asked = false;
+    // iPhone / iPad: motion sensors need the visitor's OK, and Safari only asks from a tap.
+    // Keep asking on taps until there's an answer (a tap that doesn't count just fails quietly).
+    var D = window.DeviceOrientationEvent, needsAsk = !!(D && typeof D.requestPermission === 'function'), answered = false, sensing = false;
+    var pending = false;
     var askMotion = function () {
-      if (asked) return; asked = true;
-      var D = window.DeviceOrientationEvent;
-      if (D && typeof D.requestPermission === 'function') D.requestPermission().catch(function () {});
+      if (!needsAsk || answered || sensing || pending) return;
+      pending = true;
+      D.requestPermission().then(function (r) { answered = true; el.classList.remove('--ask'); if (r !== 'granted') needsAsk = false; })
+        .catch(function () {}).then(function () { pending = false; });
     };
+    document.addEventListener('click', askMotion, true);
     document.addEventListener('touchstart', function () { down = true; lidTarget = 0.5; }, { passive: true });
     document.addEventListener('touchend', function () { down = false; lidTarget = 0; blink(); askMotion(); }, { passive: true });
     document.addEventListener('touchcancel', function () { down = false; lidTarget = 0; }, { passive: true });
@@ -342,8 +352,8 @@
     var s = dt / 1000, vv = window.visualViewport;
     var W = vv ? vv.width : window.innerWidth, Hh = vv ? vv.height : window.innerHeight;
     if (!reduceMotion) {
-      vx += gx * 2400 * s; vy += gy * 2400 * s;              // downhill
-      var fr = Math.exp(-s * 1.1); vx *= fr; vy *= fr;         // rolling resistance
+      vx += gx * 3600 * s; vy += gy * 3600 * s;              // downhill
+      var fr = Math.exp(-s * 0.55); vx *= fr; vy *= fr;        // a little rolling resistance
       bx += vx * s; by += vy * s;
     }
     var r = SIZE / 2 + 2, hit = 0;
@@ -357,8 +367,11 @@
     // once it's barely moving, let it turn back to look at you
     if (Math.hypot(vx, vy) > 14) lastMove = now;
     el.style.transform = 'translate3d(' + ex + 'px,' + ey + 'px,0)';
-    // appear once the grid has opened
-    if (!el.classList.contains('--on') && document.body.dataset.started) { el.classList.add('--on'); dirty = true; }
+    // appear once the grid has opened (on iPhone, with a nudge to allow motion)
+    if (!el.classList.contains('--on') && document.body.dataset.started) {
+      el.classList.add('--on'); dirty = true;
+      if (needsAsk && !sensing && !answered) el.classList.add('--ask');
+    }
   }
 
   var prev = performance.now();
