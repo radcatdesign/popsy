@@ -2856,12 +2856,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.centerGrid()
       gsap.set(this.products, { opacity: 0 })
       this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      // Full draw-in plays once per browser session; coming back (e.g. from the family tree) is quick
-      this.quickIntro = false
-      try {
-        this.quickIntro = sessionStorage.getItem('popsy-intro-seen') === '1'
-        sessionStorage.setItem('popsy-intro-seen', '1')
-      } catch (err) {}
+      // The full draw-in plays on every load (the family tree is an overlay now, so nobody
+      // bounces back to this page and sits through it twice)
       const overlay = document.querySelector('.intro-logo')
       this.logoDiv = this.grid.querySelector('[data-id="popsy-wolf"]')
       if (!overlay || !this.logoDiv) {
@@ -2884,8 +2880,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         overlay.classList.add('--ready')
         const lenOf = new Map(paths.map((p, i) => [p, lens[i]]))
         const tl = gsap.timeline({ onComplete: () => this.finishDraw(overlay) })
-        if (this.reduceMotion || this.quickIntro) tl.timeScale(25)
-        else tl.timeScale(1.15)
+        // normal speed for everyone; Reduce Motion just skips the camera zoom below
         // Camera starts tight on the mouth (the "o" in Popsy), centered on screen
         const W = r.width, sv = W / 800, c = W / 2
         const ls = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--logo-scale')) || 1
@@ -2893,7 +2888,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         const mcx = +mouth.getAttribute('cx'), mcy = +mouth.getAttribute('cy'), mr = +mouth.dataset.r
         const mx = c + (mcx * sv - c) * ls, my = c + ((mcy - 16.5) * sv - c) * ls
         const Z = Math.max(2.5, Math.min(7, 0.42 * Math.min(window.innerWidth, window.innerHeight) / (2 * mr * sv * ls)))
-        gsap.set(overlay, { transformOrigin: `${mx}px ${my}px`, x: c - mx, y: c - my, scale: Z })
+        if (!this.reduceMotion) gsap.set(overlay, { transformOrigin: `${mx}px ${my}px`, x: c - mx, y: c - my, scale: Z })
         // a letter draws stroke by stroke; its eye dot lands partway through, not after
         const drawGroup = (g, at, dur) => {
           const ps = [...overlay.querySelectorAll(`[data-g="${g}"] path`)]
@@ -2951,8 +2946,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const cy = lr ? lr.top + lr.height / 2 : vh / 2
       const reach = Math.hypot(vw, vh) / 2 + 60
       const tl = gsap.timeline({ onComplete: () => this.afterIntro() })
-      if (this.reduceMotion) tl.timeScale(4)
-      else if (this.quickIntro) tl.timeScale(2.5)
+      if (this.reduceMotion) tl.timeScale(1.5)
       this.grid.querySelectorAll('.product').forEach(pr => {
         const r = pr.getBoundingClientRect()
         const k = Math.min(Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy) / reach, 1.1)
