@@ -2440,7 +2440,7 @@ a {
   window.items.push({
   	id: `gumphrey`,
     name: decodeHTML(`Gumphrey Glimmerwick “The Beautiful Detour”`),
-    img: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01b90c3ff5c22c5a895a3_19-Big.png`,
+    img: `assets/thumbs/gumphrey-glimmerwick_19-Big.png`,
     price: ``,
     color: ``,
     size: ``,
@@ -2540,8 +2540,9 @@ a {
   // with the photo (lets waving arms run past the tile edge instead of cropping them)
   const NAMED_HOVERS = {
     '2-Big': { file: 'darlene' }, '31-Big': { file: 'dremmel' }, '5-Big': { file: 'frillick' },
-    '25-Big': { file: 'gorble' }, '19-Big': { file: 'gumphrey', zoom: 1.143 }, '21-Big': { file: 'noshik' },
+    '25-Big': { file: 'gorble' }, '19-Big': { file: 'gumphrey' }, '21-Big': { file: 'noshik' },
     'M_F-17': { file: 'marnie' }, 'M_F-21': { file: 'peepers', zoom: 1.169 },
+    'M_F-18': { file: 'ziggo', zoom: 1.279 }, '30-Big': { file: 'tav', zoom: 1.097 }, '28-Big': { file: 'tiv', zoom: 1.156 },
   };
   function namedHoverFor(img) {
     const key = Object.keys(NAMED_HOVERS).find(k => new RegExp('_' + k.replace('-', '\\-') + '\\.[a-z0-9]+$', 'i').test(img || ''));
@@ -2761,12 +2762,15 @@ a {
         const taken = new Set();
         const mark = (c, r) => taken.add(c + ',' + r);
         const free = (c, r) => !taken.has(c + ',' + r);
-        for (let dc = -1; dc <= 1; dc++) for (let dr = -1; dr <= 1; dr++) mark(logoC + dc, logoR + dr);
+        mark(logoC, logoR); // big tiles may sit right beside the logo, just not on it
         const spots = [];
         for (let c = 0; c <= columns - 2; c++) for (let r = 0; r <= itemsPerColumn - 2; r++) spots.push([c, r]);
-        spots.sort(() => Math.random() - 0.5);
+        // try spots near the logo first (with some shuffle) so a few big ones are on screen from the start
+        const near = ([c, r]) => Math.hypot(c + 0.5 - logoC, (r + 0.5 - logoR) * 1.2) + Math.random() * 2.5;
+        spots.forEach(sp => { sp.d = near(sp); });
+        spots.sort((a, b) => a.d - b.d);
         const pool = filteredItems.filter(p => p.category === 'monsters' && p.video).sort(() => Math.random() - 0.5);
-        const want = Math.min(5, pool.length);
+        const want = Math.min(14, pool.length);
         for (const [c, r] of spots) {
           if (blocks.length >= want) break;
           let ok = true;
