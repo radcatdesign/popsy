@@ -820,6 +820,12 @@ a {
   .grid .column .product[data-video-state="ending"],
   .grid .column .product[data-video-state="auto"],
   .grid .column .product[data-video-state="focus"] { z-index: 2; mix-blend-mode: multiply; }
+  /* Hovering a piece darkens the four grid lines around it (the whole block for a 2x2 piece).
+     The outline sits exactly on the lines, which run through the middle of the 5vw gaps. */
+  @media (hover: hover) and (pointer: fine) {
+    .grid:not(.--shelf) .column .product > div { outline: 1px solid transparent; outline-offset: calc(2.5vw - 1px); transition: outline-color .2s ease; }
+    .grid:not(.--shelf) .column .product:not(.--covered):hover > div { outline-color: #000; }
+  }
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
   .grid .column .product[data-video-state="auto"] video,
   .grid .column .product[data-video-state="focus"] video { opacity: 1; }
