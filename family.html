@@ -92,6 +92,32 @@
       --details-title: 54px;  
     }
   }
+  /* Phone map (bottom right): small thumbnail that expands to tap-to-go */
+  .fm-map.react-flow__minimap {
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 10px;
+    overflow: hidden;
+    border-image-outset: 1px;
+    border-image-width: 30px;
+    border-image-slice: 25;
+    border-image-repeat: stretch;
+    border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+  }
+  .fm-map.--open.react-flow__minimap { box-shadow: 0 0 0 100vmax rgba(255, 255, 255, 0.7); }
+  .fm-map svg { display: block; }
+  .fm-map-label.react-flow__panel { margin: 0 15px; }
+  .fm-map-label button {
+    appearance: none;
+    font: inherit;
+    font-size: 16px;
+    background: #fff;
+    color: #000;
+    border: 0;
+    padding: 2px 4px;
+    cursor: pointer;
+  }
+  .fm-map-label button span { font-size: 18px; margin-left: 4px; }
   /* Family tree: hover videos sit over each monster's photo */
   .node-media {
     position: relative;
@@ -2308,6 +2334,7 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
       Position,
       MiniMap,
       useReactFlow,
+      Panel,
     } = window.ReactFlow;
     const elk = new ELK();
     const elkLayoutOptions = {
@@ -2349,7 +2376,10 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
       const [edges, setEdges, onEdgesChange] = useEdgesState([]);
       const [isLayouting, setIsLayouting] = useState(true);
       const [filteredItems, setFilteredItems] = useState([]);
-	  	const { zoomTo, setCenter, getViewport } = useReactFlow();
+	  	const { zoomTo, setCenter, getViewport, getZoom } = useReactFlow();
+      // phones: a small map in the corner that expands so you can tap where to go
+      const isPhone = window.innerWidth <= 600;
+      const [mapOpen, setMapOpen] = useState(false);
       useEffect(() => {
         const handleFilteredItems = () => {
           setFilteredItems(window.filteredItems);
@@ -2437,7 +2467,9 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
                 const media = nodeEl && nodeEl.querySelector('.node-media');
                 // center on the logo image itself (the node also holds a name label under it)
                 const mediaOffset = media ? (media.offsetTop + media.offsetHeight / 2) : highestNode.height / 2;
-                setCenter(highestNode.x + highestNode.width / 2, highestNode.y + mediaOffset, { zoom: zoomP, duration: 0 });
+                // phones: logo sits in the upper part of the screen so more of the tree shows below it
+                const raise = window.innerWidth < 600 ? (0.5 - 0.3) * window.innerHeight / zoomP : 0;
+                setCenter(highestNode.x + highestNode.width / 2, highestNode.y + mediaOffset + raise, { zoom: zoomP, duration: 0 });
               };
               const waitForTree = (tries = 0) => {
                 const drawn = document.querySelectorAll('.react-flow__edge-path').length;
@@ -2469,10 +2501,38 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
                 attributionPosition="bottom-left"
                 nodesDraggable={false}
                 onNodeClick={onNodeClick}
+                onPaneClick={() => setMapOpen(false)}
+                onMoveStart={(e) => { if (e) setMapOpen(false); }}
                 minZoom={0.1}
             >
-                {window.innerWidth > 600 && <MiniMap zoomable pannable nodeStrokeWidth={3} />}
-                <Controls showInteractive={false} />
+                {!isPhone && <MiniMap zoomable pannable nodeStrokeWidth={3} />}
+                {isPhone && (
+                  <MiniMap
+                    className={'fm-map' + (mapOpen ? ' --open' : '')}
+                    style={mapOpen
+                      ? { width: window.innerWidth - 30, height: Math.round((window.innerWidth - 30) * 0.62) }
+                      : { width: 104, height: 72 }}
+                    nodeColor="#8c8c8c"
+                    nodeStrokeWidth={3}
+                    maskColor="rgba(255, 255, 255, 0.6)"
+                    maskStrokeColor="#000"
+                    maskStrokeWidth={2}
+                    onClick={(e, pos) => {
+                      if (!mapOpen) { setMapOpen(true); return; }
+                      setCenter(pos.x, pos.y, { zoom: getZoom(), duration: 900 });
+                      setMapOpen(false);
+                    }}
+                  />
+                )}
+                {isPhone && (
+                  <Panel position="bottom-right" className="fm-map-label"
+                    style={{ bottom: (mapOpen ? Math.round((window.innerWidth - 30) * 0.62) : 72) + 20 }}>
+                    {mapOpen
+                      ? <button type="button" onClick={() => setMapOpen(false)}>tap where to go <span aria-hidden="true">×</span></button>
+                      : <button type="button" onClick={() => setMapOpen(true)}>map</button>}
+                  </Panel>
+                )}
+                {!(isPhone && mapOpen) && <Controls showInteractive={false} />}
                 { /* <Background color="#CCCCCC" gap={16} /> */ }
             </ReactFlow>
         </div>
