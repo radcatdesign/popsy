@@ -760,6 +760,14 @@ a {
     visibility: hidden;
   }
   .intro-logo.--ready { visibility: visible; }
+  /* Preloader under the logo while the monster videos download */
+  .preload { position: fixed; z-index: 6; width: min(220px, 56vw); text-align: center; pointer-events: none; }
+  .preload svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .preload path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .preload__track { stroke: #e6e6e6; stroke-width: 5; }
+  .preload__fill { stroke: #000; stroke-width: 5; }
+  .preload__label { margin-top: 8px; font-size: 16px; white-space: nowrap; }
+  .preload__pct { display: inline-block; min-width: 3.2ch; text-align: left; font-variant-numeric: tabular-nums; }
   .intro-logo svg {
     display: block;
     width: 100%;
@@ -2823,7 +2831,7 @@ a {
       }).join('');
       list.querySelectorAll('video').forEach(v => { v.muted = true; });
       list.querySelectorAll('.sv-item').forEach(sec => observer.observe(sec));
-      if (window.PopsyVideo) window.PopsyVideo.watch(list.querySelectorAll('.sv-item'));
+      if (window.PopsyVideo) list.querySelectorAll('video').forEach(v => window.PopsyVideo.prime(v));
       el.scrollTop = 0;
     }
     function show() {
@@ -2963,18 +2971,80 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       }).catch(useRaster)
     }
     finishDraw(overlay) {
-      gsap.set(this.logoDiv, { opacity: 1 })
-      overlay.remove()
+      // the drawn logo stays up until the grid opens (the tile's own logo image may still be
+      // downloading on a slow connection); reveal() swaps them
+      this.introOverlay = overlay
       this.drawDone = true
       this.maybeReveal()
     }
     maybeReveal() {
-      if (!this.drawDone || !this.imagesReady || this.revealed) return
+      if (!this.drawDone || this.revealed) return
+      if (!this.imagesReady || !this.videosReady) {
+        // logo's drawn but photos / videos are still downloading: show progress (skip the flash on fast loads)
+        if (!this.preTimer) this.preTimer = window.setTimeout(() => this.showPreloader(), 250)
+        return
+      }
       this.revealed = true
-      this.reveal()
+      window.clearTimeout(this.preTimer)
+      if (this.preEl) this.hidePreloader(() => this.reveal())
+      else this.reveal()
+    }
+    // Preloader: a scribbly line under the logo fills as the monster videos download
+    showPreloader() {
+      if (this.preEl || this.revealed || this.videosReady) return
+      const r = this.logoDiv ? this.logoDiv.getBoundingClientRect() : { left: innerWidth / 2 - 100, top: innerHeight / 2 - 100, width: 200, height: 200 }
+      const d = 'M4 9c22-4 41 1 63-1s38-4 61-1 43 2 68-1'
+      const el = document.createElement('div')
+      el.className = 'preload'
+      el.setAttribute('role', 'status')
+      el.innerHTML = '<svg viewBox="0 0 200 16" aria-hidden="true"><path class="preload__track" d="' + d + '"/><path class="preload__fill" d="' + d + '"/></svg>' +
+        '<div class="preload__label">waking up the monsters <span class="preload__pct">0%</span></div>'
+      el.style.left = (r.left + r.width / 2) + 'px'
+      el.style.top = (r.top + r.height * 0.9 + 10) + 'px'
+      document.body.appendChild(el)
+      this.preEl = el
+      this.preFill = el.querySelector('.preload__fill')
+      this.preLen = this.preFill.getTotalLength()
+      this.prePct = el.querySelector('.preload__pct')
+      this.preShown = { p: 0 }
+      gsap.set(this.preFill, { strokeDasharray: this.preLen, strokeDashoffset: this.preLen })
+      gsap.set(el, { xPercent: -50 })
+      gsap.fromTo(el, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' })
+      const logo = this.introOverlay || this.logoDiv
+      if (logo && !this.reduceMotion) this.breathe = gsap.to(logo, { scale: 1.03, transformOrigin: '50% 50%', duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 })
+      this.updatePreloader()
+    }
+    updatePreloader() {
+      if (!this.preEl) return
+      // photos and videos together; videos are the bigger download
+      const img = this.imagesReady ? 1 : (this.imageProgress || 0)
+      const vid = this.videosReady ? 1 : (this.videoProgress || 0)
+      const p = this.preDone ? 1 : 0.35 * img + 0.65 * vid
+      gsap.to(this.preShown, {
+        p, duration: 0.4, ease: 'power2.out', overwrite: true,
+        onUpdate: () => {
+          this.preFill.style.strokeDashoffset = this.preLen * (1 - this.preShown.p)
+          this.prePct.textContent = Math.round(this.preShown.p * 100) + '%'
+        }
+      })
+    }
+    hidePreloader(then) {
+      const el = this.preEl
+      this.preDone = true
+      this.updatePreloader()
+      if (this.breathe) { const t = this.breathe.targets(); this.breathe.kill(); gsap.to(t, { scale: 1, duration: 0.3, ease: 'power2.out' }) }
+      gsap.to(el, { opacity: 0, y: 6, duration: 0.3, delay: 0.35, ease: 'power2.in', onComplete: () => { el.remove(); this.preEl = null } })
+      window.setTimeout(then, 450)
     }
     // Intro, step 2: grid lines and monsters build outward from the logo
     reveal() {
+      if (this.introOverlay) {
+        gsap.set(this.logoDiv, { opacity: 1 })
+        this.introOverlay.remove()
+        this.introOverlay = null
+      }
+      // every video is in memory by now: hand the tiles their copies while the build-out plays
+      if (this.videosReady && window.PopsyVideo) this.grid.querySelectorAll('.product video').forEach(v => window.PopsyVideo.prime(v))
       const vw = window.innerWidth, vh = window.innerHeight
       const lr = this.logoDiv ? this.logoDiv.getBoundingClientRect() : null
       const cx = lr ? lr.left + lr.width / 2 : vw / 2
@@ -3366,7 +3436,12 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     }
     observeProducts() {
       // download videos for tiles on or near the screen so they play instantly
-      if (window.PopsyVideo) window.PopsyVideo.watch(this.grid.querySelectorAll('.product'))
+      // once the preloader has them all in memory, hand every tile its copy right away;
+      // otherwise grab them as tiles come near the screen
+      if (window.PopsyVideo) {
+        if (this.videosReady) this.grid.querySelectorAll('.product video').forEach(v => window.PopsyVideo.prime(v))
+        else window.PopsyVideo.watch(this.grid.querySelectorAll('.product'))
+      }
       // Hover only on devices with a mouse/trackpad (any window width); touch screens skip it
       const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
       if (!canHover && window.innerWidth < 1100) return;
@@ -3580,15 +3655,29 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
   }
   const grid = new Grid();
   window.__grid = grid;
-  // Logo starts drawing right away; the grid builds out once the drawing and all images are ready
+  // Logo starts drawing right away; the grid builds out once the drawing, all images and all
+  // monster videos are ready, so every hover / ambient play starts instantly
   grid.prepareIntro();
+  (function preloadVideos() {
+    const done = () => { if (grid.videosReady) return; grid.videosReady = true; grid.maybeReveal(); };
+    const PV = window.PopsyVideo;
+    const files = [...new Set(window.items.map(i => i.video).filter(Boolean))].map(v => PV ? PV.fileFor(v) : v);
+    if (!PV || !files.length) return done();
+    PV.preloadAll(files, p => { grid.videoProgress = p; grid.updatePreloader(); }).then(done);
+    // never hold the site hostage on a dead connection: after 45s, open up and keep loading behind
+    window.setTimeout(done, 45000);
+  })();
   imagesLoaded('.grid img', () => {
     grid.imagesReady = true;
     grid.maybeReveal();
+    grid.updatePreloader();
     document.body.classList.remove('loading');
     /* window.setTimeout(() => {
 	    if (window.innerWidth > 991) document.body.dataset.navOpen = 't';
     }, 1000); */
+  }).on('progress', inst => {
+    grid.imageProgress = inst.progressedCount / Math.max(1, inst.images.length);
+    grid.updatePreloader();
   });
   // Grid -> shelf: the pieces on screen slide into one row (in reading order) and the
   // shelf starts on the first of them, centered; the rest of the collection follows.
