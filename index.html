@@ -803,6 +803,25 @@ a {
   html body:not([data-started]) .view-nav {
     pointer-events: none;
   }
+  /* Hover videos drop their white background (multiply), so a video that runs past its tile
+     (zoomed so arms aren't cropped) never paints a white box over the neighbours or the lines.
+     The still photo underneath hides while the video shows, so the two don't ghost. */
+  /* each column is its own layer, so the blend has to sit on the column: while one of its pieces
+     plays, that column comes to the front and multiplies, so its white turns see-through */
+  .grid .column:has(> .product[data-video-state="on"]),
+  .grid .column:has(> .product[data-video-state="ending"]),
+  .grid .column:has(> .product[data-video-state="auto"]),
+  .grid .column:has(> .product[data-video-state="focus"]) { position: relative; z-index: 3; mix-blend-mode: multiply; }
+  /* ...and the playing piece blends too, so it doesn't cover the tiles above and below it in its own column */
+  .grid .column .product[data-video-state="on"],
+  .grid .column .product[data-video-state="ending"],
+  .grid .column .product[data-video-state="auto"],
+  .grid .column .product[data-video-state="focus"] { z-index: 2; mix-blend-mode: multiply; }
+  .grid .product > div > img { transition: transform 300ms ease-in-out, opacity 0.4s ease; }
+  .grid .column .product[data-video-state="on"] > div > img,
+  .grid .column .product[data-video-state="ending"] > div > img,
+  .grid .column .product[data-video-state="auto"] > div > img,
+  .grid .column .product[data-video-state="focus"] > div > img { opacity: 0; }
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
   .grid .column .product[data-video-state="auto"] video,
   .grid .column .product[data-video-state="focus"] video { opacity: 1; }
