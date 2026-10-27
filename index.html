@@ -3596,15 +3596,16 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       // Hover only on devices with a mouse/trackpad (any window width); touch screens skip it
       const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
       if (!canHover && window.innerWidth < 1100) return;
-      // Hover video: hovering plays it to the halfway point (the big moment) and holds there a
-      // beat; staying on it plays out the rest, holds on the last frame, then goes round again.
-      // Hovering out plays out whatever's left from where it is, then fades back to the photo.
-      const HOLD_HALF = 1300, HOLD_END = 1500;
+      // Hover video: hovering plays it straight through; staying on it holds on the last frame a
+      // beat, then goes round again. Hovering out plays out whatever's left, then fades back to
+      // the photo.
+      const HOLD_END = 1500;
       document.querySelectorAll('.product').forEach(product => {
         const video = product.querySelector('[data-hover-video]');
         if (!video || product.dataset.hoverBound) return;
         product.dataset.hoverBound = 't';
         const on = () => product.dataset.videoState === 'on';
+        const atEnd = () => video.ended || video.currentTime >= (video.duration || 99) - 0.05;
         const finish = () => {
           product.dataset.videoState = '';
           window.setTimeout(() => {
@@ -3613,57 +3614,29 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
             video.currentTime = 0;
           }, 450);
         };
-        // play until time t, then pause there and call done
-        const playTo = (t, done) => {
-          const run = ++video._run || (video._run = 1);
-          video.loop = false;
-          video.play().catch(() => {});
-          const tick = () => {
-            if (video._run !== run) return;
-            if (video.currentTime >= t - 0.03) { video.pause(); if (done) done(); return; }
-            if (!video.ended) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        };
-        const stopWatching = () => { video._run = (video._run || 0) + 1; window.clearTimeout(video._hold); };
-        const half = () => (video.duration || 3) / 2;
-        // first half, hold, second half (its 'ended' carries on below)
-        const cycleFrom = () => {
-          if (!on()) return;
-          if (video.currentTime < half() - 0.05) {
-            playTo(half(), () => {
-              video._hold = window.setTimeout(() => { if (on()) { stopWatching(); video.play().catch(() => {}); } }, HOLD_HALF);
-            });
-          } else {
-            stopWatching();
-            video.play().catch(() => {});
-          }
-        };
         video.addEventListener('ended', () => {
           if (product.dataset.videoState === 'ending') return finish();
           if (!on()) return;
           window.clearTimeout(video._hold);
-          // a longer beat on the last frame before going round again
           video._hold = window.setTimeout(() => {
             if (!on()) return;
             video.currentTime = 0;
-            cycleFrom();
+            video.play().catch(() => {});
           }, HOLD_END);
         });
         product.addEventListener('mouseenter', () => {
-          stopWatching();
+          window.clearTimeout(video._hold);
+          video.loop = false;
           product.dataset.videoState = 'on';
-          if (video.ended || video.currentTime >= (video.duration || 99) - 0.05) video.currentTime = 0;
-          cycleFrom();
+          if (atEnd()) video.currentTime = 0;
+          video.play().catch(() => {});
         });
         product.addEventListener('mouseleave', () => {
           if (!on()) return;
-          stopWatching();
+          window.clearTimeout(video._hold);
           product.dataset.videoState = 'ending';
           // already sitting on the last frame: nothing left to play
-          if (video.ended || video.currentTime >= (video.duration || 99) - 0.05) return finish();
-          video.loop = false;
-          video.play().catch(() => finish());
+          if (atEnd() || video.paused) return finish();
         });
       });
       const observer = new IntersectionObserver((entries) => {
