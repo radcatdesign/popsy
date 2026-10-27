@@ -1036,6 +1036,27 @@ a {
   .grid.--shelf .product div {
     width: min(52svh, 36vw);
   }
+  .grid .product .shelf-cap { display: none; }
+  .grid.--shelf .product .shelf-cap {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+    position: absolute; left: 0; right: 0; top: calc(100% + 2.5vw + 18px); pointer-events: none;
+  }
+  .grid.--shelf .shelf-cap > * {
+    opacity: 0; transform: translateY(22px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .grid.--shelf .product.--cap-in .shelf-cap > * {
+    opacity: 1; transform: none;
+    transition: opacity 0.55s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .grid.--shelf .product.--cap-in .shelf-cap > :nth-child(2) { transition-delay: 0.07s; }
+  .grid.--shelf .product.--cap-in .shelf-cap > :nth-child(3) { transition-delay: 0.14s; }
+  .grid.--shelf .product.--cap-in .shelf-cap > :nth-child(4) { transition-delay: 0.21s; }
+  .grid.--shelf .product.--cap-in .shelf-cap .sv-btn { pointer-events: auto; cursor: pointer; }
+  .grid.--shelf .shelf-cap .sv-btn { margin-top: 8px; }
+  @media (hover: hover) {
+    .grid.--shelf .shelf-cap .sv-btn:hover { background: #333; }
+  }
   @media (max-width: 600px) {
     .grid.--shelf .product,
     .grid.--shelf .product div {
@@ -2354,7 +2375,7 @@ a {
   window.items.push({
   	id: `frillik`,
     name: decodeHTML(`Frillik Dirtle “The Two-Thought Tango”`),
-    img: `assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f0175d389acf89bd6515da_5-Big.png`,
+    img: `assets/thumbs/frillik-dirtle_5-Big.png`,
     price: ``,
     color: ``,
     size: ``,
@@ -2569,6 +2590,22 @@ a {
         if (still) still.style.opacity = '0';
       }).catch(() => { v.remove(); if (still) still.style.opacity = ''; });
     };
+    // Shelf view: the same details the phone feed shows (name, nickname, size, Details button)
+    // sit under each piece and rise in as it comes into view. A figcaption, not a div: the
+    // tile styles size every div inside a piece.
+    function addShelfCaption(productEl, item) {
+      if (!productEl || !item) return;
+      const plain = html => { const d = document.createElement('div'); d.innerHTML = html || ''; return d.textContent.trim(); };
+      const name = plain(item.name);
+      const m = name.match(/^(.*?)\s*([“"].*[”"])\s*$/);
+      const cap = document.createElement('figcaption');
+      cap.className = 'shelf-cap';
+      const h = document.createElement('h3'); h.className = 'sv-name'; h.textContent = m ? m[1] : name; cap.appendChild(h);
+      if (m) { const n = document.createElement('p'); n.className = 'sv-nick'; n.textContent = m[2]; cap.appendChild(n); }
+      if (item.size) { const z = document.createElement('p'); z.className = 'sv-size'; z.textContent = plain(item.size); cap.appendChild(z); }
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'sv-btn'; btn.textContent = 'Details'; cap.appendChild(btn);
+      productEl.appendChild(cap);
+    }
     function createProduct(item) {
       const detailsTitleEl = document.getElementById('details__title');
       const detailsTextsEl = document.getElementById('details__texts');
@@ -2696,7 +2733,11 @@ a {
           window.shelfOrder = null;
         }
         const count = Math.max(shelfItems.length, 12);
-        for (let i = 0; i < count; i++) createColumn([shelfItems[i % shelfItems.length]]);
+        for (let i = 0; i < count; i++) {
+          const it = shelfItems[i % shelfItems.length];
+          createColumn([it]);
+          addShelfCaption(gridEl.lastElementChild.firstElementChild, it);
+        }
         return;
       }
       gridEl.classList.remove('--shelf');
@@ -3260,9 +3301,16 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         // Shelf: first piece centered, row sitting a touch above the middle (clear of the filter bar)
         homeX = window.innerWidth / 2 - colW / 2
         homeY = window.innerHeight / 2 - rowH / 2 - (window.innerWidth < 600 ? 30 : 20)
+        // room under the row for each piece's details
+        const cap = cols[0].querySelector('.shelf-cap')
+        if (cap && window.innerWidth >= 600) {
+          const capH = cap.offsetTop - rowH + cap.offsetHeight
+          homeY = Math.max(24, (window.innerHeight - rowH - capH) / 2 - 10)
+        }
       }
       this.layout = {
         cols, isShelf, colW, rowH,
+        gridLeft: this.grid.getBoundingClientRect().left - (gsap.getProperty(this.grid, 'x') || 0) + cols[0].offsetLeft,
         colProducts: cols.map(col => [...col.children]),
         colStep, rowStep, W, H, homeX, homeY,
         // shelf: keep just two pieces in reserve off the left edge so the row runs a long way
@@ -3281,8 +3329,16 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         const base = c * L.colStep
         if (L.isShelf) {
           // one row: move the whole column so its top line rides along with the piece
-          L.cols[c].style.transform = `translate3d(${L.wrapX(base + ox) - base}px,${oy}px,0)`
-          if (L.colProducts[c][0]) L.colProducts[c][0].style.transform = ''
+          const x = L.wrapX(base + ox)
+          L.cols[c].style.transform = `translate3d(${x - base}px,${oy}px,0)`
+          const pr = L.colProducts[c][0]
+          if (pr) {
+            pr.style.transform = ''
+            // details show while at least 60% of the piece is on screen
+            const left = L.gridLeft + x, vis = Math.min(left + L.colW, window.innerWidth) - Math.max(left, 0)
+            const on = vis >= L.colW * 0.6
+            if (on !== pr.classList.contains('--cap-in')) pr.classList.toggle('--cap-in', on)
+          }
           continue
         }
         L.cols[c].style.transform = `translate3d(${L.wrapX(base + ox) - base}px,0,0)`
@@ -3476,6 +3532,14 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       })[0]
     }
     addEvents() {
+      // shelf details button opens the same popup as clicking the piece
+      this.grid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.shelf-cap .sv-btn')
+        if (!btn) return
+        e.stopPropagation()
+        const id = btn.closest('.product').querySelector('[data-id]')
+        if (id) this.showDetails(id)
+      })
       /* window.addEventListener("wheel", (e) => { */
       document.getElementById('container').addEventListener("wheel", (e) => {
         e.preventDefault()
@@ -3528,12 +3592,15 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       // Hover only on devices with a mouse/trackpad (any window width); touch screens skip it
       const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
       if (!canHover && window.innerWidth < 1100) return;
-      // Hover video: loops while hovered. On hover out it finishes the current loop,
-      // then fades back to the still image.
+      // Hover video: hovering plays it to the halfway point (the big moment) and holds there a
+      // beat; staying on it plays out the rest, holds on the last frame, then goes round again.
+      // Hovering out plays out whatever's left from where it is, then fades back to the photo.
+      const HOLD_HALF = 1300, HOLD_END = 1500;
       document.querySelectorAll('.product').forEach(product => {
         const video = product.querySelector('[data-hover-video]');
         if (!video || product.dataset.hoverBound) return;
         product.dataset.hoverBound = 't';
+        const on = () => product.dataset.videoState === 'on';
         const finish = () => {
           product.dataset.videoState = '';
           window.setTimeout(() => {
@@ -3542,19 +3609,57 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
             video.currentTime = 0;
           }, 450);
         };
+        // play until time t, then pause there and call done
+        const playTo = (t, done) => {
+          const run = ++video._run || (video._run = 1);
+          video.loop = false;
+          video.play().catch(() => {});
+          const tick = () => {
+            if (video._run !== run) return;
+            if (video.currentTime >= t - 0.03) { video.pause(); if (done) done(); return; }
+            if (!video.ended) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        };
+        const stopWatching = () => { video._run = (video._run || 0) + 1; window.clearTimeout(video._hold); };
+        const half = () => (video.duration || 3) / 2;
+        // first half, hold, second half (its 'ended' carries on below)
+        const cycleFrom = () => {
+          if (!on()) return;
+          if (video.currentTime < half() - 0.05) {
+            playTo(half(), () => {
+              video._hold = window.setTimeout(() => { if (on()) { stopWatching(); video.play().catch(() => {}); } }, HOLD_HALF);
+            });
+          } else {
+            stopWatching();
+            video.play().catch(() => {});
+          }
+        };
         video.addEventListener('ended', () => {
-          if (product.dataset.videoState === 'ending') finish();
+          if (product.dataset.videoState === 'ending') return finish();
+          if (!on()) return;
+          window.clearTimeout(video._hold);
+          // a longer beat on the last frame before going round again
+          video._hold = window.setTimeout(() => {
+            if (!on()) return;
+            video.currentTime = 0;
+            cycleFrom();
+          }, HOLD_END);
         });
         product.addEventListener('mouseenter', () => {
-          video.loop = true;
+          stopWatching();
           product.dataset.videoState = 'on';
-          video.play().catch(() => {});
+          if (video.ended || video.currentTime >= (video.duration || 99) - 0.05) video.currentTime = 0;
+          cycleFrom();
         });
         product.addEventListener('mouseleave', () => {
-          if (product.dataset.videoState !== 'on') return;
-          video.loop = false;
+          if (!on()) return;
+          stopWatching();
           product.dataset.videoState = 'ending';
-          if (video.paused || video.ended) finish();
+          // already sitting on the last frame: nothing left to play
+          if (video.ended || video.currentTime >= (video.duration || 99) - 0.05) return finish();
+          video.loop = false;
+          video.play().catch(() => finish());
         });
       });
       const observer = new IntersectionObserver((entries) => {
