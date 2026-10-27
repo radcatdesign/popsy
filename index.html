@@ -858,18 +858,32 @@ a {
     }
   }
   .view-icon { display: block; width: 30px; height: 30px; }
+  /* Filter tap toggle (bottom left), sized to match the view toggle */
+  #filter-list.--toggle > .filter-btn:not(.filter-toggle) { display: none !important; }
+  .nav.v--new .filter-list > .filter-toggle {
+    cursor: pointer; gap: 8px; padding: 8px 10px 8px 12px; color: #000;
+    background: transparent; border: 1px solid transparent; border-image-source: none;
+  }
+  .filter-toggle .ft-icon, .filter-toggle .filter-icon { display: block; width: 30px; height: 30px; }
+  .filter-toggle .ft-dots { display: flex; flex-direction: column; gap: 3px; }
+  .filter-toggle .ft-dots i { display: block; width: 5px; height: 5px; border-radius: 50%; border: 1.3px solid #000; transition: background-color .25s ease; }
+  .filter-toggle .ft-dots i.--on { background: #000; }
   @media screen and (max-width: 991px) {
     body .nav.v--new { gap: 4px; left: 30px; bottom: 20px; }
     .view-nav { right: 30px; bottom: 20px; padding: 8px; }
     .view-toggle { gap: 2px; }
     .view-btn { padding: 8px 8px; }
     .view-icon { width: 26px; height: 26px; }
+    .nav.v--new .filter-list > .filter-toggle { padding: 8px 8px 8px 8px; gap: 6px; }
+    .filter-toggle .ft-icon, .filter-toggle .filter-icon { width: 26px; height: 26px; }
   }
   @media screen and (max-width: 479px) {
     .nav.v--new .filter-list > .filter-btn { padding: 6px 7px; }
     .filter-icon { width: 26px; height: 26px; }
     .view-btn { padding: 6px 6px; }
     .view-icon { width: 24px; height: 24px; }
+    .nav.v--new .filter-list > .filter-toggle { padding: 6px; gap: 5px; }
+    .filter-toggle .ft-icon, .filter-toggle .filter-icon { width: 24px; height: 24px; }
   }
   /* Phone scroll feed */
   .scroll-view {
@@ -2714,6 +2728,47 @@ a {
     });
   }
   iconizeFilters();
+  // Filters as one tap toggle (like the view toggle on the right): it shows the category you're
+  // looking at, dots mark which of the three, and each tap moves on to the next one
+  (function filterToggle() {
+    const list = document.getElementById('filter-list');
+    if (!list || list.querySelector('.filter-toggle')) return;
+    const order = ['monsters', 'plants', 'kitchen'].filter(f => list.querySelector('[data-filter="' + f + '"]'));
+    if (order.length < 2) return;
+    const names = {};
+    order.forEach(f => { const el = list.querySelector('[data-filter="' + f + '"]'); names[f] = (el.getAttribute('aria-label') || el.textContent || f).trim(); });
+    const btn = document.createElement('div');
+    btn.className = 'filter-btn filter-toggle';
+    btn.setAttribute('role', 'button');
+    btn.tabIndex = 0;
+    btn.innerHTML = '<span class="ft-icon"></span><span class="ft-dots" aria-hidden="true">' + order.map(() => '<i></i>').join('') + '</span>';
+    const iconWrap = btn.querySelector('.ft-icon');
+    const dots = [...btn.querySelectorAll('.ft-dots i')];
+    const current = () => Math.max(0, order.indexOf(document.body.dataset.filter));
+    const paint = () => {
+      const i = current(), f = order[i], next = order[(i + 1) % order.length];
+      iconWrap.innerHTML = FILTER_ICONS[f] || '';
+      dots.forEach((d, j) => d.classList.toggle('--on', j === i));
+      btn.setAttribute('aria-label', 'Showing ' + names[f] + '. Switch to ' + names[next]);
+      btn.title = names[f];
+    };
+    paint();
+    const flip = () => {
+      if (!document.getElementById('container').classList.contains('--is-loaded')) return;
+      const next = order[(current() + 1) % order.length];
+      document.body.dataset.filter = next;
+      document.body.dataset.navOpen = '';
+      gsap.timeline()
+        .to(iconWrap.firstElementChild, { rotate: 90, scale: 0.4, opacity: 0, duration: 0.16, ease: 'power2.in' })
+        .add(() => { paint(); gsap.fromTo(iconWrap.firstElementChild, { rotate: -90, scale: 0.4, opacity: 0 }, { rotate: 0, scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2)' }); });
+      window.rebuildGrid && window.rebuildGrid();
+      if (document.body.dataset.view === 'scroll' && window.ScrollView) window.ScrollView.render();
+    };
+    btn.addEventListener('click', flip);
+    btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+    list.appendChild(btn);
+    list.classList.add('--toggle');
+  })();
   // View toggle: grid (default) or shelf (one row of large pieces you swipe through)
   (function addViewToggle() {
     const nav = document.querySelector('.nav.v--new');
