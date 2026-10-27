@@ -829,7 +829,17 @@ a {
     .view-btn { padding: 6px 6px; }
     .view-icon { width: 24px; height: 24px; }
   }
-  /* Shelf view: one row of big pieces */
+  /* Shelf view: one row of big pieces, with a line along the top as well as the bottom */
+  .grid.--shelf .column { position: relative; }
+  .grid.--shelf .column::before {
+    content: '';
+    position: absolute;
+    left: -2.5vw;
+    right: -2.5vw;
+    top: -2.5vw;
+    border-top: 1px solid #ddd;
+    pointer-events: none;
+  }
   .grid.--shelf .product,
   .grid.--shelf .product div {
     width: min(52svh, 36vw);
@@ -2755,6 +2765,12 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const oy = this.offset.y
       for (let c = 0; c < L.cols.length; c++) {
         const base = c * L.colStep
+        if (L.isShelf) {
+          // one row: move the whole column so its top line rides along with the piece
+          L.cols[c].style.transform = `translate3d(${L.wrapX(base + ox) - base}px,${oy}px,0)`
+          if (L.colProducts[c][0]) L.colProducts[c][0].style.transform = ''
+          continue
+        }
         L.cols[c].style.transform = `translate3d(${L.wrapX(base + ox) - base}px,0,0)`
         const prods = L.colProducts[c]
         for (let r = 0; r < prods.length; r++) {
@@ -3182,10 +3198,18 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
   window.lineUpToShelf = () => {
     const vw = window.innerWidth, vh = window.innerHeight
     const seen = new Set()
-    const onScreen = [...grid.grid.querySelectorAll('.product > div')]
+    const mid = o => [o.r.left + o.r.width / 2, o.r.top + o.r.height / 2]
+    let onScreen = [...grid.grid.querySelectorAll('.product > div')]
       .map(d => ({ d, id: d.dataset.id, r: d.getBoundingClientRect() }))
       .filter(o => o.id !== 'popsy-wolf' && o.r.width > 0 && o.r.right > 0 && o.r.left < vw && o.r.bottom > 0 && o.r.top < vh)
-      .sort((a, b) => (Math.round(a.r.top / a.r.height) - Math.round(b.r.top / b.r.height)) || (a.r.left - b.r.left))
+    // first = the piece closest to the middle of the screen (where you are on the canvas);
+    // the rest line up to its right, nearest pieces first
+    const dist = (a, x, y) => Math.hypot(mid(a)[0] - x, mid(a)[1] - y)
+    const anchor = onScreen.slice().sort((a, b) => dist(a, vw / 2, vh / 2) - dist(b, vw / 2, vh / 2))[0]
+    if (anchor) {
+      const [ax, ay] = mid(anchor)
+      onScreen = [anchor].concat(onScreen.filter(o => o !== anchor).sort((a, b) => dist(a, ax, ay) - dist(b, ax, ay)))
+    }
     const lineup = [], extras = []
     onScreen.forEach(o => {
       if (seen.has(o.id)) extras.push(o)
@@ -3218,13 +3242,15 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const target = cols[k] && cols[k].querySelector('.product > div')
       if (!target) return
       placed.add(target)
+      // fly above the other tiles (their photos have white backgrounds)
+      cols[k].style.zIndex = String(200 - k)
       const tr = target.getBoundingClientRect()
       tl.fromTo(target, {
         x: (o.r.left + o.r.width / 2) - (tr.left + tr.width / 2),
         y: (o.r.top + o.r.height / 2) - (tr.top + tr.height / 2),
         scale: o.r.width / tr.width,
         opacity: 1,
-      }, { x: 0, y: 0, scale: 1, duration: 1.1, ease: 'power3.inOut' }, k * 0.06)
+      }, { x: 0, y: 0, scale: 1, duration: 1.1, ease: 'power3.inOut', onComplete: () => { cols[k].style.zIndex = '' } }, k * 0.06)
     })
     grid.grid.querySelectorAll('.product').forEach(pr => {
       tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.6, ease: 'power2.out' }, 0.9)
