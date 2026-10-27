@@ -1,5 +1,5 @@
 /* Popsy eye cursor: a little glazed ceramic eyeball (cream ball, black pupil, pink speckled
-   lid shell) that rolls along under the mouse like a real ball, settles back to look at you
+   lid shell) that follows the normal pointer around, rolling along behind it like a real ball, settles back to look at you
    when you stop, blinks on its own, closes halfway while you hold the button down, and swells
    a little over things you can click. Mouse / trackpad devices only.
 
@@ -15,7 +15,6 @@
   var SIZE = 34;                       // CSS px
   var style = document.createElement('style');
   style.textContent = [
-    'html.eye-cursor, html.eye-cursor * { cursor: none !important; }',
     '.eye-cursor-el { position: fixed; left: 0; top: 0; width: ' + SIZE + 'px; height: ' + SIZE + 'px; margin: -' + SIZE / 2 + 'px 0 0 -' + SIZE / 2 + 'px;',
     '  pointer-events: none; z-index: 2147483647; opacity: 0; transition: opacity .2s ease; will-change: transform; }',
     '.eye-cursor-el.--on { opacity: 1; }',
@@ -266,6 +265,9 @@
 
   /* ---------- motion ---------- */
   var x = -100, y = -100, lastX = null, lastY = null, lastMove = 0, dirty = true;
+  // the eye trails the normal pointer, sitting just below and to the right of the arrow
+  var OFF_X = 26, OFF_Y = 28, FOLLOW = 110;          // px, px, ms (how far behind it lags)
+  var ex = null, ey = null;
   var lidTarget = 0, blinkT = -1, down = false;
   var RADIUS = SIZE / 2 * 1.5;   // a touch slower than a true roll so it reads, not spins
 
@@ -286,11 +288,8 @@
 
   document.addEventListener('mousemove', function (e) {
     x = e.clientX; y = e.clientY;
-    if (lastX !== null && !reduceMotion) {
-      var dx = x - lastX, dy = y - lastY;
-      if (Math.abs(dx) < 120 && Math.abs(dy) < 120) { roll(dx, dy, RADIUS); dirty = true; } // ignore jumps (re-entering the window)
-    }
-    lastX = x; lastY = y; lastMove = performance.now();
+    if (ex === null || lastX === null || Math.abs(x - lastX) > 200 || Math.abs(y - lastY) > 200) { ex = x + OFF_X; ey = y + OFF_Y; } // first sight / re-entering: no flying in
+    lastX = x; lastY = y;
     el.classList.toggle('--on', !detailsTakeover(e.target));
     el.classList.toggle('--hover', !!(e.target && e.target.closest && e.target.closest(CLICKABLE)));
   }, { passive: true });
@@ -306,7 +305,17 @@
   var prev = performance.now();
   function tick(now) {
     var dt = Math.min(64, now - prev); prev = now;
-    el.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+    if (ex !== null) {
+      // ease toward the pointer, and roll by however far the eye itself moved this frame
+      var f = reduceMotion ? 1 : 1 - Math.exp(-dt / FOLLOW);
+      var mx = (x + OFF_X - ex) * f, my = (y + OFF_Y - ey) * f;
+      ex += mx; ey += my;
+      if (Math.abs(mx) + Math.abs(my) > 0.05) {
+        lastMove = now;
+        if (!reduceMotion) { roll(mx, my, RADIUS); dirty = true; }
+      }
+      el.style.transform = 'translate3d(' + ex + 'px,' + ey + 'px,0)';
+    }
     // settle back to face you once the mouse rests
     if (!reduceMotion && now - lastMove > 140 && (Math.abs(1 - Math.abs(q[0])) > 1e-5)) { settle(1 - Math.exp(-dt / 260)); dirty = true; }
     // lid: blink pulse on top of the held (half-shut while pressed) position
