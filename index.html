@@ -2445,13 +2445,19 @@ a {
       }, 500);
     }
     window.rebuildGrid = rebuildGrid;
+    window.initGrid = initGrid;
     function initGrid() {
       const gridEl = document.getElementById('grid');
       const filter = document.body.dataset.filter;
       // Shelf view: one row of large pieces you swipe left and right (no logo tile)
       if (document.body.dataset.view === 'shelf') {
         gridEl.classList.add('--shelf');
-        const shelfItems = window.items.filter(p => p.id !== 'popsy-wolf' && (!filter || p.category === filter));
+        let shelfItems = window.items.filter(p => p.id !== 'popsy-wolf' && (!filter || p.category === filter));
+        if (window.shelfOrder && window.shelfOrder.length) {
+          const first = window.shelfOrder.map(id => shelfItems.find(p => p.id === id)).filter(Boolean);
+          shelfItems = first.concat(shelfItems.filter(p => !window.shelfOrder.includes(p.id)));
+          window.shelfOrder = null;
+        }
         const count = Math.max(shelfItems.length, 12);
         for (let i = 0; i < count; i++) createColumn([shelfItems[i % shelfItems.length]]);
         return;
@@ -2530,7 +2536,8 @@ a {
         if (document.body.dataset.view === view) return;
         document.body.dataset.view = view;
         wrap.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('--active', b.dataset.view === view));
-        window.rebuildGrid && window.rebuildGrid();
+        if (view === 'shelf' && window.lineUpToShelf) window.lineUpToShelf();
+        else window.rebuildGrid && window.rebuildGrid();
       });
       wrap.appendChild(btn);
     });
@@ -3170,6 +3177,62 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
 	    if (window.innerWidth > 991) document.body.dataset.navOpen = 't';
     }, 1000); */
   });
+  // Grid -> shelf: the pieces on screen slide into one row (in reading order) and the
+  // shelf starts on the first of them, centered; the rest of the collection follows.
+  window.lineUpToShelf = () => {
+    const vw = window.innerWidth, vh = window.innerHeight
+    const seen = new Set()
+    const onScreen = [...grid.grid.querySelectorAll('.product > div')]
+      .map(d => ({ d, id: d.dataset.id, r: d.getBoundingClientRect() }))
+      .filter(o => o.id !== 'popsy-wolf' && o.r.width > 0 && o.r.right > 0 && o.r.left < vw && o.r.bottom > 0 && o.r.top < vh)
+      .sort((a, b) => (Math.round(a.r.top / a.r.height) - Math.round(b.r.top / b.r.height)) || (a.r.left - b.r.left))
+    const lineup = [], extras = []
+    onScreen.forEach(o => {
+      if (seen.has(o.id)) extras.push(o)
+      else { seen.add(o.id); lineup.push(o) }
+    })
+    // the old grid stays behind as a fading layer: its lines, the logo and any duplicate
+    // tiles dissolve while the pieces in the line slide into the shelf
+    lineup.forEach(o => { o.d.style.opacity = '0' })
+    const ghost = document.createElement('div')
+    ghost.className = 'grid grid-ghost'
+    ghost.setAttribute('aria-hidden', 'true')
+    Object.assign(ghost.style, { pointerEvents: 'none', transform: 'none' })
+    while (grid.grid.firstChild) ghost.appendChild(grid.grid.firstChild)
+    grid.grid.parentNode.insertBefore(ghost, grid.grid)
+    gsap.to(ghost, { opacity: 0, duration: 0.55, ease: 'power2.out', onComplete: () => ghost.remove() })
+    window.shelfOrder = lineup.map(o => o.id)
+    window.initGrid()
+    grid.centerGrid()
+    grid.products = [...grid.grid.querySelectorAll('.product div')]
+    const cols = [...grid.grid.querySelectorAll('.column')]
+    const placed = new Set()
+    const tl = gsap.timeline({
+      onComplete: () => {
+        grid.handleDetails()
+        grid.scheduleFocus()
+        window.setTimeout(() => grid.observeProducts(), 300)
+      }
+    })
+    lineup.forEach((o, k) => {
+      const target = cols[k] && cols[k].querySelector('.product > div')
+      if (!target) return
+      placed.add(target)
+      const tr = target.getBoundingClientRect()
+      tl.fromTo(target, {
+        x: (o.r.left + o.r.width / 2) - (tr.left + tr.width / 2),
+        y: (o.r.top + o.r.height / 2) - (tr.top + tr.height / 2),
+        scale: o.r.width / tr.width,
+        opacity: 1,
+      }, { x: 0, y: 0, scale: 1, duration: 1.1, ease: 'power3.inOut' }, k * 0.06)
+    })
+    grid.grid.querySelectorAll('.product').forEach(pr => {
+      tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.6, ease: 'power2.out' }, 0.9)
+      const d = pr.firstElementChild
+      if (!d || placed.has(d)) return
+      tl.fromTo(d, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.8 + Math.random() * 0.3)
+    })
+  }
   window.filterTrigger = () => {
   	grid.grid.style.transition = 'none';
     grid.centerGrid();
