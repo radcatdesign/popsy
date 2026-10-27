@@ -179,6 +179,7 @@
     videoEl.removeAttribute('src');
     delete videoEl.dataset.primed;
     videoEl.innerHTML = '';
+    videoEl.style.transform = item.videoZoom ? 'scale(' + item.videoZoom + ')' : '';
     if (item.video) {
       videoEl.innerHTML = '<source src="' + esc(item.video) + '" type="video/webm">' +
         (/^assets\/hover\/.+\.webm$/i.test(item.video) ? '<source src="' + esc(item.video.replace(/\.webm$/i, '.mp4')) + '" type="video/mp4">' : '');

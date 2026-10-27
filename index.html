@@ -770,6 +770,14 @@ a {
   .preload__pct { display: inline-block; min-width: 3.2ch; text-align: left; font-variant-numeric: tabular-nums; }
   /* multiply drops the film's white background, so only the ink shows over the grid */
   .intro-logo video { display: block; width: 100%; height: 100%; mix-blend-mode: multiply; }
+  /* the loop clip is the logo's square of the film frame (541px at 80,103 of 720) */
+  .intro-logo .intro-loop { position: absolute; left: 11.111%; top: 14.306%; width: 75.139%; height: 75.139%; }
+  .grid .product .logo-loop {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1;
+    display: block !important; opacity: 0 !important; transform: scale(var(--logo-scale));
+    mix-blend-mode: multiply; pointer-events: none; transition: opacity .3s ease;
+  }
+  .grid .product .logo-loop.--on { opacity: 1 !important; }
   /* The Popsy logo tile in the middle of the grid sits a little smaller than the pieces */
   :root { --logo-scale: 0.8; }
   .grid .product [data-id="popsy-wolf"] img { transform: scale(var(--logo-scale)); }
@@ -2506,7 +2514,23 @@ a {
     const hit = names.find(n => HOVER_VIDEOS.includes(n));
     return hit ? `assets/hover/${hit}.webm` : '';
   }
-  window.items = window.items.map(item => ({ ...item, video: hoverVideoFor(item.img) || item.video }));
+  // Newer pieces whose photo file names don't follow the M_F-## pattern: matched by photo name.
+  // zoom: the video frames the piece wider than its photo, so it plays scaled up to line up
+  // with the photo (lets waving arms run past the tile edge instead of cropping them)
+  const NAMED_HOVERS = {
+    '2-Big': { file: 'darlene' }, '31-Big': { file: 'dremmel' }, '5-Big': { file: 'frillick' },
+    '25-Big': { file: 'gorble' }, '19-Big': { file: 'gumphrey', zoom: 1.143 }, '21-Big': { file: 'noshik' },
+    'M_F-17': { file: 'marnie' }, 'M_F-21': { file: 'peepers', zoom: 1.169 },
+  };
+  function namedHoverFor(img) {
+    const key = Object.keys(NAMED_HOVERS).find(k => new RegExp('_' + k.replace('-', '\\-') + '\\.[a-z0-9]+$', 'i').test(img || ''));
+    return key ? NAMED_HOVERS[key] : null;
+  }
+  window.items = window.items.map(item => {
+    const named = namedHoverFor(item.img);
+    if (named) return { ...item, video: `assets/hover/${named.file}.webm`, videoZoom: named.zoom || 0 };
+    return { ...item, video: hoverVideoFor(item.img) || item.video };
+  });
   window.items = window.items.map(item => {
   	let text = '';
     if (item.price) text += `<span>$${item.price}</span>`;
@@ -2531,6 +2555,20 @@ a {
       columns: Math.floor(window.items.length / 11) + 2,
       itemsPerColumn: 10,
     }
+    // The centre logo tile plays the looping logo over its still (still stays as the fallback)
+    window.attachLogoLoop = function (div) {
+      if (!div || !window.PopsyLogoLoop || div.querySelector('.logo-loop')) return;
+      const v = document.createElement('video');
+      v.className = 'logo-loop';
+      v.muted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('aria-hidden', 'true');
+      div.appendChild(v);
+      const still = div.querySelector('img');
+      window.PopsyLogoLoop.then(url => { v.src = url; return v.play(); }).then(() => {
+        v.classList.add('--on');
+        if (still) still.style.opacity = '0';
+      }).catch(() => { v.remove(); if (still) still.style.opacity = ''; });
+    };
     function createProduct(item) {
       const detailsTitleEl = document.getElementById('details__title');
       const detailsTextsEl = document.getElementById('details__texts');
@@ -2550,6 +2588,7 @@ a {
       idEl.appendChild(imgEl);
       if (item.video) {
         videoEl.playsInline = true;
+        if (item.videoZoom) videoEl.style.transform = `scale(${item.videoZoom})`;
         const sourceEl = document.createElement('source');
         sourceEl.src = item.video;
         if (/\.webm$/i.test(item.video)) sourceEl.type = 'video/webm';
@@ -2564,6 +2603,7 @@ a {
         idEl.appendChild(videoEl);
       }
       productEl.appendChild(idEl);
+      if (item.id === 'popsy-wolf' && window.attachLogoLoop) window.attachLogoLoop(idEl);
       /* Title */
       /*
       const titleEl = document.createElement('p');
@@ -2888,7 +2928,7 @@ a {
         const name = plain(item.name);
         const m = name.match(/^(.*?)\s*([“"].*[”"])\s*$/);
         const title = m ? m[1] : name, nick = m ? m[2] : '';
-        const video = item.video ? '<video muted playsinline preload="none"><source src="' + esc(item.video) + '" type="video/webm">' +
+        const video = item.video ? '<video muted playsinline preload="none"' + (item.videoZoom ? ' style="transform:scale(' + item.videoZoom + ')"' : '') + '><source src="' + esc(item.video) + '" type="video/webm">' +
           (/^assets\/hover\/.+\.webm$/i.test(item.video) ? '<source src="' + esc(item.video.replace(/\.webm$/i, '.mp4')) + '" type="video/mp4">' : '') + '</video>' : '';
         return '<section class="sv-item">' +
           '<div class="sv-media"><img src="' + esc(item.img) + '" alt="' + esc(name) + '" loading="lazy">' + video + '</div>' +
@@ -2984,6 +3024,11 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const file = PV ? PV.fileFor('assets/intro/popsy-intro.webm') : 'assets/intro/popsy-intro.mp4'
       // download the whole film first so it never stalls mid-play
       this.introLoad = PV ? PV.load(file) : Promise.resolve(file)
+      // after the film, the logo's last few frames (its hand-drawn boil) loop so it never sits still
+      const loopFile = PV ? PV.fileFor('assets/intro/popsy-logo-loop.webm') : 'assets/intro/popsy-logo-loop.mp4'
+      window.PopsyLogoLoop = this.introLoad.then(() => PV ? PV.load(loopFile) : loopFile)
+      window.PopsyLogoLoop.catch(() => {})
+      if (window.attachLogoLoop) window.attachLogoLoop(this.logoDiv)
       const guard = window.setTimeout(skip, 9000) // too slow to start: don't keep anyone waiting on it
       this.introLoad.then(url => {
         if (this.drawDone) return
@@ -2993,6 +3038,14 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
           window.clearTimeout(guard)
           v.addEventListener('ended', () => {
             window.removeEventListener('resize', place)
+            // keep the logo alive while anything is still loading: swap to the loop right away
+            const lv = document.createElement('video')
+            lv.className = 'intro-loop'
+            lv.muted = true; lv.loop = true; lv.playsInline = true
+            overlay.appendChild(lv)
+            window.PopsyLogoLoop.then(url => { lv.src = url; return lv.play() })
+              .then(() => { v.style.visibility = 'hidden' })
+              .catch(() => lv.remove())
             this.finishDraw(overlay)
           }, { once: true })
         })
@@ -3141,7 +3194,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         if (this.grid.querySelector('.product[data-video-state="on"]')) return
         const vw = window.innerWidth, vh = window.innerHeight
         const pool = [...this.grid.querySelectorAll('.product')].filter(pr => {
-          if (pr.dataset.videoState || !pr.querySelector('video') || pr.classList.contains('--covered')) return false
+          if (pr.dataset.videoState || !pr.querySelector('video[data-hover-video]') || pr.classList.contains('--covered')) return false
           const r = pr.firstElementChild.getBoundingClientRect()
           return r.right > 0 && r.left < vw && r.bottom > 0 && r.top < vh - 80
         })
@@ -3151,7 +3204,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.ambientTimer = window.setTimeout(tick, 900)
     }
     playOnce(pr) {
-      const v = pr.querySelector('video')
+      const v = pr.querySelector('video[data-hover-video]')
       if (!v) return
       pr.dataset.videoState = 'auto-wait'
       v.loop = false
@@ -3278,14 +3331,14 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         const d = Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy)
         if (d < bd) { bd = d; best = pr }
       })
-      if (best && (bd > (best.firstElementChild || best).getBoundingClientRect().width * 0.5 || !best.querySelector('video'))) best = null
+      if (best && (bd > (best.firstElementChild || best).getBoundingClientRect().width * 0.5 || !best.querySelector('video[data-hover-video]'))) best = null
       if (best === this.focusProduct) return
       if (this.focusProduct) this.unfocus(this.focusProduct)
       this.focusProduct = best
       if (best) this.focus(best)
     }
     focus(pr) {
-      const v = pr.querySelector('video')
+      const v = pr.querySelector('video[data-hover-video]')
       v.loop = true
       v.preload = 'auto'
       if (pr.dataset.videoState === 'auto' || pr.dataset.videoState === 'ending') {
@@ -3301,7 +3354,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       })
     }
     unfocus(pr) {
-      const v = pr.querySelector('video')
+      const v = pr.querySelector('video[data-hover-video]')
       if (!v || !/^focus/.test(pr.dataset.videoState || '')) return
       const finish = () => {
         pr.dataset.videoState = ''
@@ -3509,7 +3562,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
           if (entry.target === this.currentProduct) return
           if (entry.isIntersecting) {
             // Buffer hover videos for tiles on screen so playback starts instantly
-            const v = entry.target.querySelector('video')
+            const v = entry.target.querySelector('video[data-hover-video]')
             if (v && v.preload !== 'auto') v.preload = 'auto'
             gsap.to(entry.target, {
               // scale: 1,
