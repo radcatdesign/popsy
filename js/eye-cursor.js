@@ -71,6 +71,9 @@
     el.classList.toggle('--on', !hidden);
     el.classList.toggle('--hover', !!(e.target && e.target.closest && e.target.closest(CLICKABLE)));
   }, { passive: true });
+  document.addEventListener('mouseover', function (e) {
+    if (e.target && e.target.tagName === 'IFRAME') el.classList.remove('--on');
+  }, { passive: true });
   document.addEventListener('mousedown', function () { el.classList.add('--down'); }, { passive: true });
   document.addEventListener('mouseup', function () { el.classList.remove('--down'); blink(); }, { passive: true });
   document.addEventListener('mouseleave', function () { el.classList.remove('--on'); });

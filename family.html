@@ -8,6 +8,19 @@
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="only light">
+  <script>
+  // Embed mode: shown inside the grid's family tree overlay
+  (function () {
+    var embed = /[?&]embed=1/.test(location.search) && window.parent !== window;
+    if (!embed) return;
+    document.documentElement.classList.add('is-embed');
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || document.querySelector('.pp.--open')) return;
+      window.parent.postMessage({ type: 'popsy:close-family' }, location.origin);
+    });
+  })();
+  </script>
+  <style>html.is-embed .back-link, html.is-embed .about { display: none !important; }</style>
   <style>html, body { background-color: #ffffff; color-scheme: only light; }</style>
   <meta content="Webflow" name="generator">
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
@@ -2471,12 +2484,14 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
                 // phones: logo sits up in the top row, level with "about" and "back",
                 // so the tree fills the screen below it
                 let raise = 0;
-                if (window.innerWidth < 600) {
+                // also inside the grid's overlay card, where a centered logo leaves the top half empty
+                if (window.innerWidth < 600 || document.documentElement.classList.contains('is-embed')) {
                   const about = document.querySelector('.about-link');
                   const rowY = about ? about.getBoundingClientRect().top + about.offsetHeight / 2 : 42;
                   // never let the top of the logo touch the screen edge
                   const halfLogo = (media ? media.offsetHeight : 160) * zoomP / 2;
-                  raise = (window.innerHeight / 2 - Math.max(rowY, halfLogo + 10)) / zoomP;
+                  const pad = document.documentElement.classList.contains('is-embed') ? 24 : 10;
+                  raise = (window.innerHeight / 2 - Math.max(rowY, halfLogo + pad)) / zoomP;
                 }
                 setCenter(highestNode.x + highestNode.width / 2, highestNode.y + mediaOffset + raise, { zoom: zoomP, duration: 0 });
               };
