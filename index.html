@@ -780,17 +780,40 @@ a {
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
   .grid .column .product[data-video-state="auto"] video,
   .grid .column .product[data-video-state="focus"] video { opacity: 1; }
-  /* View toggle sits at the end of the filter bar */
+  /* Bottom corners: filters pill bottom-left, grid/shelf pill bottom-right
+     (lined up with "about" and "family tree" above them) */
   body .nav.v--new {
     display: flex;
     align-items: center;
     gap: 8px;
+    left: 30px;
+    right: auto;
+    bottom: 30px;
+    transform: none;
   }
   .view-toggle {
     display: flex;
     gap: 4px;
-    padding-left: 8px;
-    border-left: 1px solid #ddd;
+  }
+  .view-nav {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    z-index: 10;
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 13px;
+    padding: 12px;
+    border-image-outset: 1px;
+    border-image-width: 30px;
+    border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+    border-image-slice: 25;
+    border-image-repeat: stretch;
+    transition: opacity 0.5s;
+  }
+  html body:not([data-started]) .view-nav {
+    opacity: 0;
+    pointer-events: none;
   }
   .view-btn {
     cursor: pointer;
@@ -818,8 +841,9 @@ a {
   }
   .view-icon { display: block; width: 30px; height: 30px; }
   @media screen and (max-width: 991px) {
-    body .nav.v--new { gap: 4px; }
-    .view-toggle { padding-left: 4px; gap: 2px; }
+    body .nav.v--new { gap: 4px; left: 30px; bottom: 20px; }
+    .view-nav { right: 30px; bottom: 20px; padding: 8px; }
+    .view-toggle { gap: 2px; }
     .view-btn { padding: 8px 8px; }
     .view-icon { width: 26px; height: 26px; }
   }
@@ -2609,7 +2633,9 @@ a {
       });
       wrap.appendChild(btn);
     });
-    nav.appendChild(wrap);
+    // its own pill in the bottom-right corner (filters sit bottom-left)
+    wrap.classList.add('view-nav');
+    document.body.appendChild(wrap);
   })();
 </script>
   </div>
