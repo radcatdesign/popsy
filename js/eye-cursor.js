@@ -8,15 +8,15 @@
   var style = document.createElement('style');
   style.textContent = [
     'html.eye-cursor, html.eye-cursor * { cursor: none !important; }',
-    '.eye-cursor-el { position: fixed; left: 0; top: 0; width: 46px; height: 32px; margin: -16px 0 0 -23px;',
+    '.eye-cursor-el { position: fixed; left: 0; top: 0; width: 28px; height: 28px; margin: -14px 0 0 -14px;',
     '  pointer-events: none; z-index: 2147483647; opacity: 0; transition: opacity .2s ease; will-change: transform; }',
     '.eye-cursor-el.--on { opacity: 1; }',
     '.eye-cursor-el .ec-size { width: 100%; height: 100%; transition: transform .25s cubic-bezier(.34,1.56,.64,1); transform-origin: 50% 50%; }',
     '.eye-cursor-el.--hover .ec-size { transform: scale(1.35); }',
-    '.eye-cursor-el .ec-squint { width: 100%; height: 100%; transition: transform .18s ease; transform-origin: 50% 50%; }',
-    '.eye-cursor-el.--down .ec-squint { transform: scaleY(.5); }',
     '.eye-cursor-el svg { display: block; width: 100%; height: 100%; overflow: visible; }',
-    '.eye-cursor-el .ec-blink { transform-origin: 23px 16px; transform-box: view-box; }'
+    /* eyelid: parked above the ball, half down while you press/drag, all the way down to blink */
+    '.eye-cursor-el .ec-lid { transform: translateY(-20px); transition: transform .16s ease; }',
+    '.eye-cursor-el.--down .ec-lid { transform: translateY(-7px); }'
   ].join('\n');
   document.head.appendChild(style);
 
@@ -24,25 +24,26 @@
   el.className = 'eye-cursor-el';
   el.setAttribute('aria-hidden', 'true');
   el.innerHTML =
-    '<div class="ec-size"><div class="ec-squint">' +
-    '<svg viewBox="0 0 46 32" fill="none" stroke-linecap="round" stroke-linejoin="round">' +
-    '<defs><clipPath id="ec-clip"><path d="M3.4 16.4C9.6 6.9 16.2 4.3 23.2 4.4c7.2.1 13.6 3.4 19.4 11.7-5.9 8.3-12.4 11.7-19.6 11.6-7.1-.1-13.6-3.2-19.6-11.3Z"/></clipPath></defs>' +
-    '<g class="ec-blink">' +
-    '<path d="M3.4 16.4C9.6 6.9 16.2 4.3 23.2 4.4c7.2.1 13.6 3.4 19.4 11.7-5.9 8.3-12.4 11.7-19.6 11.6-7.1-.1-13.6-3.2-19.6-11.3Z" fill="#fff" stroke="#000" stroke-width="2.4"/>' +
-    '<g clip-path="url(#ec-clip)"><g class="ec-pupil">' +
-    '<circle cx="23" cy="16" r="7.2" fill="#000"/>' +
-    '<circle cx="25.6" cy="13.3" r="2.1" fill="#fff"/>' +
-    '</g></g>' +
-    '<path d="M12.4 8.3 10.2 4.6M19.6 5.4l-.9-4M27.3 5.3l1-4M34.4 8l2.4-3.4" stroke="#000" stroke-width="2.2"/>' +
-    '</g></svg></div></div>';
+    '<div class="ec-size">' +
+    '<svg viewBox="0 0 28 28" fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+    '<defs><clipPath id="ec-clip"><path d="M14.2 2.6c6.4.1 11.3 5 11.2 11.5-.1 6.4-5.1 11.3-11.5 11.3S2.6 20.4 2.6 14 7.8 2.5 14.2 2.6Z"/></clipPath></defs>' +
+    /* the ball */
+    '<path d="M14.2 2.6c6.4.1 11.3 5 11.2 11.5-.1 6.4-5.1 11.3-11.5 11.3S2.6 20.4 2.6 14 7.8 2.5 14.2 2.6Z" fill="#fff"/>' +
+    '<g clip-path="url(#ec-clip)">' +
+    '<g class="ec-pupil"><circle cx="14" cy="14" r="5.6" fill="#000"/><circle cx="16" cy="11.9" r="1.6" fill="#fff"/></g>' +
+    /* upper eyelid that slides down over the ball */
+    '<g class="ec-lid"><path d="M-2-30h32v43.2c-5.6 3.6-26.4 3.6-32 0Z" fill="#fff"/><path d="M1.2 13.9c6 3.4 19.6 3.4 25.6 0" stroke="#000" stroke-width="2"/></g>' +
+    '</g>' +
+    '<path d="M14.2 2.6c6.4.1 11.3 5 11.2 11.5-.1 6.4-5.1 11.3-11.5 11.3S2.6 20.4 2.6 14 7.8 2.5 14.2 2.6Z" stroke="#000" stroke-width="2.2"/>' +
+    '</svg></div>';
 
-  var blinkEl, pupilEl;
+  var lidEl, pupilEl;
   var x = -100, y = -100, lastX = null, lastY = null, px = 0, py = 0, tx = 0, ty = 0;
 
   function mount() {
     document.body.appendChild(el);
     document.documentElement.classList.add('eye-cursor');
-    blinkEl = el.querySelector('.ec-blink');
+    lidEl = el.querySelector('.ec-lid');
     pupilEl = el.querySelector('.ec-pupil');
     requestAnimationFrame(tick);
     scheduleBlink();
@@ -61,8 +62,9 @@
     x = e.clientX; y = e.clientY;
     if (lastX !== null) {
       // look the way you're moving
-      tx = Math.max(-4, Math.min(4, (x - lastX) * 0.6));
-      ty = Math.max(-3, Math.min(3, (y - lastY) * 0.6));
+      // googly: the pupil rolls toward the direction you move
+      tx = Math.max(-5, Math.min(5, (x - lastX) * 0.7));
+      ty = Math.max(-5, Math.min(5, (y - lastY) * 0.7));
     }
     lastX = x; lastY = y;
     var hidden = detailsTakeover(e.target);
@@ -85,10 +87,11 @@
   }
 
   function blink(double) {
-    if (!blinkEl || !blinkEl.animate) return;
-    var a = blinkEl.animate(
-      [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0.08)', offset: 0.45 }, { transform: 'scaleY(1)' }],
-      { duration: reduceMotion ? 1 : 190, easing: 'ease-in-out' }
+    if (!lidEl || !lidEl.animate) return;
+    var rest = el.classList.contains('--down') ? 'translateY(-7px)' : 'translateY(-20px)';
+    var a = lidEl.animate(
+      [{ transform: rest }, { transform: 'translateY(4px)', offset: 0.45 }, { transform: rest }],
+      { duration: reduceMotion ? 1 : 220, easing: 'ease-in-out' }
     );
     if (double) a.onfinish = function () { setTimeout(function () { blink(false); }, 90); };
   }
