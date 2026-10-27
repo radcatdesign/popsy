@@ -829,6 +829,31 @@ a {
     .view-btn { padding: 6px 6px; }
     .view-icon { width: 24px; height: 24px; }
   }
+  /* Feature tiles: a 2x2 monster. The big piece overflows its cell; the three cells it covers
+     are see-through and click-through, and the grid lines inside the block are hidden. */
+  .grid .column .product.--big > div {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    width: calc(2 * 18.5vw + 5vw);
+  }
+  @media (max-width: 600px) {
+    .grid .column .product.--big > div { width: calc(2 * 44vw + 5vw); }
+  }
+  .grid .column .product.--covered { pointer-events: none; }
+  /* columns are click-through so the overlapping half of a big tile still gets hover/clicks */
+  .grid .column { pointer-events: none; }
+  .grid .column .product { pointer-events: auto; }
+  .grid .column .product.--covered,
+  .grid .column .product:has([data-id="popsy-wolf"]) { pointer-events: none; }
+  .grid .column .product.--covered > div { visibility: hidden; }
+  .grid .column .product.--big::before,
+  .grid .column .product.--big::after,
+  .grid .column .product.--no-bottom::after,
+  .grid .column .product.--no-right::before {
+    display: none;
+  }
   /* Shelf view: one row of big pieces, with a line along the top as well as the bottom */
   .grid.--shelf .column { position: relative; }
   .grid.--shelf .column::before {
@@ -2485,12 +2510,45 @@ a {
         productsArray.push(filteredItems[i % filteredItems.length]);
       }
       if (logoItem && (!filter || logoItem.category === filter)) productsArray[centerPos] = logoItem;
+      // Feature tiles: a few monsters take up a 2x2 block (top-left cell holds the big piece,
+      // the other three cells step aside). Blocks stay apart and clear of the logo.
+      const blocks = [];
+      if (filter === 'monsters' || !filter) {
+        const logoC = Math.floor(centerPos / itemsPerColumn), logoR = centerPos % itemsPerColumn;
+        const taken = new Set();
+        const mark = (c, r) => taken.add(c + ',' + r);
+        const free = (c, r) => !taken.has(c + ',' + r);
+        for (let dc = -1; dc <= 1; dc++) for (let dr = -1; dr <= 1; dr++) mark(logoC + dc, logoR + dr);
+        const spots = [];
+        for (let c = 0; c <= columns - 2; c++) for (let r = 0; r <= itemsPerColumn - 2; r++) spots.push([c, r]);
+        spots.sort(() => Math.random() - 0.5);
+        const pool = filteredItems.filter(p => p.category === 'monsters' && p.video).sort(() => Math.random() - 0.5);
+        const want = Math.min(5, pool.length);
+        for (const [c, r] of spots) {
+          if (blocks.length >= want) break;
+          let ok = true;
+          for (let dc = 0; dc < 2 && ok; dc++) for (let dr = 0; dr < 2 && ok; dr++) ok = free(c + dc, r + dr);
+          if (!ok) continue;
+          // the block plus a one-cell margin is reserved so big tiles never touch
+          for (let dc = -1; dc <= 2; dc++) for (let dr = -1; dr <= 2; dr++) mark(c + dc, r + dr);
+          productsArray[c * itemsPerColumn + r] = pool[blocks.length];
+          blocks.push([c, r]);
+        }
+      }
       for (let i = 0; i < columns; i++) {
       	const start = itemsPerColumn * i;
         const end = start + itemsPerColumn;
         const prods = productsArray.slice(start, end);
         createColumn(prods);
       }
+      const colEls = [...gridEl.children];
+      const cell = (c, r) => colEls[c] && colEls[c].children[r];
+      blocks.forEach(([c, r]) => {
+        cell(c, r).classList.add('--big');
+        cell(c + 1, r).classList.add('--covered', '--no-bottom');
+        cell(c, r + 1).classList.add('--covered', '--no-right');
+        cell(c + 1, r + 1).classList.add('--covered');
+      });
     }
     initGrid();
     createFilters();
@@ -2682,8 +2740,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         if (this.grid.querySelector('.product[data-video-state="on"]')) return
         const vw = window.innerWidth, vh = window.innerHeight
         const pool = [...this.grid.querySelectorAll('.product')].filter(pr => {
-          if (pr.dataset.videoState || !pr.querySelector('video')) return false
-          const r = pr.getBoundingClientRect()
+          if (pr.dataset.videoState || !pr.querySelector('video') || pr.classList.contains('--covered')) return false
+          const r = pr.firstElementChild.getBoundingClientRect()
           return r.right > 0 && r.left < vw && r.bottom > 0 && r.top < vh - 80
         })
         if (pool.length) this.playOnce(pool[Math.floor(Math.random() * pool.length)])
@@ -2814,12 +2872,12 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const cx = window.innerWidth / 2
       const cy = this.layout.isShelf ? this.offset.y + this.layout.rowH / 2 : window.innerHeight / 2
       let best = null, bd = Infinity
-      this.grid.querySelectorAll('.product').forEach(pr => {
-        const r = pr.getBoundingClientRect()
+      this.grid.querySelectorAll('.product:not(.--covered)').forEach(pr => {
+        const r = (pr.firstElementChild || pr).getBoundingClientRect()
         const d = Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy)
         if (d < bd) { bd = d; best = pr }
       })
-      if (best && (bd > best.getBoundingClientRect().width * 0.5 || !best.querySelector('video'))) best = null
+      if (best && (bd > (best.firstElementChild || best).getBoundingClientRect().width * 0.5 || !best.querySelector('video'))) best = null
       if (best === this.focusProduct) return
       if (this.focusProduct) this.unfocus(this.focusProduct)
       this.focusProduct = best
@@ -3201,7 +3259,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     const vw = window.innerWidth, vh = window.innerHeight
     const seen = new Set()
     const mid = o => [o.r.left + o.r.width / 2, o.r.top + o.r.height / 2]
-    let onScreen = [...grid.grid.querySelectorAll('.product > div')]
+    let onScreen = [...grid.grid.querySelectorAll('.product:not(.--covered) > div')]
       .map(d => ({ d, id: d.dataset.id, r: d.getBoundingClientRect() }))
       .filter(o => o.id !== 'popsy-wolf' && o.r.width > 0 && o.r.right > 0 && o.r.left < vw && o.r.bottom > 0 && o.r.top < vh)
     // first = the piece closest to the middle of the screen (where you are on the canvas),
