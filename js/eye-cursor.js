@@ -1,7 +1,9 @@
 /* Popsy eye cursor: a little glazed ceramic eyeball (cream ball, black pupil, pink speckled
    lid shell) that follows the normal pointer around, rolling along behind it like a real ball, settles back to look at you
    when you stop, blinks on its own, closes halfway while you hold the button down, and swells
-   a little over things you can click. Mouse / trackpad devices only.
+   a little over things you can click. On phones and tablets it's a loose ball on the screen
+   that rolls around as you tilt the device (motion sensors), bounces off the edges, and
+   squints / blinks when you touch the screen.
 
    No 3D library: at cursor size the ball is only ~70x70 real pixels, so a small canvas
    ray-traces it every frame it moves. The look comes from the clay eyeball model (Meshy), baked
@@ -9,10 +11,13 @@
    surface direction in RGB, how far the surface stands out in alpha, which is what tells the
    raised lid from the ball). Until those load, a drawn stand-in with the same proportions shows. */
 (function () {
-  if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  if (!window.matchMedia) return;
+  var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;          // mouse / trackpad
+  var TILT = !FINE && ('ontouchstart' in window || navigator.maxTouchPoints > 0);       // phone / tablet
+  if (!FINE && !TILT) return;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var SIZE = 34;                       // CSS px
+  var SIZE = FINE ? 34 : 44;           // CSS px
   var style = document.createElement('style');
   style.textContent = [
     '.eye-cursor-el { position: fixed; left: 0; top: 0; width: ' + SIZE + 'px; height: ' + SIZE + 'px; margin: -' + SIZE / 2 + 'px 0 0 -' + SIZE / 2 + 'px;',
@@ -286,6 +291,7 @@
     return open && !(target && target.closest && target.closest('.details'));
   }
 
+  if (FINE) {
   document.addEventListener('mousemove', function (e) {
     x = e.clientX; y = e.clientY;
     if (ex === null || lastX === null || Math.abs(x - lastX) > 200 || Math.abs(y - lastY) > 200) { ex = x + OFF_X; ey = y + OFF_Y; } // first sight / re-entering: no flying in
@@ -301,11 +307,65 @@
   document.addEventListener('mouseleave', function () { el.classList.remove('--on'); });
   document.documentElement.addEventListener('mouseleave', function () { el.classList.remove('--on'); });
   window.addEventListener('blur', function () { el.classList.remove('--on'); });
+  }
+
+  /* ---------- phones: a loose ball that rolls with the tilt of the device ---------- */
+  var bx = 0, by = 0, vx = 0, vy = 0, gx = 0, gy = 0, base = null, slowSince = 0;
+  if (TILT) {
+    bx = ex = window.innerWidth / 2; by = ey = window.innerHeight * 0.6;
+    window.addEventListener('deviceorientation', function (e) {
+      if (e.beta == null || e.gamma == null) return;
+      var b = e.beta, g = e.gamma;
+      // "level" is however you're holding the phone; it drifts slowly toward your grip so a
+      // relaxed hold doesn't pin the ball to one edge, while a tilt sends it rolling
+      if (!base) base = { b: b, g: g };
+      base.b += (b - base.b) * 0.004; base.g += (g - base.g) * 0.004;
+      var dX = Math.sin((g - base.g) * Math.PI / 180), dY = Math.sin((b - base.b) * Math.PI / 180);
+      var ang = (screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : (window.orientation || 0);
+      if (ang === 90) { gx = dY; gy = -dX; }
+      else if (ang === 270 || ang === -90) { gx = -dY; gy = dX; }
+      else if (ang === 180) { gx = -dX; gy = -dY; }
+      else { gx = dX; gy = dY; }
+    });
+    // iPhone / iPad: motion sensors need the visitor's OK, and Safari only asks after a tap
+    var asked = false;
+    var askMotion = function () {
+      if (asked) return; asked = true;
+      var D = window.DeviceOrientationEvent;
+      if (D && typeof D.requestPermission === 'function') D.requestPermission().catch(function () {});
+    };
+    document.addEventListener('touchstart', function () { down = true; lidTarget = 0.5; }, { passive: true });
+    document.addEventListener('touchend', function () { down = false; lidTarget = 0; blink(); askMotion(); }, { passive: true });
+    document.addEventListener('touchcancel', function () { down = false; lidTarget = 0; }, { passive: true });
+  }
+  function tiltStep(now, dt) {
+    var s = dt / 1000, vv = window.visualViewport;
+    var W = vv ? vv.width : window.innerWidth, Hh = vv ? vv.height : window.innerHeight;
+    if (!reduceMotion) {
+      vx += gx * 2400 * s; vy += gy * 2400 * s;              // downhill
+      var fr = Math.exp(-s * 1.1); vx *= fr; vy *= fr;         // rolling resistance
+      bx += vx * s; by += vy * s;
+    }
+    var r = SIZE / 2 + 2, hit = 0;
+    if (bx < r) { bx = r; if (vx < 0) { hit = Math.max(hit, -vx); vx = -vx * 0.45; } }
+    if (bx > W - r) { bx = W - r; if (vx > 0) { hit = Math.max(hit, vx); vx = -vx * 0.45; } }
+    if (by < r) { by = r; if (vy < 0) { hit = Math.max(hit, -vy); vy = -vy * 0.45; } }
+    if (by > Hh - r) { by = Hh - r; if (vy > 0) { hit = Math.max(hit, vy); vy = -vy * 0.45; } }
+    if (hit > 320 && blinkT < 0) blink();                       // a hard knock makes it blink
+    var mx = bx - ex, my = by - ey; ex = bx; ey = by;
+    if (Math.abs(mx) + Math.abs(my) > 0.05) { roll(mx, my, SIZE / 2); dirty = true; }
+    // once it's barely moving, let it turn back to look at you
+    if (Math.hypot(vx, vy) > 14) lastMove = now;
+    el.style.transform = 'translate3d(' + ex + 'px,' + ey + 'px,0)';
+    // appear once the grid has opened
+    if (!el.classList.contains('--on') && document.body.dataset.started) { el.classList.add('--on'); dirty = true; }
+  }
 
   var prev = performance.now();
   function tick(now) {
     var dt = Math.min(64, now - prev); prev = now;
-    if (ex !== null) {
+    if (TILT) tiltStep(now, dt);
+    else if (ex !== null) {
       // ease toward the pointer, and roll by however far the eye itself moved this frame
       var f = reduceMotion ? 1 : 1 - Math.exp(-dt / FOLLOW);
       var mx = (x + OFF_X - ex) * f, my = (y + OFF_Y - ey) * f;
