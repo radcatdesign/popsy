@@ -778,10 +778,17 @@ a {
   }
   body:not([data-started]) .grid .product { --lo: 0; }
   .about-link, .family-link { transition: opacity 0.6s ease; }
+  /* the interface stays hidden until the grid starts building out, then animates in (see animateUI) */
+  html body:not([data-started]):not(.--ui-in) .nav.v--new,
+  html body:not([data-started]):not(.--ui-in) .about-link,
+  html body:not([data-started]):not(.--ui-in) .family-link,
+  html body:not([data-started]):not(.--ui-in) .view-nav {
+    opacity: 0;
+  }
   html body:not([data-started]) .nav.v--new,
   html body:not([data-started]) .about-link,
-  html body:not([data-started]) .family-link {
-    opacity: 0;
+  html body:not([data-started]) .family-link,
+  html body:not([data-started]) .view-nav {
     pointer-events: none;
   }
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
@@ -817,10 +824,6 @@ a {
     border-image-slice: 25;
     border-image-repeat: stretch;
     transition: opacity 0.5s;
-  }
-  html body:not([data-started]) .view-nav {
-    opacity: 0;
-    pointer-events: none;
   }
   .view-btn {
     cursor: pointer;
@@ -2987,6 +2990,37 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         if (!div || div === this.logoDiv) return
         tl.fromTo(div, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)' }, 0.2 + k * 0.8)
       })
+      this.animateUI(tl)
+    }
+    // Interface comes in with the pieces: links slide in from the top corners, the filter and
+    // view pills rise from the bottom corners, and their icons pop in one after another
+    animateUI(tl) {
+      const q = s => [...document.querySelectorAll(s)]
+      const top = q('.about-link, .family-link')
+      const pills = q('.nav.v--new, .view-nav')
+      const all = top.concat(pills)
+      // CSS opacity transitions would fight the tween, so park them until it's done
+      all.forEach(el => { el.style.transition = 'none' })
+      const done = () => {
+        gsap.set(all, { clearProps: 'opacity,transform,transformOrigin,transition' })
+        gsap.set(q('.nav.v--new .filter-btn, .view-nav .view-icon'), { clearProps: 'opacity,transform' })
+      }
+      if (this.reduceMotion) {
+        tl.fromTo(all, { opacity: 0 }, { opacity: 1, duration: 0.5, onComplete: done }, 0.3)
+        document.body.classList.add('--ui-in')
+        return
+      }
+      const about = q('.about-link'), fam = q('.family-link')
+      tl.fromTo(about, { opacity: 0, x: -18, y: -12 }, { opacity: 1, x: 0, y: 0, duration: 0.8, ease: 'power3.out' }, 0.25)
+      tl.fromTo(fam, { opacity: 0, x: 18, y: -12 }, { opacity: 1, x: 0, y: 0, duration: 0.8, ease: 'power3.out' }, 0.32)
+      const nav = q('.nav.v--new'), view = q('.view-nav')
+      tl.fromTo(nav, { opacity: 0, y: 46, scale: 0.92, transformOrigin: '0% 100%' }, { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: 'back.out(1.4)' }, 0.42)
+      tl.fromTo(q('.nav.v--new .filter-btn'), { opacity: 0, scale: 0.3, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(2.2)', stagger: 0.08 }, 0.6)
+      tl.fromTo(view, { opacity: 0, y: 46, scale: 0.92, transformOrigin: '100% 100%' }, { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: 'back.out(1.4)' }, 0.52)
+      tl.fromTo(q('.view-nav .view-icon'), { opacity: 0, scale: 0.3, rotate: -90 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.6, ease: 'back.out(2)' }, 0.78)
+      tl.add(done)
+      // the from-states above are already applied, so it's safe to lift the CSS hide now
+      document.body.classList.add('--ui-in')
     }
     afterIntro() {
       this.setupDraggable()
