@@ -666,6 +666,11 @@ a {
   body:not([data-nav-open="t"]) .nav-btn__icon__img[data-nav-btn-icon="x"] { display: none; }
   body[data-nav-open="t"] .nav-btn__icon__img[data-nav-btn-icon="h"] { display: none; }
   .details__text-w { flex: 1; }
+  /* Phones: "about" and "family tree" sit on the same line as the middle of the parked eye
+     (eye centre is 56px down; the links are 20px tall) */
+  @media (hover: none), (pointer: coarse) {
+    body .about-link, body .family-link { top: 46px; }
+  }
   /* Family tree link: top right, mirrors "about" top left */
   .family-link {
     z-index: 20;
@@ -962,9 +967,7 @@ a {
     padding: 24px 30px;
     scroll-snap-align: center;
     scroll-snap-stop: always;
-    border-bottom: 1px solid #ddd;
   }
-  .sv-item:last-child { border-bottom: 0; }
   .sv-media {
     position: relative;
     width: min(80vw, 420px);
