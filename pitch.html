@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Popsy Loves You: a TV show pitch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- off menu: not linked from the site, and kept out of search results -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Inside Out meets Rick and Morty. A nine-year-old, her grandfather Popsy, and a house full of monsters living in the walls.">
+  <meta property="og:title" content="Popsy Loves You: a TV show pitch">
+  <meta property="og:description" content="Inside Out meets Rick and Morty. A nine-year-old, her grandfather Popsy, and a house full of monsters living in the walls.">
+  <meta property="og:image" content="https://popsy-neon.vercel.app/images/popsy-og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="preload" href="fonts/UglyDave.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    @font-face { font-family: Uglydave; src: url('fonts/UglyDave.woff2') format('woff2'); font-display: swap; }
+    :root {
+      --ink: #000; --paper: #fff; --soft: #5a5a5a; --line: #ddd;
+      --border: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);
+      --border2: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.webp);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: Uglydave, Verdana, sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    p { margin: 0 0 1em; }
+    .wrap { width: min(760px, 100% - 40px); margin: 0 auto; }
+    .wide { width: min(1120px, 100% - 40px); margin: 0 auto; }
+    /* hand-drawn card, same border as the site's popups */
+    .card { position: relative; background: #fff; border: 1px solid #000; border-radius: 13px; padding: 24px 26px;
+      border-image-source: var(--border); border-image-slice: 25; border-image-width: 30px; border-image-outset: 1px; border-image-repeat: stretch; }
+    .tag { display: inline-block; font-size: 15px; line-height: 1; padding: 7px 14px 6px; border: 1px solid #000; border-radius: 13px;
+      border-image-source: var(--border); border-image-slice: 25; border-image-width: 30px; border-image-outset: 1px; border-image-repeat: stretch; }
+
+    /* top bar: home link and the eye's spot */
+    .bar { position: fixed; inset: 0 0 auto; z-index: 20; display: flex; justify-content: space-between; padding: 26px 30px; pointer-events: none;
+      background: linear-gradient(#fff 40%, rgba(255,255,255,0)); }
+    .bar a { pointer-events: auto; font-size: 20px; text-decoration: none; }
+    .bar a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    /* hero */
+    .hero { min-height: 100svh; display: grid; place-items: center; text-align: center; padding: 110px 20px 70px; }
+    .hero__logo { position: relative; width: min(440px, 78vw); aspect-ratio: 1; margin: 0 auto; }
+    .hero__logo img, .hero__logo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+    .hero__logo video { opacity: 0; transition: opacity .4s ease; }
+    .hero__logo.--moving video { opacity: 1; }
+    .hero__logo.--moving img { opacity: 0; transition: opacity .3s ease .1s; }
+    .kicker { font-size: clamp(18px, 2.4vw, 22px); margin: 18px 0 10px; }
+    .hero h1 { font-weight: normal; font-size: clamp(30px, 5.4vw, 54px); line-height: 1.08; margin: 0 auto; max-width: 14ch; }
+    .scroll-hint { margin-top: 34px; font-size: 16px; color: var(--soft); text-decoration: none; display: inline-block; }
+    .scroll-hint span { display: inline-block; animation: bob 1.8s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(5px); } }
+
+    /* sections */
+    section { padding: clamp(56px, 9vw, 110px) 0; }
+    section + section { border-top: 1px solid var(--line); }
+    h2 { font-weight: normal; font-size: clamp(32px, 5vw, 48px); line-height: 1.08; margin: 0 0 26px; }
+    h3 { font-weight: normal; font-size: 26px; line-height: 1.15; margin: 0 0 8px; }
+    .lede { font-size: clamp(22px, 3vw, 28px); line-height: 1.35; }
+    .body { font-size: clamp(17px, 2vw, 19px); }
+    .pull { font-size: clamp(26px, 4vw, 38px); line-height: 1.2; margin: 6px 0 30px; max-width: 22ch; }
+    .soft { color: var(--soft); }
+
+    /* format: a grid of short cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    @media (max-width: 820px) { .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+    .card p:last-child { margin-bottom: 0; }
+    .format .card { font-size: 18px; }
+    .format .card .n { display: block; font-size: 15px; color: var(--soft); margin-bottom: 6px; }
+
+    /* monsters: cards with a job line and the damage */
+    .mon { font-size: 17px; }
+    .mon .job { font-size: 19px; margin: 0 0 12px; }
+    .mon .damage { margin-top: 14px; display: block; }
+    .mon .damage .tag { transform: rotate(-2deg); margin-bottom: 8px; }
+    .mon:nth-child(2) { transform: rotate(.6deg); }
+    .mon:nth-child(3) { transform: rotate(-.5deg); }
+
+    /* the house: a collage of labels */
+    .labels { display: flex; flex-wrap: wrap; gap: 14px 12px; margin: 30px 0 34px; padding: 0; list-style: none; }
+    .labels li { font-size: 18px; line-height: 1.2; padding: 10px 16px 9px; background: #fff; border: 1px solid #000; border-radius: 13px;
+      border-image-source: var(--border); border-image-slice: 25; border-image-width: 30px; border-image-outset: 1px; border-image-repeat: stretch; }
+    .labels li:nth-child(3n+1) { transform: rotate(-1.6deg); }
+    .labels li:nth-child(3n+2) { transform: rotate(1.2deg); }
+    .labels li:nth-child(5n) { transform: rotate(-.4deg) translateY(4px); }
+    .labels li.last { background: #000; color: #fff; border-image-source: var(--border2); border-image-slice: 15; border-image-outset: 3px; }
+
+    /* in the walls: doors */
+    .doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin: 34px 0 40px; }
+    @media (max-width: 900px) { .doors { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .doors { grid-template-columns: 1fr; } }
+    .door { padding: 22px 22px 20px; border-radius: 60px 60px 13px 13px; }
+    .door .who { font-size: 15px; color: var(--soft); display: block; margin-bottom: 8px; }
+    .door p { font-size: 17px; }
+    .door::after { content: ''; position: absolute; right: 18px; top: 50%; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #000; }
+    .still { font-size: clamp(22px, 3vw, 28px); line-height: 1.35; }
+
+    /* how it works: numbered rules */
+    .rules { counter-reset: r; list-style: none; padding: 0; margin: 0; }
+    .rules li { counter-increment: r; position: relative; padding: 0 0 18px 54px; font-size: clamp(17px, 2vw, 19px); }
+    .rules li::before { content: counter(r); position: absolute; left: 0; top: -4px; width: 38px; height: 38px; display: grid; place-items: center; font-size: 18px;
+      border: 1px solid #000; border-radius: 50%; }
+
+    /* episodes */
+    .eps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+    @media (max-width: 700px) { .eps { grid-template-columns: 1fr; } }
+    .ep .num { display: inline-block; font-size: 15px; margin-bottom: 10px; }
+    .ep p { font-size: 17px; }
+
+    /* where it came from: real pieces, sliding past; hover (or tap) one to wake it up */
+    .reel { overflow: hidden; margin: 40px 0 10px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+    .reel__track { display: flex; gap: 22px; width: max-content; animation: reel 90s linear infinite; }
+    .reel:hover .reel__track { animation-play-state: paused; }
+    @media (prefers-reduced-motion: reduce) { .reel__track { animation: none; } }
+    @keyframes reel { to { transform: translateX(-50%); } }
+    .piece { position: relative; width: 190px; flex: 0 0 auto; text-align: center; margin: 0; }
+    .piece .ph { position: relative; aspect-ratio: 1; }
+    .piece img, .piece video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+    .piece video { opacity: 0; transition: opacity .3s ease; }
+    .piece.--on video { opacity: 1; }
+    .piece figcaption { font-size: 15px; margin-top: 4px; }
+    .facts { margin: 36px 0 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+    .facts li { font-size: clamp(18px, 2.2vw, 21px); padding-left: 26px; position: relative; }
+    .facts li::before { content: ''; position: absolute; left: 2px; top: .55em; width: 9px; height: 9px; border-radius: 50%; background: #000; }
+
+    /* theory: the closing note, big */
+    .theory .big { font-size: clamp(30px, 5vw, 52px); line-height: 1.12; margin: 0 0 30px; }
+    .theory .end { font-size: clamp(22px, 3vw, 28px); line-height: 1.35; }
+
+    footer { padding: 70px 20px 90px; text-align: center; border-top: 1px solid var(--line); }
+    footer img { width: 120px; height: auto; display: block; margin: 0 auto 12px; }
+    footer p { font-size: 17px; margin: 0; }
+
+    /* headings write themselves in as they arrive (handwrite.js); everything else drifts up */
+    .rise { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .8s cubic-bezier(.22,1,.36,1); }
+    .rise.--in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .rise { opacity: 1; transform: none; } }
+  </style>
+</head>
+<body data-started="true">
+  <nav class="bar" aria-label="Site"><a href="/">popsy loves you</a><a href="#theory">the idea</a></nav>
+
+  <header class="hero">
+    <div>
+      <div class="hero__logo" aria-hidden="true"><img src="assets/popsy-logo-v2.svg" alt=""><video muted loop playsinline></video></div>
+      <p class="kicker" data-write>A TV show pitch</p>
+      <h1 data-write>Think Inside Out meets Rick and Morty.</h1>
+      <a class="scroll-hint" href="#overview">read the pitch <span>&darr;</span></a>
+    </div>
+  </header>
+
+  <main>
+    <section id="overview"><div class="wrap">
+      <h2 data-write>Overview</h2>
+      <div class="body rise">
+        <p>So the whole thing centers around this nine-year-old girl named Frankie. She&#x27;s got a mom, a five-year-old brother, and a dad that&#x27;s been dead for four years. She&#x27;s been completely fine about it the whole time.</p>
+        <p>Mom&#x27;s been trying to hold it together, but after getting a new job, they&#x27;re forced to move in with their dad&#x27;s dad, Popsy. Popsy is an eccentric artist who lives in one of the most unique houses you&#x27;ve ever seen, full of secret rooms, wacky design, and an entire world of monsters living in the walls.</p>
+        <p>Somewhere in his thirties, Popsy figured out that all the different parts of a person are already in there, and that if you sit down and sculpt one out of clay, it&#x27;ll show you its face. He&#x27;s been doing it ever since. Each monster is spectacularly good at exactly one thing and has absolutely no idea when to stop, and somehow, between them, they&#x27;ve made his whole life work.</p>
+      </div>
+      <p class="pull rise">On her first day at the new school, Frankie borrows one of his.</p>
+      <p class="lede rise">It goes very badly.</p>
+      <p class="body rise">So Popsy starts teaching her how to make her own. She's terrible at it, and chaos ensues.</p>
+    </div></section>
+    <section class="format"><div class="wide">
+      <div class="wrap" style="width:auto;margin:0"><h2 data-write>Format</h2></div>
+      <div class="grid-2">
+        <div class="card rise"><p>Eleven episodes in season one, ten to fifteen minutes each.</p></div>
+        <div class="card rise"><p>2D, hand-built, warm and overstuffed. Everything looks like somebody made it.</p></div>
+        <div class="card rise"><p>Kids six to eleven, with a second layer underneath that the parent in the room gets and the kid doesn&#x27;t.</p></div>
+        <div class="card rise"><p>Funny on top, confronting and heartwarming underneath, almost never in the same beat.</p></div>
+        <div class="card rise"><p>Nothing in it is a villain. Not the monsters, not Popsy, not the part she hasn&#x27;t made yet.</p></div>
+        <div class="card rise"><p>The walls are never creepy. Bright, overbuilt, too much going on in every frame.</p></div>
+        <div class="card rise"><p>The show never says grief, or feelings, or anything that sounds like a session, and it doesn&#x27;t conspicuously avoid them either.</p></div>
+        <div class="card rise" style="background:#000;color:#fff;border-image-source:var(--border2);border-image-slice:15;border-image-outset:3px"><p>Inside Out meets Rick and Morty.</p></div>
+      </div>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>About Frankie</h2>
+      <p class="pull rise">Frankie is nine and she is handling everything.</p>
+      <div class="body rise">
+        <p>She&#x27;s got a bag with everything in it. She knows the bus times. She packs her brother&#x27;s lunch, signs her own permission slips, and has handed somebody a Band-Aid every day for four years.</p>
+        <p>She&#x27;s funny. Properly funny. Dry, fast, mostly at her brother&#x27;s expense. About everything except herself, which she treats as a logistics problem rather than a subject.</p>
+        <p>What she actually wants is to be the kind of kid who&#x27;s relaxed. She watches other nine-year-olds forget their jacket, not notice the mood in a room, say something without checking it first, and it looks to her like a superpower.</p>
+        <p>She takes after her dad. He rejected Popsy and everything he was doing. Hard worker, loved his family, always in control, never once looked at any of it.</p>
+      </div>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>Popsy</h2>
+      <p class="pull rise">He's in his seventies, he's her father's father, and he has never once asked her how she's doing.</p>
+      <div class="body rise">
+        <p>He worked it out somewhere in his thirties and he&#x27;s been doing it every day since. He doesn&#x27;t think it&#x27;s special. It&#x27;s a craft, like welding. Anybody could learn it, almost nobody bothers, and in fifty years he&#x27;s never gotten a single person interested.</p>
+        <p>He does not parent. He&#x27;ll let a nine-year-old ride a dumbwaiter and then ask her opinion on a glaze.</p>
+        <p>Dinner is at ten. He has no position on bedtime.</p>
+        <p>He&#x27;s the only person in that house who doesn&#x27;t believe her when she says she&#x27;s fine, and he never asks. He just keeps handing her clay.</p>
+      </div>
+    </div></section>
+    <section><div class="wide">
+      <h2 data-write>Meet Some of Popsy's Monsters</h2>
+      <div class="grid-3">
+        <article class="card mon rise"><h3>Bix.</h3><p class="job">Follows whatever&#x27;s interesting.</p><p>Fast. Never settles. Head on a swivel, half out of frame, already doing the next thing. Starts everything. Fifty years of going toward whatever was interesting is not a personality, it&#x27;s a career. This is the one that made Popsy an artist.</p><span class="damage"><span class="tag">The damage:</span><br>he never finishes anything. Never has.</span></article>
+        <article class="card mon rise"><h3>Gail.</h3><p class="job">Doesn&#x27;t care what anybody thinks.</p><p>Still. Completely at ease. Slow blink. Takes up more room than she needs and has never once noticed. Popsy made what he wanted for fifty years in a world that had opinions about it. Without Gail there&#x27;s no house, no walls, no monsters.</p><span class="damage"><span class="tag">The damage:</span><br>he also doesn&#x27;t notice when somebody&#x27;s hurt.</span></article>
+        <article class="card mon rise"><h3>Flo.</h3><p class="job">Always has a solution.</p><p>Busy. Full pockets. Always carrying something. Already building the answer before you&#x27;ve finished the question. When the kiln broke, she fixed the kiln. When the house needed another room, she built another room. Flo is why a man with no money and no plan ended up with all of this.</p><span class="damage"><span class="tag">The damage:</span><br>he solves the wrong problem, confidently, at speed.</span></article>
+      </div>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>The Rest of the House</h2>
+      <div class="grid-2" style="grid-template-columns:1fr">
+        <article class="card rise"><h3>Mom.</h3><p>Works constantly and is doing her best. Four years in, she&#x27;s keeping two kids afloat, and she moved them into her dead husband&#x27;s father&#x27;s house because she couldn&#x27;t do it on her own. She&#x27;s in the series, not in every week.</p><p>She&#x27;s also carrying something the size of a refrigerator that she has never once turned around and looked at. Frankie manages her and is quietly proud of it.</p></article>
+        <article class="card rise"><h3>The brother, five.</h3><p>He has no memory of their dad at all, which makes Frankie the only kid in the house who remembers. He&#x27;s who she&#x27;s being fine for. His monsters are brand new, loud and badly raised, which is a running joke against Popsy&#x27;s fifty-year-old collection.</p></article>
+      </div>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>Popsy's House</h2>
+      <p class="lede rise">Popsy has lived here fifty years and built most of it himself. You can tell which decade each part went up, and none of it matches.</p>
+      <ul class="labels">
+        <li class="rise">A hallway added in 1981.</li>
+        <li class="rise">A staircase that stops.</li>
+        <li class="rise">Two doors that go nowhere, one that doesn&#x27;t.</li>
+        <li class="rise">A room with a sand floor.</li>
+        <li class="rise">A dumbwaiter the kids learn to ride by day two.</li>
+        <li class="rise">The bathtub is full of clay.</li>
+        <li class="rise">Tools on the piano.</li>
+        <li class="rise">The chest freezer in the hall is glazes, not food.</li>
+        <li class="rise">No two chairs match, and every flat surface is already in use.</li>
+        <li class="rise">The kiln&#x27;s in the old garage. When it fires, the whole house is warm and nobody sleeps.</li>
+        <li class="rise">The light is perfect in every single room. That part he got right on purpose.</li>
+        <li class="rise last">His son's room. Unchanged since 1998.</li>
+      </ul>
+      <div class="body rise">
+        <p>Frankie's assessment on arrival, out loud: death trap. She has notes. Popsy could not care less.</p>
+        <p>And the walls are thick. Deep cavities, fifty years of somebody adding on. There's a great deal of room in there.</p>
+      </div>
+    </div></section>
+    <section><div class="wide">
+      <div class="wrap" style="width:min(760px,100%);margin:0">
+        <h2 data-write>In the Walls</h2>
+        <p class="body rise">Behind the walls is where Popsy's monsters live, and the place only has one rule. A door opens onto whatever the episode needs, but the room has to exist because of a monster. We never go through a door for the set. We go because somebody's part needs somewhere to happen.</p>
+      </div>
+      <div class="doors">
+        <div class="card door rise"><span class="who">Gorm’s door</span><p>A gladiator arena where nobody has ever beaten Gorm, who can&#x27;t stand anything ending in a tie.</p></div>
+        <div class="card door rise"><span class="who">Doreen’s door</span><p>A stadium concert with ninety thousand monsters and one microphone, and Doreen is holding it, because she hates being talked over.</p></div>
+        <div class="card door rise"><span class="who">Odge’s door</span><p>A beach with nothing to do on it, built by Odge to slow everything down, and he&#x27;s never mentioned it to anybody.</p></div>
+        <div class="card door rise"><span class="who">Pell’s door</span><p>A DMV with a line that&#x27;s been moving since the seventies, run by Pell, who doesn&#x27;t let anything get skipped.</p></div>
+        <div class="card door rise"><span class="who">Nock’s door</span><p>An all-night diner run by Nock, full of retired ones going over what happened and refusing to call any of it a lesson.</p></div>
+        <div class="card door rise"><span class="who">Brack’s door</span><p>An empty swimming pool the size of a neighborhood that Brack dug in a weekend before anybody asked for a pool.</p></div>
+        <div class="card door rise"><span class="who">Marcia’s door</span><p>A parade Marcia started in 1974 and won&#x27;t call off, since the mood is not coming down on her watch.</p></div>
+        <div class="card door rise"><span class="who">Bix’s door</span><p>A hallway of open doors that Bix won&#x27;t close, in case the next one&#x27;s better.</p></div>
+        <div class="card door rise"><span class="who">Sattle’s door</span><p>A courtroom where Sattle has spent thirty years getting one unfair thing made even.</p></div>
+      </div>
+      <div class="wrap" style="width:min(760px,100%);margin:0">
+        <p class="still rise">And it doesn't hold still.</p>
+        <p class="body rise">Last week's arena is a laundromat this week, and Gorm is still in there, still undefeated.</p>
+        <p class="body rise">Any genre, any scale, any era, and the show never owes an explanation.</p>
+        <p class="lede rise">If an episode needs a submarine, there's a door.</p>
+      </div>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>How It Works</h2>
+      <ol class="rules">
+        <li class="rise">The part is already in there. The clay doesn&#x27;t make a monster, it gives one a body.</li>
+        <li class="rise">You sit down and sculpt until something comes out that you recognize and didn&#x27;t plan. That&#x27;s the entire method.</li>
+        <li class="rise">An afternoon for Popsy. Days for Frankie, and sometimes nothing comes at all.</li>
+        <li class="rise">You can&#x27;t make a part you don&#x27;t have, which is why she can&#x27;t make a relaxed one no matter how many times she tries.</li>
+        <li class="rise">A monster has exactly one job and knows nothing outside it.</li>
+        <li class="rise">They can&#x27;t be in two places and they can&#x27;t do each other&#x27;s jobs.</li>
+        <li class="rise">Nobody gets unmade. Once it&#x27;s got a face it&#x27;s yours and it stays.</li>
+        <li class="rise">You can lend one out. It&#x27;ll do its job perfectly for anybody, and perfect is the problem.</li>
+        <li class="rise">Frankie, Popsy and the five-year-old can see them. Mom can&#x27;t, and nobody in the house makes anything of it.</li>
+        <li class="rise">The ones you&#x27;ve never met are the ones running you. Those don&#x27;t have faces yet. That&#x27;s the whole point of sitting down with the clay.</li>
+      </ol>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>First Episode</h2>
+      <div class="body rise">
+        <p>First episode, Frankie&#x27;s starting at a new school and Popsy takes her into the walls to meet the monsters. He sends one with her to help.</p>
+        <p>It&#x27;s a monster he made in the seventies for working a room at a dinner party. It is spectacularly good at this. By lunch it has asked four nine-year-olds what they do for a living, proposed a toast, and told her new teacher a very long story about a boat.</p>
+        <p>Frankie comes home and says it went fine. Popsy is the only person in the house who doesn&#x27;t believe her.</p>
+      </div>
+      <p class="pull rise">So she tells him she wants her own. Not his.</p>
+      <p class="body rise">Each episode explores Frankie making monsters, one at a time, as things come up. She's good at the useful ones. She's going to spend eleven episodes avoiding the one she actually needs.</p>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>Where It's Going</h2>
+      <div class="body rise">
+        <p>Popsy starts teaching her and she turns out to be good at it, which is the problem.</p>
+        <p>She makes the useful ones. One who&#x27;s ready for anything, one who keeps track of everybody, one who gets a five-year-old out the door on time. They all work. They&#x27;re all a version of what she was already doing before she had any of them.</p>
+        <p>She makes nine or ten over the season and every one of them is competent.</p>
+        <p>The only ones that come out wrong are the ones she tries to make on purpose, about being relaxed, because you can&#x27;t make a part you don&#x27;t have.</p>
+        <p>Somewhere in the back half she works out that Popsy&#x27;s monsters all knew her dad. He grew up in that house and he used to come into the walls as a boy, and then one year he stopped.</p>
+        <p>They&#x27;re the only ones in her life who&#x27;ll talk about him, and she starts going in there for that instead of for help.</p>
+      </div>
+      <p class="lede rise">The finale. She sits down and makes the one she's been avoiding since the pilot. It isn't what she expected, she didn't plan what came out of her hands, and there's something of her father in its face she didn't put there.</p>
+      <p class="body rise soft">The long one, and no character ever says it out loud. Eventually she's the reason he finishes his.</p>
+    </div></section>
+    <section><div class="wide">
+      <h2 data-write>Eight of the Eleven</h2>
+      <div class="eps">
+        <article class="card ep rise"><span class="num tag">Episode one. Pilot.</span><p>New school, and Popsy lends her something he built in 1974 for working a room at a dinner party. By lunch it has asked four nine-year-olds what they do for a living.</p></article>
+        <article class="card ep rise"><span class="num tag">Episode two.</span><p>Her brother is melting down daily, so she makes one who can calm anybody down, and it calms down the entire class, the teacher, and a fire drill.</p></article>
+        <article class="card ep rise"><span class="num tag">Episode three.</span><p>Group project with a kid who does nothing, so she takes Gorm, and a diorama about the water cycle becomes a blood sport.</p></article>
+        <article class="card ep rise"><span class="num tag">Episode four.</span><p>She wants to get invited to something, so she makes one who&#x27;s easy to be around, and it says yes to everything until she&#x27;s committed to four places on Saturday.</p></article>
+        <article class="card ep rise"><span class="num tag">Episode five.</span><p>School presentation. She borrows Doreen. It becomes a concert and she has to get ninety thousand monsters out of a classroom.</p></article>
+        <article class="card ep rise"><span class="num tag">Episode six.</span><p>Mom forgets the anniversary of Dad&#x27;s death and Frankie doesn&#x27;t. She takes Sattle in to find out why, and it ends up in court.</p></article>
+        <article class="card ep rise"><span class="num tag">Episode seven.</span><p>Her brother makes one by accident, at five, badly, and it&#x27;s enormous and loud and he isn&#x27;t remotely scared of it. Frankie is furious about how easy he found it.</p></article>
+        <article class="card ep rise"><span class="num tag">Episode eight.</span><p>A sleepover, and she can&#x27;t bring any of them. First time in four years she&#x27;s alone with it.</p></article>
+      </div>
+    </div></section>
+    <section><div class="wrap">
+      <h2 data-write>Where This Came From</h2>
+      <p class="pull rise">The monsters existed before the show did.</p>
+    </div>
+    <div class="reel rise" aria-label="Some of the monsters, as ceramic pieces"><div class="reel__track"><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d47f7eb7efd0114e0e7_M_F-26.avif" alt="Siddles Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-26.webm"></video></div><figcaption>Siddles Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/thumbs/dax-glimmerwick_M_F-23.webp" alt="Dax Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AC-23.webm"></video></div><figcaption>Dax Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c288e19fe35fe917eb3_M_FC-14.avif" alt="Cinder Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AC-14.webm"></video></div><figcaption>Cinder Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01b16f33ce27956ef4e62_2-Big.webp" alt="Darlene" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/darlene.webm"></video></div><figcaption>Darlene</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c94de22c7e30f40e5cd_M_F-20.avif" alt="Droozle Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-20.webm"></video></div><figcaption>Droozle Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ac99b40ad39ec82a081_M_F-07.avif" alt="Druthal Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-07.webm"></video></div><figcaption>Druthal Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01ec98f815664271941a1_31-Big.webp" alt="Dremmel Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/dremmel.webm"></video></div><figcaption>Dremmel Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b4d6f48d1c6740acd3a_M_F-11.avif" alt="Moro Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-11.webm"></video></div><figcaption>Moro Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c5dbc9faf057cf4ded5_M_F-17.avif" alt="Marnie Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/marnie.webm"></video></div><figcaption>Marnie Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c85f17e6f6420f2c3e9_M_F-19.avif" alt="Sunder Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-19.webm"></video></div><figcaption>Sunder Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c345be0d592d5f69b6e_M_F-15.avif" alt="Fennick Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-15.webm"></video></div><figcaption>Fennick Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52cdff3599d418fe0e396_M_F-22.avif" alt="Ned Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-22.webm"></video></div><figcaption>Ned Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b0abd91355ac9142f42_M_FP-09.avif" alt="Gabbles Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-09.webm"></video></div><figcaption>Gabbles Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68ca6d5753c5f7b1ee9ecb6f_M_AP-28.webp" alt="Stubbs Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-28.webm"></video></div><figcaption>Stubbs Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ab7a0d92b92f0069c3d_M_F-06.avif" alt="Janice Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-06.webm"></video></div><figcaption>Janice Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b5cc82308a962bd91fb_M_F-12.avif" alt="Bellowan Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-12.webm"></video></div><figcaption>Bellowan Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f018b37e8faface2a89192_21-Big.webp" alt="Noshik Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/noshik.webm"></video></div><figcaption>Noshik Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01a8b4e5faff514f89aa8_28-Big.webp" alt="Tiv Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.156)" data-src="assets/hover/tiv.webm"></video></div><figcaption>Tiv Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d6e513520b6bbe4a208_M_FP-29.avif" alt="Gush Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-29.webm"></video></div><figcaption>Gush Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/thumbs/gumphrey-glimmerwick_19-Big.webp" alt="Gumphrey Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/gumphrey.webm"></video></div><figcaption>Gumphrey Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a7d98928ab373b7c831_M_F-04.avif" alt="Murn Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-04.webm"></video></div><figcaption>Murn Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f019faaba6b5564a51d31d_30-Big.webp" alt="Tav Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.097)" data-src="assets/hover/tav.webm"></video></div><figcaption>Tav Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b2fccc854a48bea86fc_M_FP-10.avif" alt="Gribble Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-10.webm"></video></div><figcaption>Gribble Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/thumbs/frillik-dirtle_5-Big.webp" alt="Frillik Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/frillick.webm"></video></div><figcaption>Frillik Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ca624f6247993caf2c4_M_F-21.avif" alt="Peepers Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.169)" data-src="assets/hover/peepers.webm"></video></div><figcaption>Peepers Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c75a32b0fa93bbd6633_M_F-18.avif" alt="Ziggo Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.279)" data-src="assets/hover/ziggo.webm"></video></div><figcaption>Ziggo Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01f6c4bd1f77c68dc7308_25-Big.webp" alt="Gorble Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/gorble.webm"></video></div><figcaption>Gorble Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a9b48140221fc479edb_M_F-05.avif" alt="Plink Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-05.webm"></video></div><figcaption>Plink Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52add5fe42fcabd1a38e6_M_F-08.avif" alt="Fratch Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-08.webm"></video></div><figcaption>Fratch Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c4c9aba7881ec01c53f_M_F-16.avif" alt="Orbin Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-16.webm"></video></div><figcaption>Orbin Dirtle</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a5003094b86ada5bf25_M_F-02.avif" alt="Spatter Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-02.webm"></video></div><figcaption>Spatter Roarborn</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a33672d962870c86833_M_F-01.avif" alt="Hortencia Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-01.webm"></video></div><figcaption>Hortencia Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d366f48d1c6740b104b_M_F-25.avif" alt="Pigpen Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-25.webm"></video></div><figcaption>Pigpen Glimmerwick</figcaption></figure><figure class="piece"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a65085a37dc8093cf64_M_F-03.avif" alt="Craig Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-03.webm"></video></div><figcaption>Craig Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d47f7eb7efd0114e0e7_M_F-26.avif" alt="Siddles Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-26.webm"></video></div><figcaption>Siddles Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/thumbs/dax-glimmerwick_M_F-23.webp" alt="Dax Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AC-23.webm"></video></div><figcaption>Dax Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c288e19fe35fe917eb3_M_FC-14.avif" alt="Cinder Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AC-14.webm"></video></div><figcaption>Cinder Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01b16f33ce27956ef4e62_2-Big.webp" alt="Darlene" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/darlene.webm"></video></div><figcaption>Darlene</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c94de22c7e30f40e5cd_M_F-20.avif" alt="Droozle Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-20.webm"></video></div><figcaption>Droozle Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ac99b40ad39ec82a081_M_F-07.avif" alt="Druthal Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-07.webm"></video></div><figcaption>Druthal Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01ec98f815664271941a1_31-Big.webp" alt="Dremmel Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/dremmel.webm"></video></div><figcaption>Dremmel Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b4d6f48d1c6740acd3a_M_F-11.avif" alt="Moro Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-11.webm"></video></div><figcaption>Moro Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c5dbc9faf057cf4ded5_M_F-17.avif" alt="Marnie Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/marnie.webm"></video></div><figcaption>Marnie Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c85f17e6f6420f2c3e9_M_F-19.avif" alt="Sunder Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-19.webm"></video></div><figcaption>Sunder Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c345be0d592d5f69b6e_M_F-15.avif" alt="Fennick Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-15.webm"></video></div><figcaption>Fennick Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52cdff3599d418fe0e396_M_F-22.avif" alt="Ned Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-22.webm"></video></div><figcaption>Ned Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b0abd91355ac9142f42_M_FP-09.avif" alt="Gabbles Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-09.webm"></video></div><figcaption>Gabbles Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68ca6d5753c5f7b1ee9ecb6f_M_AP-28.webp" alt="Stubbs Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-28.webm"></video></div><figcaption>Stubbs Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ab7a0d92b92f0069c3d_M_F-06.avif" alt="Janice Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-06.webm"></video></div><figcaption>Janice Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b5cc82308a962bd91fb_M_F-12.avif" alt="Bellowan Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-12.webm"></video></div><figcaption>Bellowan Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f018b37e8faface2a89192_21-Big.webp" alt="Noshik Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/noshik.webm"></video></div><figcaption>Noshik Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01a8b4e5faff514f89aa8_28-Big.webp" alt="Tiv Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.156)" data-src="assets/hover/tiv.webm"></video></div><figcaption>Tiv Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d6e513520b6bbe4a208_M_FP-29.avif" alt="Gush Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-29.webm"></video></div><figcaption>Gush Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/thumbs/gumphrey-glimmerwick_19-Big.webp" alt="Gumphrey Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/gumphrey.webm"></video></div><figcaption>Gumphrey Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a7d98928ab373b7c831_M_F-04.avif" alt="Murn Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-04.webm"></video></div><figcaption>Murn Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f019faaba6b5564a51d31d_30-Big.webp" alt="Tav Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.097)" data-src="assets/hover/tav.webm"></video></div><figcaption>Tav Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52b2fccc854a48bea86fc_M_FP-10.avif" alt="Gribble Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_AP-10.webm"></video></div><figcaption>Gribble Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/thumbs/frillik-dirtle_5-Big.webp" alt="Frillik Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/frillick.webm"></video></div><figcaption>Frillik Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52ca624f6247993caf2c4_M_F-21.avif" alt="Peepers Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.169)" data-src="assets/hover/peepers.webm"></video></div><figcaption>Peepers Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c75a32b0fa93bbd6633_M_F-18.avif" alt="Ziggo Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" style="transform:scale(1.279)" data-src="assets/hover/ziggo.webm"></video></div><figcaption>Ziggo Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f01f6c4bd1f77c68dc7308_25-Big.webp" alt="Gorble Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/gorble.webm"></video></div><figcaption>Gorble Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a9b48140221fc479edb_M_F-05.avif" alt="Plink Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-05.webm"></video></div><figcaption>Plink Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52add5fe42fcabd1a38e6_M_F-08.avif" alt="Fratch Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-08.webm"></video></div><figcaption>Fratch Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52c4c9aba7881ec01c53f_M_F-16.avif" alt="Orbin Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-16.webm"></video></div><figcaption>Orbin Dirtle</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a5003094b86ada5bf25_M_F-02.avif" alt="Spatter Roarborn" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-02.webm"></video></div><figcaption>Spatter Roarborn</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a33672d962870c86833_M_F-01.avif" alt="Hortencia Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-01.webm"></video></div><figcaption>Hortencia Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52d366f48d1c6740b104b_M_F-25.avif" alt="Pigpen Glimmerwick" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-25.webm"></video></div><figcaption>Pigpen Glimmerwick</figcaption></figure><figure class="piece" aria-hidden="true"><div class="ph"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68c52a65085a37dc8093cf64_M_F-03.avif" alt="Craig Dirtle" loading="lazy" decoding="async"><video muted playsinline preload="none" data-src="assets/hover/M_A-03.webm"></video></div><figcaption>Craig Dirtle</figcaption></figure></div></div>
+    <div class="wrap">
+      <ul class="facts">
+        <li class="rise">Three years of them made as ceramic objects, sold, photographed and dated.</li>
+        <li class="rise">Thirty-six written out with names, families, histories and a job each, as a card deck.</li>
+        <li class="rise">Three families with their own naming systems, their own behavior and their own founders.</li>
+        <li class="rise">A brand that's already out in the world under my own name.</li>
+      </ul>
+      <p class="lede rise" style="margin-top:34px">This is the fourth thing this world has been. It wasn't reverse-engineered from a pitch.</p>
+    </div></section>
+    <section class="theory" id="theory"><div class="wrap">
+      <h2 data-write>Theory Behind It</h2>
+      <p class="big rise">We've all got parts of us running the show without asking.</p>
+      <div class="body rise">
+        <p>Something you picked up when you were seven because it worked. Something your mom did, that her mom did before her. Something that showed up to protect you from a thing that stopped happening a long time ago and never got the memo.</p>
+        <p>When you don&#x27;t know they&#x27;re in there, they run your life and you think that&#x27;s just who you are.</p>
+      </div>
+      <p class="end rise">When you get to know them, they're the best thing you've got.</p>
+      <div class="body rise">
+        <p>That&#x27;s the whole show. Every one of those parts is a monster. It&#x27;s got a name, a face, a job it&#x27;s weirdly proud of, and absolutely no sense of when it&#x27;s helping and when it&#x27;s a catastrophe.</p>
+        <p>There&#x27;s a well-established therapy model that says more or less this, called Internal Family Systems. This isn&#x27;t a show about therapy. It&#x27;s a show about a kid with a houseful of monsters. But it&#x27;s the reason the world holds together, and it&#x27;s why we&#x27;ll never run out of characters.</p>
+      </div>
+    </div></section>
+  </main>
+
+  <footer>
+    <a href="/" aria-label="Popsy Loves You, home"><img src="assets/popsy-logo-v2.svg" alt=""></a>
+    <p>by Brandon Kaufer, aka Popsy Wolf</p>
+  </footer>
+
+  <script src="js/video-prime.js"></script>
+  <script src="js/handwrite.js"></script>
+  <script src="js/eye-cursor.js"></script>
+  <script>
+  (function () {
+    var PV = window.PopsyVideo;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // the hero logo boils, like the homepage's
+    var logo = document.querySelector('.hero__logo'), lv = logo.querySelector('video');
+    lv.muted = true;
+    var loopFile = PV ? PV.fileFor('assets/intro/popsy-logo-loop.webm') : 'assets/intro/popsy-logo-loop.mp4';
+    if (!reduce) Promise.resolve(PV ? PV.load(loopFile) : loopFile).then(function (u) { lv.src = u; return lv.play(); })
+      .then(function () { logo.classList.add('--moving'); }).catch(function () {});
+
+    // headings write themselves in when they scroll into view; the rest drifts up
+    var W = window.PopsyWrite;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        if (e.target.hasAttribute('data-write')) { if (W) W.write(e.target, 0.05); }
+        else e.target.classList.add('--in');
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('[data-write], .rise').forEach(function (el) { io.observe(el); });
+
+    // the reel: point at (or tap) a piece and it comes alive
+    var touch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    function wake(fig) {
+      var v = fig.querySelector('video'); if (!v) return;
+      if (!v.getAttribute('src')) {
+        v.muted = true;
+        var f = PV ? PV.fileFor(v.dataset.src) : v.dataset.src.replace(/\.webm$/, '.mp4');
+        Promise.resolve(PV ? PV.load(f) : f).then(function (u) { v.src = u; v.currentTime = 0; return v.play(); })
+          .then(function () { fig.classList.add('--on'); }).catch(function () {});
+      } else { v.currentTime = 0; v.play().then(function () { fig.classList.add('--on'); }).catch(function () {}); }
+      v.onended = function () { fig.classList.remove('--on'); };
+    }
+    var reel = document.querySelector('.reel');
+    if (touch) reel.addEventListener('click', function (e) { var f = e.target.closest('.piece'); if (f) wake(f); });
+    else reel.addEventListener('mouseover', function (e) { var f = e.target.closest('.piece'); if (f && !f.classList.contains('--on')) wake(f); });
+  })();
+  </script>
+</body>
+</html>
