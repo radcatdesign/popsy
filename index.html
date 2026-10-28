@@ -846,7 +846,7 @@ a {
      The outline sits exactly on the lines, which run through the middle of the 5vw gaps. */
   @media (hover: hover) and (pointer: fine) {
     .grid:not(.--shelf) .column .product > div { outline: 1px solid transparent; outline-offset: calc(2.5vw - 1px); transition: outline-color .2s ease; }
-    .grid:not(.--shelf) .column .product:not(.--covered):hover > div { outline-color: #9a9a9a; }
+    .grid:not(.--shelf) .column .product:not(.--covered):hover > div { outline-color: #c2c2c2; }
   }
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
   .grid .column .product[data-video-state="auto"] video,
@@ -2893,8 +2893,11 @@ a {
       if (filter === 'monsters' || !filter) {
         const logoC = Math.floor(centerPos / itemsPerColumn), logoR = centerPos % itemsPerColumn;
         const taken = new Set();
-        const mark = (c, r) => taken.add(c + ',' + r);
-        const free = (c, r) => !taken.has(c + ',' + r);
+        // the grid wraps, so a block at the far edge sits right beside one at the near edge:
+        // keep the reserved cells wrapped too
+        const wc = c => ((c % columns) + columns) % columns, wr = r => ((r % itemsPerColumn) + itemsPerColumn) % itemsPerColumn;
+        const mark = (c, r) => taken.add(wc(c) + ',' + wr(r));
+        const free = (c, r) => !taken.has(wc(c) + ',' + wr(r));
         mark(logoC, logoR); // big tiles may sit right beside the logo, just not on it
         const spots = [];
         for (let c = 0; c <= columns - 2; c++) for (let r = 0; r <= itemsPerColumn - 2; r++) spots.push([c, r]);
