@@ -179,6 +179,16 @@
     doneView.hidden = view !== 'done';
     card.classList.toggle('--form', view === 'form');
     card.classList.toggle('--done', view === 'done');
+    // the title writes itself in, then the rest of the view rises in under it
+    var W = window.PopsyWrite;
+    if (W) {
+      var v = view === 'form' ? formView : view === 'done' ? doneView : infoView;
+      var end = W.write(v.querySelector('.pp__title'), 0.15);
+      var rest = view === 'info' ? [metaEl.hidden ? null : metaEl, textEl, v.querySelector('[data-action="inquire"]')]
+        : view === 'form' ? [].slice.call(form.querySelectorAll('label, button[type="submit"]'))
+        : [v.querySelector('.pp__done'), v.querySelector('[data-action="close"]')];
+      W.rise(rest, end * 0.75, 0.08);
+    }
     if (view === 'form') {
       var nameInput = form.querySelector('[name="name"]');
       setTimeout(function () { nameInput.focus(); }, 50);

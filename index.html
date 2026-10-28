@@ -3206,10 +3206,19 @@ a {
           if (e.intersectionRatio >= 0.6) {
             if (sec.classList.contains('--in')) return;
             sec.classList.add('--in');
+            // the name writes itself in; the tag, nickname, size and button follow
+            if (window.PopsyWrite) {
+              const nameEl = sec.querySelector('.sv-name');
+              const end = window.PopsyWrite.write(nameEl, 0.08);
+              nameEl.style.transitionDelay = '0s';
+              [...sec.querySelector('.sv-caption').children].filter(c => c !== nameEl)
+                .forEach((c, i) => { c.style.transitionDelay = (end * 0.75 + i * 0.08).toFixed(2) + 's'; });
+            }
             // settles into view: plays once, then the replay button shows
             if (v && el.classList.contains('--open')) playOnce(sec, v);
           } else if (sec.classList.contains('--in')) {
             sec.classList.remove('--in', '--replay');
+            sec.querySelectorAll('.sv-caption > *').forEach(c => { c.style.transitionDelay = '0s'; });
             // scrolled away mid-play: it finishes on its own and fades back to the photo
           }
         });
@@ -4349,6 +4358,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
   <script src="js/webflow.js" type="text/javascript"></script>
   <script src="js/video-prime.js"></script>
   <script src="js/eye-cursor.js"></script>
+  <script src="js/handwrite.js"></script>
   <script src="js/piece-popup.js"></script>
   <script src="js/about-popup.js"></script>
   <script src="js/family-overlay.js"></script>
