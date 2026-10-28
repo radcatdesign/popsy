@@ -26,6 +26,9 @@
     '.eye-cursor-el.--on { opacity: 1; }',
     '.eye-cursor-el .ec-size { position: relative; width: 100%; height: 100%; transition: transform .25s cubic-bezier(.34,1.56,.64,1); transform-origin: 50% 50%; }',
     '.eye-cursor-el.--hover .ec-size { transform: scale(1.35); }',
+    /* pressed: eyes wide, and it pops a little bigger */
+    '.eye-cursor-el.--wide .ec-size { transform: scale(1.18); }',
+    '.eye-cursor-el.--hover.--wide .ec-size { transform: scale(1.5); }',
     '.eye-cursor-el canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }',
     /* phones: the eye itself can be tapped (to let it roll / send it home) */
     '.eye-cursor-el.--tap { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }',
@@ -94,7 +97,8 @@
   var PUPIL = 19 * Math.PI / 180;
   // the pupil looks slightly down, sitting in the middle of the opening (like the photos)
   var PUP_T = 11 * Math.PI / 180, PUP_Y = -Math.sin(PUP_T), PUP_Z = Math.cos(PUP_T);
-  var lid = 0;                                      // 0 open, 0.5 half, 1 shut
+  var lid = 0;                                      // -0.4 wide open, 0 open, 0.5 half, 1 shut
+  var WIDE = -0.4;                                  // pressed: the lid pulls right up
   var L = [-0.45, 0.62, 0.64]; (function () { var l = Math.hypot(L[0], L[1], L[2]); L = [L[0] / l, L[1] / l, L[2] / l]; })();
   var H = [L[0], L[1], L[2] + 1]; (function () { var l = Math.hypot(H[0], H[1], H[2]); H = [H[0] / l, H[1] / l, H[2] / l]; })();
 
@@ -173,16 +177,24 @@
         var wz = Math.sqrt(1 - Math.min(r2, 1));
         // the ball's own direction for this pixel
         var dx = m00 * wx + m10 * wy + m20 * wz, dy = m01 * wx + m11 * wy + m21 * wz, dz = m02 * wx + m12 * wy + m22 * wz;
-        var t = texel(dx, dy, dz), fromLid = false, shadow = 0;
-        if (a > 0.001) {
-          // blinking: the lid slides down, so look up where this spot sat on the lid before it moved
+        var t = texel(dx, dy, dz), fromLid = false, shadow = 0, bare = false;
+        if (a > 0.001 || a < -0.001) {
+          // the lid slides (down to blink, up to open wide): look up where this spot sat on the lid
           var ly = dy * ca + dz * sa, lz = -dy * sa + dz * ca;
           var tl = texel(dx, ly, lz);
           if (SHP[tl + 3] > LID_EDGE) { t = tl; fromLid = true; }
           else {
             var ly2 = dy * ca2 + dz * sa2, lz2 = -dy * sa2 + dz * ca2;
             if (SHP[texel(dx, ly2, lz2) + 3] > LID_EDGE) shadow = 0.32;   // tucked just under the moving lid
+            // opened wide: ball that's normally under the lid shows (the model never painted it)
+            if (a < 0 && SHP[t + 3] > LID_EDGE) bare = true;
           }
+        }
+        if (bare) {
+          ballColour(dx, dy, dz, col);
+          glaze(wx, wy, wz, 0.6, col, 0.7);
+          px[o] = col[0]; px[o + 1] = col[1]; px[o + 2] = col[2]; px[o + 3] = alpha * 255;
+          continue;
         }
         col[0] = COL[t]; col[1] = COL[t + 1]; col[2] = COL[t + 2];
         // the model's own surface direction, turned with the ball (and the lid, if it came from there)
@@ -305,8 +317,8 @@
   document.addEventListener('mouseover', function (e) {
     if (e.target && e.target.tagName === 'IFRAME') el.classList.remove('--on');
   }, { passive: true });
-  document.addEventListener('mousedown', function () { down = true; lidTarget = 0.5; }, { passive: true });
-  document.addEventListener('mouseup', function () { down = false; lidTarget = 0; blink(); }, { passive: true });
+  document.addEventListener('mousedown', function () { down = true; lidTarget = WIDE; el.classList.add('--wide'); }, { passive: true });
+  document.addEventListener('mouseup', function () { down = false; lidTarget = 0; el.classList.remove('--wide'); blink(); }, { passive: true });
   document.addEventListener('mouseleave', function () { el.classList.remove('--on'); });
   document.documentElement.addEventListener('mouseleave', function () { el.classList.remove('--on'); });
   window.addEventListener('blur', function () { el.classList.remove('--on'); });
@@ -355,9 +367,9 @@
       D.requestPermission().then(function (r) { answered = true; if (r !== 'granted') needsAsk = false; })
         .catch(function () {}).then(function () { pending = false; });
     });
-    document.addEventListener('touchstart', function () { down = true; lidTarget = 0.5; }, { passive: true });
-    document.addEventListener('touchend', function () { down = false; lidTarget = 0; blink(); }, { passive: true });
-    document.addEventListener('touchcancel', function () { down = false; lidTarget = 0; }, { passive: true });
+    document.addEventListener('touchstart', function () { down = true; lidTarget = WIDE; el.classList.add('--wide'); }, { passive: true });
+    document.addEventListener('touchend', function () { down = false; lidTarget = 0; el.classList.remove('--wide'); blink(); }, { passive: true });
+    document.addEventListener('touchcancel', function () { down = false; lidTarget = 0; el.classList.remove('--wide'); }, { passive: true });
   }
   // circle vs the UI's buttons: push out and bounce off their edges
   function bumpWalls(R) {
