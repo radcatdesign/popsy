@@ -791,6 +791,14 @@ a {
     mix-blend-mode: multiply; pointer-events: none; transition: opacity .3s ease;
   }
   .grid .product .logo-loop.--on { opacity: 1 !important; }
+  .grid .product .logo-hover {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 2;
+    display: block !important; opacity: 0 !important; transform: scale(var(--logo-scale));
+    mix-blend-mode: multiply; pointer-events: none;
+  }
+  .grid .product .logo-hover.--on { opacity: 1 !important; }
+  .shelf-logo .logo-hover { opacity: 0; }
+  .shelf-logo .logo-hover.--on { opacity: 1; }
   /* The Popsy logo tile in the middle of the grid sits a little smaller than the pieces */
   :root { --logo-scale: 0.8; }
   .grid .product [data-id="popsy-wolf"] img { transform: scale(var(--logo-scale)); }
@@ -1092,6 +1100,7 @@ a {
     opacity: 0; transform: translateY(-10px); pointer-events: none;
     transition: opacity .4s ease, transform .5s cubic-bezier(.22,1,.36,1);
   }
+  body[data-view="shelf"][data-started] .shelf-logo { pointer-events: auto; cursor: pointer; }
   .shelf-logo img, .shelf-logo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
   .shelf-logo.--moving img { opacity: 0; }
   body[data-view="shelf"][data-started] .shelf-logo { opacity: 1; transform: none; }
@@ -2657,6 +2666,37 @@ a {
         if (still) still.style.opacity = '0';
       }).catch(() => { v.remove(); if (still) still.style.opacity = ''; });
     };
+    // Hover or tap the logo: it plays its little burst once, then goes back to the loop.
+    // The burst video sits over the loop; they swap on a matching frame so there's no jump.
+    window.logoBurst = function (host) {
+      const loop = host && host.querySelector('.logo-loop');
+      if (!loop || !window.PopsyLogoHover || host.dataset.burst) return;
+      if (loop.classList.contains('logo-loop') && host.closest('.grid') && !loop.classList.contains('--on')) return;
+      host.dataset.burst = '1';
+      let hv = host.querySelector('.logo-hover');
+      if (!hv) {
+        hv = document.createElement('video');
+        hv.className = 'logo-hover';
+        hv.muted = true; hv.playsInline = true; hv.preload = 'auto';
+        hv.setAttribute('aria-hidden', 'true');
+        host.appendChild(hv);
+      }
+      const done = () => {
+        try { loop.currentTime = 0; } catch (e) {}
+        loop.style.visibility = '';
+        loop.play().catch(() => {});
+        requestAnimationFrame(() => { hv.classList.remove('--on'); delete host.dataset.burst; });
+      };
+      window.PopsyLogoHover.then(url => {
+        if (hv.dataset.src !== url) { hv.src = url; hv.dataset.src = url; }
+        try { hv.currentTime = 0; } catch (e) {}
+        return hv.play();
+      }).then(() => {
+        hv.classList.add('--on');
+        loop.style.visibility = 'hidden';
+        hv.onended = done;
+      }).catch(() => { delete host.dataset.burst; });
+    };
     // Shelf view: the same details the phone feed shows (name, nickname, size, Details button)
     // sit under each piece and rise in as it comes into view. A figcaption, not a div: the
     // tile styles size every div inside a piece.
@@ -3001,16 +3041,57 @@ a {
     el.innerHTML = '<img src="assets/popsy-logo-v2.svg" alt="">';
     document.body.appendChild(el);
     const tryLoop = () => {
-      if (!window.PopsyLogoLoop || el.querySelector('video')) return;
+      if (!window.PopsyLogoLoop || el.querySelector('.logo-loop')) return;
       const v = document.createElement('video');
+      v.className = 'logo-loop';
       v.muted = true; v.loop = true; v.playsInline = true;
       el.appendChild(v);
       window.PopsyLogoLoop.then(url => { v.src = url; return v.play(); })
         .then(() => el.classList.add('--moving')).catch(() => v.remove());
     };
+    el.addEventListener('mouseenter', () => window.logoBurst && window.logoBurst(el));
+    el.addEventListener('click', () => window.logoBurst && window.logoBurst(el));
     // start it the first time shelf view opens
     new MutationObserver(() => { if (document.body.dataset.view === 'shelf') tryLoop(); })
       .observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
+  })();
+  // The grid's logo tile lets clicks through (so drags start anywhere), so hovers and taps on
+  // it are found by position: pointer over it on desktop, or a tap that didn't drag.
+  (function logoTriggers() {
+    const logoAt = (x, y) => {
+      if (document.body.dataset.view !== 'grid' || !document.body.dataset.started) return null;
+      if (document.querySelector('.pp.--open') || document.body.dataset.aboutOpen === 't') return null;
+      const hit = [...document.querySelectorAll('.grid:not(.--shelf) [data-id="popsy-wolf"]')].find(d => {
+        const r = d.getBoundingClientRect(), k = 0.4; // the drawn logo, not the whole cell
+        return x > r.left + r.width * (0.5 - k) && x < r.right - r.width * (0.5 - k) &&
+          y > r.top + r.height * (0.5 - k) && y < r.bottom - r.height * (0.5 - k);
+      });
+      return hit || null;
+    };
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      let over = null, pending = false, px = 0, py = 0;
+      document.addEventListener('pointermove', e => {
+        px = e.clientX; py = e.clientY;
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+          pending = false;
+          const hit = logoAt(px, py);
+          if (hit && hit !== over) window.logoBurst && window.logoBurst(hit);
+          over = hit;
+        });
+      }, { passive: true });
+    }
+    let down = null;
+    document.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; }, { passive: true, capture: true });
+    document.addEventListener('pointerup', e => {
+      if (!down) return;
+      const tap = Math.hypot(e.clientX - down.x, e.clientY - down.y) < 10 && performance.now() - down.t < 500;
+      down = null;
+      if (!tap) return;
+      const hit = logoAt(e.clientX, e.clientY);
+      if (hit && window.logoBurst) window.logoBurst(hit);
+    }, { passive: true, capture: true });
   })();
   // Phone scroll feed: one big piece per screen, scrolling vertically. As a piece settles into
   // view its name, size and a Details button rise up under it (and its video plays); they drop
@@ -3184,6 +3265,10 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       const loopFile = PV ? PV.fileFor('assets/intro/popsy-logo-loop.webm') : 'assets/intro/popsy-logo-loop.mp4'
       window.PopsyLogoLoop = this.introLoad.then(() => PV ? PV.load(loopFile) : loopFile)
       window.PopsyLogoLoop.catch(() => {})
+      // hover/tap the logo: it plays this, then drops back into the loop
+      const hoverFile = PV ? PV.fileFor('assets/intro/popsy-logo-hover.webm') : 'assets/intro/popsy-logo-hover.mp4'
+      window.PopsyLogoHover = window.PopsyLogoLoop.then(() => PV ? PV.load(hoverFile) : hoverFile)
+      window.PopsyLogoHover.catch(() => {})
       if (window.attachLogoLoop) window.attachLogoLoop(this.logoDiv)
       const guard = window.setTimeout(skip, 9000) // too slow to start: don't keep anyone waiting on it
       this.introLoad.then(url => {
