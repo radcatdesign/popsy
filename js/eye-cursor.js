@@ -26,8 +26,8 @@
     '.eye-cursor-el .ec-size { position: relative; width: 100%; height: 100%; transition: transform .25s cubic-bezier(.34,1.56,.64,1); transform-origin: 50% 50%; }',
     '.eye-cursor-el.--hover .ec-size { transform: scale(1.35); }',
     '.eye-cursor-el canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }',
-    /* phones: until motion is allowed the eye waits at the top and can be tapped (to ask) */
-    '.eye-cursor-el.--ask { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }',
+    /* phones: the eye itself can be tapped (to let it roll / send it home) */
+    '.eye-cursor-el.--tap { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }',
     /* a soft contact shadow so it reads as a ball sitting just above the page */
     '.eye-cursor-el .ec-shadow { position: absolute; left: 12%; right: 4%; top: 62%; height: 46%; border-radius: 50%;',
     '  background: radial-gradient(closest-side, rgba(60,30,20,.28), rgba(60,30,20,0)); transform: translate(3px, 2px); }'
@@ -313,12 +313,21 @@
 
   /* ---------- phones: a loose ball that rolls with the tilt of the device ---------- */
   var bx = 0, by = 0, vx = 0, vy = 0, gx = 0, gy = 0, base = null;
+  // docked: parked at the top middle, tipping in place with the phone; tap to let it roll,
+  // tap again while it's rolling to send it back up
+  var docked = true;
+  var dockX = function () { return (window.visualViewport ? window.visualViewport.width : window.innerWidth) / 2; };
+  var DOCK_Y = 34 + SIZE / 2;
+  // UI it bumps into instead of rolling over
+  var WALLS = '.nav.v--new, .view-nav, .about-link, .family-link, .sv-btn';
+  var walls = [], wallsAt = 0;
   if (TILT) {
-    bx = ex = window.innerWidth / 2; by = ey = 34 + SIZE / 2;   // waits at the top middle
+    bx = ex = window.innerWidth / 2; by = ey = DOCK_Y;
     window.addEventListener('deviceorientation', function (e) {
       if (e.beta == null || e.gamma == null) return;
       var b = e.beta, g = e.gamma;
-      sensing = true; el.classList.remove('--ask');
+      if (!sensing && wantRoll) docked = false;   // allowed after a tap: off it goes
+      sensing = true;
       // "level" is how you're holding the phone when it first wakes up; after that, tilting
       // keeps it rolling like a marble (it only creeps toward your grip over half a minute or so)
       if (!base) base = { b: b, g: g };
@@ -333,29 +342,70 @@
     // iPhone / iPad: motion sensors need the visitor's OK, and Safari only asks from a tap.
     // Keep asking on taps until there's an answer (a tap that doesn't count just fails quietly).
     var D = window.DeviceOrientationEvent, needsAsk = !!(D && typeof D.requestPermission === 'function'), answered = false, sensing = false;
-    var pending = false;
-    // tapping the eye asks for motion access (Safari's rule: only straight from a tap)
+    var pending = false, wantRoll = false;
     el.addEventListener('click', function (e) {
       e.stopPropagation();
       blink();
-      if (!needsAsk || answered || sensing || pending) return;
+      if (sensing) { docked = !docked; if (docked) { vx = vy = 0; } return; }   // roll / come home
+      // not reporting yet: on iPhone the first tap asks for motion (Safari's rule: only from a tap)
+      wantRoll = true;
+      if (!needsAsk || answered || pending) return;
       pending = true;
-      D.requestPermission().then(function (r) { answered = true; el.classList.remove('--ask'); if (r !== 'granted') needsAsk = false; })
+      D.requestPermission().then(function (r) { answered = true; if (r !== 'granted') needsAsk = false; })
         .catch(function () {}).then(function () { pending = false; });
     });
     document.addEventListener('touchstart', function () { down = true; lidTarget = 0.5; }, { passive: true });
     document.addEventListener('touchend', function () { down = false; lidTarget = 0; blink(); }, { passive: true });
     document.addEventListener('touchcancel', function () { down = false; lidTarget = 0; }, { passive: true });
   }
+  // circle vs the UI's buttons: push out and bounce off their edges
+  function bumpWalls(R) {
+    if (performance.now() - wallsAt > 400) {
+      wallsAt = performance.now();
+      walls = [].slice.call(document.querySelectorAll(WALLS)).map(function (w) { return w.getBoundingClientRect(); })
+        .filter(function (r) { return r.width > 4 && r.height > 4; });
+    }
+    var hit = 0;
+    for (var i = 0; i < walls.length; i++) {
+      var w = walls[i];
+      var cx = Math.max(w.left, Math.min(bx, w.right)), cy = Math.max(w.top, Math.min(by, w.bottom));
+      var dx = bx - cx, dy = by - cy, d = Math.hypot(dx, dy);
+      if (d >= R) continue;
+      var nx, ny;
+      if (d > 0.001) { nx = dx / d; ny = dy / d; }
+      else {  // centre got inside: leave by the nearest side
+        var l = bx - w.left, rr = w.right - bx, t = by - w.top, bo = w.bottom - by, m = Math.min(l, rr, t, bo);
+        nx = m === l ? -1 : m === rr ? 1 : 0; ny = m === t ? -1 : m === bo ? 1 : 0; d = 0;
+      }
+      bx = cx + nx * R; by = cy + ny * R;
+      var vn = vx * nx + vy * ny;
+      if (vn < 0) { hit = Math.max(hit, -vn); vx -= 1.45 * vn * nx; vy -= 1.45 * vn * ny; }
+    }
+    return hit;
+  }
   function tiltStep(now, dt) {
     var s = dt / 1000, vv = window.visualViewport;
     var W = vv ? vv.width : window.innerWidth, Hh = vv ? vv.height : window.innerHeight;
-    if (!reduceMotion && sensing) {
+    if (docked) {
+      // roll back up to the top middle, then tip in place with the phone
+      var k = reduceMotion ? 1 : 1 - Math.exp(-dt / 170);
+      bx += (dockX() - bx) * k; by += (DOCK_Y - by) * k; vx = vy = 0;
+      if (Math.hypot(dockX() - bx, DOCK_Y - by) < 1.5 && sensing && !reduceMotion) {
+        var g = Math.hypot(gx, gy), ang = Math.min(1, g * 2.4) * 0.9;
+        var qt = [1, 0, 0, 0];
+        if (g > 0.001) { var sh = Math.sin(ang / 2); qt = [Math.cos(ang / 2), gy / g * sh, gx / g * sh, 0]; }  // look the way it's tipped
+        if (qt[0] * q[0] + qt[1] * q[1] + qt[2] * q[2] + qt[3] * q[3] < 0) qt = [-qt[0], -qt[1], -qt[2], -qt[3]];
+        var f = 1 - Math.exp(-dt / 110);
+        q = qnorm([q[0] + (qt[0] - q[0]) * f, q[1] + (qt[1] - q[1]) * f, q[2] + (qt[2] - q[2]) * f, q[3] + (qt[3] - q[3]) * f]);
+        dirty = true;
+      }
+      lastMove = now;   // it does its own looking while parked
+    } else if (!reduceMotion && sensing) {
       vx += gx * 3600 * s; vy += gy * 3600 * s;              // downhill
       var fr = Math.exp(-s * 0.55); vx *= fr; vy *= fr;        // a little rolling resistance
       bx += vx * s; by += vy * s;
     }
-    var r = SIZE / 2 + 2, hit = 0;
+    var r = SIZE / 2 + 2, hit = docked ? 0 : bumpWalls(r);
     if (bx < r) { bx = r; if (vx < 0) { hit = Math.max(hit, -vx); vx = -vx * 0.45; } }
     if (bx > W - r) { bx = W - r; if (vx > 0) { hit = Math.max(hit, vx); vx = -vx * 0.45; } }
     if (by < r) { by = r; if (vy < 0) { hit = Math.max(hit, -vy); vy = -vy * 0.45; } }
@@ -366,11 +416,8 @@
     // once it's barely moving, let it turn back to look at you
     if (Math.hypot(vx, vy) > 14) lastMove = now;
     el.style.transform = 'translate3d(' + ex + 'px,' + ey + 'px,0)';
-    // appear once the grid has opened (on iPhone, with a nudge to allow motion)
-    if (!el.classList.contains('--on') && document.body.dataset.started) {
-      el.classList.add('--on'); dirty = true;
-      if (needsAsk && !sensing && !answered) el.classList.add('--ask');
-    }
+    // appear once the grid has opened
+    if (!el.classList.contains('--on') && document.body.dataset.started) { el.classList.add('--on', '--tap'); dirty = true; }
   }
 
   var prev = performance.now();

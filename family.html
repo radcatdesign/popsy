@@ -2414,6 +2414,14 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
       const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
       const onNodeClick = useCallback((event, node) => {
           // console.log(`Clicked item ID: ${node.id} --- Line 70`);
+          // the Popsy logo in the middle goes home: closes the overlay when the tree is
+          // open over the grid, otherwise loads the homepage
+          if (node.id === 'popsy-wolf') {
+            const embedded = document.documentElement.classList.contains('is-embed') && window.parent !== window;
+            if (embedded) window.parent.postMessage({ type: 'popsy:close-family' }, location.origin);
+            else window.location.href = '/';
+            return;
+          }
           const selectedItem = window.items.find(el => el.id === node.id)
           // open the piece popup (photo/video, story, Inquire form)
           if (selectedItem && window.PiecePopup) window.PiecePopup.open(selectedItem);
