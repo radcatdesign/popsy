@@ -1,7 +1,9 @@
 /* Instant hover videos: when a monster with a video is on (or near) the screen, download its
    video file into memory once and point every <video> of that piece at the in-memory copy, so
-   playing starts immediately instead of waiting on the network. Safari / iPhone get MP4 (HEVC
-   where supported, else H.264; both hardware decoded); other browsers get VP9 WebM. */
+   playing starts immediately instead of waiting on the network. Safari / iPhone get the H.264
+   MP4 (hardware decoded); other browsers get the smaller VP9 WebM. (HEVC was tried for Safari:
+   iPhone draws it on a separate video layer that ignores the page's multiply blend and the big
+   tiles' sizing, so it stays H.264.) */
 (function () {
   var ua = navigator.userAgent;
   var preferMp4 = /iPad|iPhone|iPod/.test(ua) || (/^((?!chrome|android|crios|fxios).)*safari/i.test(ua));
@@ -15,7 +17,7 @@
     var mp4 = list.filter(function (s) { return /mp4/.test(s.type) || /\.mp4$/i.test(s.src); })[0];
     var webm = list.filter(function (s) { return /webm/.test(s.type) || /\.webm$/i.test(s.src); })[0];
     var okWebm = webm && v.canPlayType('video/webm; codecs="vp9"');
-    if (preferMp4 && mp4) return hevc(hd(mp4.src));
+    if (preferMp4 && mp4) return hd(mp4.src);
     if (okWebm) return hd(webm.src);
     return hd((mp4 || list[0]).src);
   }
@@ -66,15 +68,9 @@
     var m = url.match(/\/([a-z]+)\.(webm|mp4)$/i);
     return m && HD.indexOf(m[1].toLowerCase()) > -1 ? url.replace(/\.(webm|mp4)$/i, '-hd.$1') : url;
   }
-  // Safari gets HEVC: Apple hardware decodes it, at about half the size of the H.264 file
-  // (name.hevc.mp4 beside every name.mp4). Anything that can't play it keeps the H.264.
-  var canHevc = !!probe.canPlayType('video/mp4; codecs="hvc1"');
-  function hevc(url) {
-    return canHevc && url && /\.mp4$/i.test(url) && !/\.hevc\.mp4$/i.test(url) ? url.replace(/\.mp4$/i, '.hevc.mp4') : url;
-  }
   function fileFor(webm) {
     var mp4 = webm.replace(/\.webm$/i, '.mp4');
-    if (preferMp4 || !canWebm) return hevc(hd(mp4));
+    if (preferMp4 || !canWebm) return hd(mp4);
     return hd(webm);
   }
 

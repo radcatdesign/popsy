@@ -20,9 +20,9 @@ Hover videos live in `assets/hover/` and pair with pieces by image filename (`M_
 - **Photos** are WebP (PNG / JPEG originals converted at 1200px, white backgrounds intact) or the
   AVIF Webflow already serves. The sync workflow converts any new PNG / JPEG it pulls in.
 - **Font**: `fonts/UglyDave.woff2` (WOFF2 of the original OTF, every glyph kept), preloaded.
-- **Monster videos**: VP9 WebM for most browsers; Safari gets HEVC (`name.hevc.mp4`, about half
-  the size of the H.264 `name.mp4`, which stays as the fallback). Desktop and tablet get a 960px
-  cut (`name-hd.*`) for the pieces that have one.
+- **Monster videos**: VP9 WebM for most browsers; Safari gets H.264 MP4. (Not HEVC: iPhone draws
+  it on its own video layer, which ignores the multiply blend and the big tiles' sizing.) Desktop
+  and tablet get a 960px cut (`name-hd.*`) for the pieces that have one.
 - **Loading**: the grid builds out once the logo film has played and the photos and videos of the
   pieces on the first screen are in memory; everything else downloads behind it, nearest first.
   Off-screen photos load as they come near.
