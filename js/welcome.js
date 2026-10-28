@@ -2,10 +2,12 @@
    is: an art series by Brandon Kaufer, monsters made of the feelings we push down, and every one
    of them looking for a home. Same card as the piece popup; shown once per visitor. */
 (function () {
+  // Shows on every visit for now. To show it once per visitor again, set ONCE to true.
+  var ONCE = false;
   var KEY = 'popsy-welcome-seen';
   var seen = false;
   try { seen = localStorage.getItem(KEY) === '1'; } catch (e) {}
-  if (seen) return;
+  if (ONCE && seen) return;
 
   var css = [
     '.pw-welcome { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px;',
