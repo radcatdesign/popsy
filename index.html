@@ -3349,7 +3349,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.introLoad = PV ? PV.load(file) : Promise.resolve(file)
       // after the film, the logo's last few frames (its hand-drawn boil) loop so it never sits still
       const loopFile = PV ? PV.fileFor('assets/intro/popsy-logo-loop.webm') : 'assets/intro/popsy-logo-loop.mp4'
-      window.PopsyLogoLoop = this.introLoad.then(() => PV ? PV.load(loopFile) : loopFile)
+      // fetched alongside the film (it's small), so it's ready the moment the film ends
+      window.PopsyLogoLoop = PV ? PV.load(loopFile) : Promise.resolve(loopFile)
       window.PopsyLogoLoop.catch(() => {})
       // hover/tap the logo: it plays this, then drops back into the loop
       const hoverFile = PV ? PV.fileFor('assets/intro/popsy-logo-hover.webm') : 'assets/intro/popsy-logo-hover.mp4'
@@ -3361,18 +3362,44 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         if (this.drawDone) return
         v.src = url
         overlay.classList.add('--ready')
+        // The loop waits, loaded and hidden, over the film. It starts a beat before the film
+        // ends so it's already moving at the swap: the logo never holds still.
+        const lv = document.createElement('video')
+        lv.className = 'intro-loop'
+        lv.muted = true; lv.loop = true; lv.playsInline = true; lv.preload = 'auto'
+        lv.style.opacity = '0'
+        overlay.appendChild(lv)
+        let lvReady = false, swapped = false, boiling = false
+        window.PopsyLogoLoop.then(u => {
+          lv.addEventListener('loadeddata', () => { lvReady = true; if (boiling) toLoop() }, { once: true })
+          lv.src = u; lv.load()
+        }).catch(() => {})
+        const early = () => {
+          if (lvReady && lv.paused && v.duration - v.currentTime < 0.45) lv.play().catch(() => {})
+        }
+        v.addEventListener('timeupdate', early)
+        // the film's last frames are the loop's drawing, so it can boil on its own while it waits
+        const TAIL = 79 / 24
+        const boil = () => { try { v.currentTime = TAIL } catch (e) {} v.play().catch(() => {}) }
+        const toLoop = () => {
+          if (swapped) return
+          const go = lv.paused ? lv.play() : Promise.resolve()
+          go.then(() => {
+            if (swapped) return
+            swapped = true
+            lv.style.opacity = ''
+            v.style.visibility = 'hidden'
+            v.removeEventListener('ended', boil)
+            v.pause()
+          }).catch(() => {})
+        }
         return v.play().then(() => {
           window.clearTimeout(guard)
           v.addEventListener('ended', () => {
             window.removeEventListener('resize', place)
-            // keep the logo alive while anything is still loading: swap to the loop right away
-            const lv = document.createElement('video')
-            lv.className = 'intro-loop'
-            lv.muted = true; lv.loop = true; lv.playsInline = true
-            overlay.appendChild(lv)
-            window.PopsyLogoLoop.then(url => { lv.src = url; return lv.play() })
-              .then(() => { v.style.visibility = 'hidden' })
-              .catch(() => lv.remove())
+            v.removeEventListener('timeupdate', early)
+            if (lvReady) toLoop()
+            else { boiling = true; v.addEventListener('ended', boil); boil() }
             this.finishDraw(overlay)
           }, { once: true })
         })
@@ -4142,7 +4169,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     const files = [...new Set(window.items.map(i => i.video).filter(Boolean))].map(v => PV ? PV.fileFor(v) : v);
     if (!PV || !files.length) return done();
     // the intro film downloads first, then the monsters
-    Promise.resolve(grid.introLoad).catch(() => {}).then(() =>
+    // monster videos queue behind the logo's film and loop, so the logo never waits on them
+    Promise.all([grid.introLoad, window.PopsyLogoLoop].map(x => Promise.resolve(x).catch(() => {}))).then(() =>
       PV.preloadAll(files, p => { grid.videoProgress = p; grid.updatePreloader(); })).then(done);
     // never hold the site hostage on a dead connection: after 45s, open up and keep loading behind
     window.setTimeout(done, 45000);
