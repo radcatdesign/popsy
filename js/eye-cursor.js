@@ -353,6 +353,18 @@
   // UI it bumps into instead of rolling over
   var WALLS = '.nav.v--new, .view-nav, .about-link, .family-link, .sv-btn';
   var walls = [], wallsAt = 0;
+  var look = null;   // phones: a spot it's looking at (where you just touched)
+  // the turn that points the front of the eye at a spot on screen (same sense as rolling)
+  function lookQuat(dx, dy) {
+    var d = Math.hypot(dx, dy);
+    if (d < 1) return [1, 0, 0, 0];
+    var ang = Math.min(1, d / 240) * 1.0, sh = Math.sin(ang / 2);
+    return [Math.cos(ang / 2), dy / d * sh, dx / d * sh, 0];
+  }
+  function turnToward(qt, f) {
+    if (qt[0] * q[0] + qt[1] * q[1] + qt[2] * q[2] + qt[3] * q[3] < 0) qt = [-qt[0], -qt[1], -qt[2], -qt[3]];
+    q = qnorm([q[0] + (qt[0] - q[0]) * f, q[1] + (qt[1] - q[1]) * f, q[2] + (qt[2] - q[2]) * f, q[3] + (qt[3] - q[3]) * f]);
+  }
   if (TILT) {
     bx = ex = window.innerWidth / 2; by = ey = DOCK_Y;
     window.addEventListener('deviceorientation', function (e) {
@@ -385,6 +397,17 @@
       pending = true;
       D.requestPermission().then(function (r) { answered = true; if (r !== 'granted') needsAsk = false; })
         .catch(function () {}).then(function () { pending = false; });
+    });
+    // it looks where you touch, follows your finger while it's down, then goes back to the tilt
+    var watching = false;
+    var lookAt = function (e) {
+      if (e.pointerType === 'mouse' || (e.target && e.target.closest && e.target.closest('.eye-cursor-el'))) return;
+      look = { x: e.clientX, y: e.clientY, until: performance.now() + 1100 };
+    };
+    document.addEventListener('pointerdown', function (e) { watching = true; lookAt(e); }, { passive: true, capture: true });
+    document.addEventListener('pointermove', function (e) { if (watching) lookAt(e); }, { passive: true, capture: true });
+    ['pointerup', 'pointercancel'].forEach(function (t) {
+      document.addEventListener(t, function () { watching = false; if (look) look.until = performance.now() + 900; }, { passive: true, capture: true });
     });
     document.addEventListener('touchstart', press, { passive: true });
     document.addEventListener('touchend', release, { passive: true });
@@ -422,7 +445,7 @@
       // roll back up to the top middle, then tip in place with the phone
       var k = reduceMotion ? 1 : 1 - Math.exp(-dt / 170);
       bx += (dockX() - bx) * k; by += (DOCK_Y - by) * k; vx = vy = 0;
-      if (Math.hypot(dockX() - bx, DOCK_Y - by) < 1.5 && sensing && !reduceMotion) {
+      if (Math.hypot(dockX() - bx, DOCK_Y - by) < 1.5 && sensing && !reduceMotion && !(look && now < look.until)) {
         var g = Math.hypot(gx, gy), ang = Math.min(1, g * 2.4) * 0.9;
         var qt = [1, 0, 0, 0];
         if (g > 0.001) { var sh = Math.sin(ang / 2); qt = [Math.cos(ang / 2), gy / g * sh, gx / g * sh, 0]; }  // look the way it's tipped
@@ -431,7 +454,7 @@
         q = qnorm([q[0] + (qt[0] - q[0]) * f, q[1] + (qt[1] - q[1]) * f, q[2] + (qt[2] - q[2]) * f, q[3] + (qt[3] - q[3]) * f]);
         dirty = true;
       }
-      lastMove = now;   // it does its own looking while parked
+      if (sensing) lastMove = now;   // it does its own looking while parked (no motion: it settles back to you)
     } else if (!reduceMotion && sensing) {
       vx += gx * 3600 * s; vy += gy * 3600 * s;              // downhill
       var fr = Math.exp(-s * 0.55); vx *= fr; vy *= fr;        // a little rolling resistance
@@ -445,6 +468,11 @@
     if (hit > 320 && blinkT < 0) blink();                       // a hard knock makes it blink
     var mx = bx - ex, my = by - ey; ex = bx; ey = by;
     if (Math.abs(mx) + Math.abs(my) > 0.05) { roll(mx, my, SIZE / 2); dirty = true; }
+    // looking at a touch wins over everything else for a moment
+    if (look && now < look.until && !reduceMotion) {
+      turnToward(lookQuat(look.x - ex, look.y - ey), 1 - Math.exp(-dt / 70));
+      lastMove = now; dirty = true;
+    } else if (look) look = null;
     // once it's barely moving, let it turn back to look at you
     if (Math.hypot(vx, vy) > 14) lastMove = now;
     el.style.transform = 'translate3d(' + ex + 'px,' + ey + 'px,0)';
