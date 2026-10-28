@@ -1047,13 +1047,18 @@ a {
   .sv-item.--in .sv-caption > :nth-child(3) { transition-delay: 0.14s; }
   .sv-item.--in .sv-caption > :nth-child(4) { transition-delay: 0.21s; }
   .sv-item.--in .sv-caption > :nth-child(5) { transition-delay: 0.28s; }
-  /* already has a home: a little hand-drawn tag above the Details button */
-  .sv-adopted { margin: 0 0 6px; }
-  .sv-adopted > span {
+  /* a little hand-drawn tag above the name: Available (with an ink dot) or Adopted */
+  .sv-tag { margin: 0 0 6px; }
+  .sv-tag > span {
     display: inline-block; font-size: 15px; line-height: 1; padding: 6px 14px 5px; transform: rotate(-3deg);
     background: #fff; color: #000; border: 1px solid #000; border-radius: 13px;
     border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;
     border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);
+  }
+  .sv-tag.--available > span { transform: rotate(2deg); }
+  .sv-tag.--available > span::before {
+    content: ''; display: inline-block; width: 7px; height: 7px; margin: 0 7px 1px 0; vertical-align: middle;
+    border-radius: 50%; background: #000;
   }
   .sv-name { font-size: 26px; line-height: 1.1; margin: 0; font-weight: normal; }
   .sv-nick { font-size: 17px; margin: 0; }
@@ -3249,7 +3254,7 @@ a {
               [...sec.querySelector('.sv-caption').children].forEach(c => {
                 c.style.transitionDelay = t.toFixed(2) + 's';
                 t = (c.matches('.sv-name') ? window.PopsyWrite.write(c, t)
-                  : window.PopsyWrite.block(c.matches('.sv-adopted') ? c.querySelector('span') : c, t)) - 0.03;
+                  : window.PopsyWrite.block(c.matches('.sv-tag') ? c.querySelector('span') : c, t)) - 0.03;
               });
             }
             // settles into view: plays once, then the replay button shows
@@ -3305,7 +3310,7 @@ a {
           '<div class="sv-media"><img src="' + esc(item.img) + '" alt="' + esc(name) + '" loading="lazy">' + video +
           (video ? '<button class="sv-replay" type="button" aria-label="Play ' + esc(name) + ' again">' + REPLAY_ICON + '</button>' : '') + '</div>' +
           '<div class="sv-caption">' +
-          (window.PopsyAdopted && window.PopsyAdopted(name) ? '<p class="sv-adopted"><span>Adopted</span></p>' : '') +
+          (window.PopsyAdopted && window.PopsyAdopted(name) ? '<p class="sv-tag --adopted"><span>Adopted</span></p>' : '<p class="sv-tag --available"><span>Available</span></p>') +
           '<h3 class="sv-name">' + esc(title) + '</h3>' +
           (nick ? '<p class="sv-nick">' + esc(nick) + '</p>' : '') +
           (item.size ? '<p class="sv-size">' + esc(item.size) + '</p>' : '') +
