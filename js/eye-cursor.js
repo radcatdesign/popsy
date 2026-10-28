@@ -294,7 +294,20 @@
   // the eye trails the normal pointer, sitting just below and to the right of the arrow
   var OFF_X = 26, OFF_Y = 28, FOLLOW = 110;          // px, px, ms (how far behind it lags)
   var ex = null, ey = null;
-  var lidTarget = 0, blinkT = -1, down = false;
+  var lidTarget = 0, blinkT = -1, down = false, holdTimer = 0;
+  // eyes go wide only on a proper hold, not a quick tap / click; letting go blinks
+  var HOLD_MS = 260;
+  function press() {
+    down = true;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(function () { if (down) lidTarget = WIDE; }, HOLD_MS);
+  }
+  function release(quiet) {
+    down = false;
+    clearTimeout(holdTimer);
+    lidTarget = 0;
+    if (quiet !== true) blink();
+  }
   var RADIUS = SIZE / 2 * 1.5;   // a touch slower than a true roll so it reads, not spins
 
   function mount() {
@@ -323,8 +336,8 @@
   document.addEventListener('mouseover', function (e) {
     if (e.target && e.target.tagName === 'IFRAME') el.classList.remove('--on');
   }, { passive: true });
-  document.addEventListener('mousedown', function () { down = true; lidTarget = WIDE; el.classList.add('--wide'); }, { passive: true });
-  document.addEventListener('mouseup', function () { down = false; lidTarget = 0; el.classList.remove('--wide'); blink(); }, { passive: true });
+  document.addEventListener('mousedown', press, { passive: true });
+  document.addEventListener('mouseup', release, { passive: true });
   document.addEventListener('mouseleave', function () { el.classList.remove('--on'); });
   document.documentElement.addEventListener('mouseleave', function () { el.classList.remove('--on'); });
   window.addEventListener('blur', function () { el.classList.remove('--on'); });
@@ -373,9 +386,9 @@
       D.requestPermission().then(function (r) { answered = true; if (r !== 'granted') needsAsk = false; })
         .catch(function () {}).then(function () { pending = false; });
     });
-    document.addEventListener('touchstart', function () { down = true; lidTarget = WIDE; el.classList.add('--wide'); }, { passive: true });
-    document.addEventListener('touchend', function () { down = false; lidTarget = 0; el.classList.remove('--wide'); blink(); }, { passive: true });
-    document.addEventListener('touchcancel', function () { down = false; lidTarget = 0; el.classList.remove('--wide'); }, { passive: true });
+    document.addEventListener('touchstart', press, { passive: true });
+    document.addEventListener('touchend', release, { passive: true });
+    document.addEventListener('touchcancel', function () { release(true); }, { passive: true });
   }
   // circle vs the UI's buttons: push out and bounce off their edges
   function bumpWalls(R) {
