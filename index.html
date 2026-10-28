@@ -1040,7 +1040,7 @@ a {
   .sv-item.--in .sv-caption > :nth-child(5) { transition-delay: 0.28s; }
   /* already has a home: a little hand-drawn tag above the Details button */
   .sv-adopted { margin: 0 0 6px; }
-  .sv-adopted span {
+  .sv-adopted > span {
     display: inline-block; font-size: 15px; line-height: 1; padding: 6px 14px 5px; transform: rotate(-3deg);
     background: #fff; color: #000; border: 1px solid #000; border-radius: 13px;
     border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;
@@ -3207,12 +3207,15 @@ a {
             if (sec.classList.contains('--in')) return;
             sec.classList.add('--in');
             // the name writes itself in; the tag, nickname, size and button follow
+            // every line of the caption writes itself in, one after another; boxes (the tag, the
+            // button) show up just as their words start
             if (window.PopsyWrite) {
-              const nameEl = sec.querySelector('.sv-name');
-              const end = window.PopsyWrite.write(nameEl, 0.08);
-              nameEl.style.transitionDelay = '0s';
-              [...sec.querySelector('.sv-caption').children].filter(c => c !== nameEl)
-                .forEach((c, i) => { c.style.transitionDelay = (end * 0.75 + i * 0.08).toFixed(2) + 's'; });
+              let t = 0.05;
+              [...sec.querySelector('.sv-caption').children].forEach(c => {
+                c.style.transitionDelay = t.toFixed(2) + 's';
+                t = (c.matches('.sv-name') ? window.PopsyWrite.write(c, t)
+                  : window.PopsyWrite.block(c.matches('.sv-adopted') ? c.querySelector('span') : c, t)) - 0.03;
+              });
             }
             // settles into view: plays once, then the replay button shows
             if (v && el.classList.contains('--open')) playOnce(sec, v);

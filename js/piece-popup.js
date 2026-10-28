@@ -179,15 +179,15 @@
     doneView.hidden = view !== 'done';
     card.classList.toggle('--form', view === 'form');
     card.classList.toggle('--done', view === 'done');
-    // the title writes itself in, then the rest of the view rises in under it
+    // everything writes itself in, fast: the title, then the details, the story and the button
     var W = window.PopsyWrite;
     if (W) {
       var v = view === 'form' ? formView : view === 'done' ? doneView : infoView;
-      var end = W.write(v.querySelector('.pp__title'), 0.15);
-      var rest = view === 'info' ? [metaEl.hidden ? null : metaEl, textEl, v.querySelector('[data-action="inquire"]')]
-        : view === 'form' ? [].slice.call(form.querySelectorAll('label, button[type="submit"]'))
-        : [v.querySelector('.pp__done'), v.querySelector('[data-action="close"]')];
-      W.rise(rest, end * 0.75, 0.08);
+      var items = [{ el: v.querySelector('.pp__title'), title: true }];
+      if (view === 'info') items.push({ el: metaEl }, { el: textEl }, { el: v.querySelector('[data-action="inquire"]'), box: true });
+      else if (view === 'form') [].forEach.call(form.querySelectorAll('label, button[type="submit"]'), function (el) { items.push({ el: el, box: el.tagName === 'BUTTON' }); });
+      else items.push({ el: v.querySelector('.pp__done') }, { el: v.querySelector('[data-action="close"]'), box: true });
+      W.sequence(items, 0.12);
     }
     if (view === 'form') {
       var nameInput = form.querySelector('[name="name"]');

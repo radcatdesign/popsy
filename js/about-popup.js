@@ -64,11 +64,9 @@
       if (e.key === 'Escape' && document.body.dataset.aboutOpen === 't') document.body.dataset.aboutOpen = '';
     });
     // each time it opens: the title writes itself in, then the story rises in under it
-    var body = popup.querySelector('.about-popup-c');
     new MutationObserver(function () {
       if (document.body.dataset.aboutOpen !== 't' || !window.PopsyWrite) return;
-      var end = window.PopsyWrite.write(title, 0.2);
-      window.PopsyWrite.rise([body], end * 0.75);
+      window.PopsyWrite.sequence([{ el: title, title: true }, { el: popup.querySelector('.about-space') }], 0.15);
     }).observe(document.body, { attributes: true, attributeFilter: ['data-about-open'] });
     // reset the story to the top each time it opens
     var scroller = popup.querySelector('.about-popup-block__scroll');
