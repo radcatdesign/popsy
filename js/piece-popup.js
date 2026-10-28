@@ -69,6 +69,7 @@
   // pieces that already have a home: the button says so and can't be used
   var ADOPTED = ['Moro', 'Gumphrey', 'Tiv', 'Stubbs', 'Craig', 'Ned', 'Tav', 'Murn', 'Noshik', 'Droozle', 'Dremmel', 'Gabbles', 'Hortencia'];
   function isAdopted(name) { return ADOPTED.indexOf(String(name).trim().split(/\s+/)[0]) !== -1; }
+  window.PopsyAdopted = isAdopted;
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function plain(html) { var d = document.createElement('div'); d.innerHTML = html || ''; return d.textContent; }

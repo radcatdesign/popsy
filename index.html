@@ -1019,6 +1019,15 @@ a {
   .sv-item.--in .sv-caption > :nth-child(2) { transition-delay: 0.07s; }
   .sv-item.--in .sv-caption > :nth-child(3) { transition-delay: 0.14s; }
   .sv-item.--in .sv-caption > :nth-child(4) { transition-delay: 0.21s; }
+  .sv-item.--in .sv-caption > :nth-child(5) { transition-delay: 0.28s; }
+  /* already has a home: a little hand-drawn tag above the Details button */
+  .sv-adopted { margin: 8px 0 0; }
+  .sv-adopted span {
+    display: inline-block; font-size: 15px; line-height: 1; padding: 6px 14px 5px; transform: rotate(-3deg);
+    background: #fff; color: #000; border: 1px solid #000; border-radius: 13px;
+    border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;
+    border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);
+  }
   .sv-name { font-size: 26px; line-height: 1.1; margin: 0; font-weight: normal; }
   .sv-nick { font-size: 17px; margin: 0; }
   .sv-size { font-size: 16px; margin: 0; color: #444; }
@@ -3078,6 +3087,7 @@ a {
           '<h3 class="sv-name">' + esc(title) + '</h3>' +
           (nick ? '<p class="sv-nick">' + esc(nick) + '</p>' : '') +
           (item.size ? '<p class="sv-size">' + esc(item.size) + '</p>' : '') +
+          (window.PopsyAdopted && window.PopsyAdopted(name) ? '<p class="sv-adopted"><span>Adopted</span></p>' : '') +
           '<button class="sv-btn" type="button" data-id="' + esc(item.id) + '">Details</button>' +
           '</div></section>';
       }).join('');
