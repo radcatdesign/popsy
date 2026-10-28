@@ -780,7 +780,7 @@ a {
     font-weight: normal; line-height: 1.1; pointer-events: none; z-index: 3; }
   .grid .product [data-id="popsy-wolf"] { container-type: inline-size; }
   body.--logo-hover, body.--logo-hover * { cursor: pointer; }
-  .grid .product [data-id="popsy-wolf"] .logo-byline { left: 0; right: 0; top: 85%; font-size: 8.2cqw; }
+  .grid .product [data-id="popsy-wolf"] .logo-byline { left: 0; right: 0; top: 81%; font-size: 8.2cqw; }
   .grid.--shelf .logo-byline { display: none; }
   /* Preloader under the logo while the monster videos download */
   .preload { position: fixed; z-index: 6; width: min(220px, 56vw); text-align: center; pointer-events: none; }
@@ -796,13 +796,13 @@ a {
   .intro-logo .intro-loop { position: absolute; left: 11.111%; top: 14.306%; width: 75.139%; height: 75.139%; }
   .grid .product .logo-loop {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1;
-    display: block !important; opacity: 0 !important; transform: scale(var(--logo-scale));
+    display: block !important; opacity: 0 !important; transform: translateY(var(--logo-lift)) scale(var(--logo-scale));
     mix-blend-mode: multiply; pointer-events: none; transition: opacity .3s ease;
   }
   .grid .product .logo-loop.--on { opacity: 1 !important; }
   .grid .product .logo-hover {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 2;
-    display: block !important; opacity: 0 !important; transform: scale(var(--logo-scale));
+    display: block !important; opacity: 0 !important; transform: translateY(var(--logo-lift)) scale(var(--logo-scale));
     mix-blend-mode: multiply; pointer-events: none; transition: opacity .26s ease;
   }
   .grid .product .logo-hover.--on { opacity: 1 !important; }
@@ -812,8 +812,9 @@ a {
   .shelf-logo .logo-loop { transition: opacity .26s ease; }
   .shelf-logo .logo-loop.--out { opacity: 0; }
   /* The Popsy logo tile in the middle of the grid sits a little smaller than the pieces */
-  :root { --logo-scale: 0.8; }
-  .grid .product [data-id="popsy-wolf"] img { transform: scale(var(--logo-scale)); }
+  /* --logo-lift: the logo sits a touch high so logo + byline together are centred in the tile */
+  :root { --logo-scale: 0.8; --logo-lift: -4%; }
+  .grid .product [data-id="popsy-wolf"] img { transform: translateY(var(--logo-lift)) scale(var(--logo-scale)); }
   /* dragging the grid should never pick up a picture or select text */
   .grid img, .grid video { -webkit-user-drag: none; user-drag: none; }
   .grid { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
