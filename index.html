@@ -774,6 +774,14 @@ a {
     visibility: hidden;
   }
   .intro-logo.--ready { visibility: visible; }
+  /* "by Brandon Kaufer" under the logo (the grid tile's sizes itself to the tile; the intro's
+     copy is placed over it in px) */
+  .logo-byline { position: absolute; margin: 0; text-align: center; white-space: nowrap; color: #000;
+    font-weight: normal; line-height: 1.1; pointer-events: none; z-index: 3; }
+  .grid .product [data-id="popsy-wolf"] { container-type: inline-size; }
+  body.--logo-hover, body.--logo-hover * { cursor: pointer; }
+  .grid .product [data-id="popsy-wolf"] .logo-byline { left: 0; right: 0; top: 85%; font-size: 8.2cqw; }
+  .grid.--shelf .logo-byline { display: none; }
   /* Preloader under the logo while the monster videos download */
   .preload { position: fixed; z-index: 6; width: min(220px, 56vw); text-align: center; pointer-events: none; }
   .preload svg { display: block; width: 100%; height: auto; overflow: visible; }
@@ -2810,7 +2818,14 @@ a {
         idEl.appendChild(videoEl);
       }
       productEl.appendChild(idEl);
-      if (item.id === 'popsy-wolf' && window.attachLogoLoop) window.attachLogoLoop(idEl);
+      if (item.id === 'popsy-wolf') {
+        // "by Brandon Kaufer" under the logo, like the share image (a <p>: tile styles size every div)
+        const by = document.createElement('p');
+        by.className = 'logo-byline';
+        by.textContent = 'by Brandon Kaufer';
+        idEl.appendChild(by);
+        if (window.attachLogoLoop) window.attachLogoLoop(idEl);
+      }
       /* Title */
       /*
       const titleEl = document.createElement('p');
@@ -3164,13 +3179,18 @@ a {
         .then(() => el.classList.add('--moving')).catch(() => v.remove());
     };
     el.addEventListener('mouseenter', () => window.logoBurst && window.logoBurst(el));
-    el.addEventListener('click', () => window.logoBurst && window.logoBurst(el));
+    el.addEventListener('click', () => openAbout(0));
     // start it the first time shelf view opens
     new MutationObserver(() => { if (document.body.dataset.view === 'shelf') tryLoop(); })
       .observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
   })();
   // The grid's logo tile lets clicks through (so drags start anywhere), so hovers and taps on
   // it are found by position: pointer over it on desktop, or a tap that didn't drag.
+  // the About popup, opened the same way the "about" link does
+  function openAbout(delay) {
+    const link = document.querySelector('.about-link');
+    if (link) setTimeout(() => { if (document.body.dataset.aboutOpen !== 't') link.click(); }, delay || 0);
+  }
   (function logoTriggers() {
     // the logo tiles, looked up once (and again only after the grid is rebuilt)
     let logos = [];
@@ -3208,9 +3228,10 @@ a {
           // while the grid is being dragged or gliding, measuring the logo would force a layout
           // every frame; a hover only counts once things have settled
           const g = window.__grid;
-          if (g && (g.panRaf || (g.draggable && g.draggable.isPressed))) { over = null; return; }
+          if (g && (g.panRaf || (g.draggable && g.draggable.isPressed))) { over = null; document.body.classList.remove('--logo-hover'); return; }
           const hit = logoAt(px, py);
           if (hit && hit !== over) window.logoBurst && window.logoBurst(hit);
+          document.body.classList.toggle('--logo-hover', !!hit);
           over = hit;
         });
       }, { passive: true });
@@ -3223,7 +3244,11 @@ a {
       down = null;
       if (!tap) return;
       const hit = logoAt(e.clientX, e.clientY);
-      if (hit && window.logoBurst) window.logoBurst(hit);
+      if (!hit) return;
+      // a click on the logo opens the story; a tap on a phone plays the logo's burst first
+      const touch = e.pointerType !== 'mouse';
+      if (touch && window.logoBurst) window.logoBurst(hit);
+      openAbout(touch ? 650 : 0);
     }, { passive: true, capture: true });
   })();
   // Phone scroll feed: one big piece per screen, scrolling vertically. As a piece settles into
@@ -3384,7 +3409,11 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         if (this.drawDone) return
         if (overlay) overlay.remove()
         this.introOverlay = null
-        if (this.logoDiv) gsap.to(this.logoDiv, { opacity: 1, duration: 0.5, ease: 'power2.out' })
+        if (this.logoDiv) {
+          gsap.to(this.logoDiv, { opacity: 1, duration: 0.5, ease: 'power2.out' })
+          const tb = this.logoDiv.querySelector('.logo-byline')
+          if (tb && window.PopsyWrite) window.PopsyWrite.write(tb, 0.3)
+        }
         this.drawDone = true
         this.maybeReveal()
       }
@@ -3397,10 +3426,18 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         const x = r.left + (r.width - side) / 2 - 80 * k, y = r.top + (r.height - side) / 2 - 103 * k
         Object.assign(overlay.style, { left: x + 'px', top: y + 'px', width: 720 * k + 'px', height: 720 * k + 'px' })
       }
-      place()
-      window.addEventListener('resize', place)
-      overlay.innerHTML = '<video muted playsinline preload="auto"></video>'
+      overlay.innerHTML = '<video muted playsinline preload="auto"></video><p class="logo-byline" style="visibility:hidden">by Brandon Kaufer</p>'
       const v = overlay.firstChild
+      // the byline sits exactly over the tile's own (so nothing moves when the overlay hands off)
+      const by = overlay.querySelector('.logo-byline'), tileBy = this.logoDiv.querySelector('.logo-byline')
+      const placeBy = () => {
+        if (!tileBy) return
+        const a = tileBy.getBoundingClientRect(), o = overlay.getBoundingClientRect(), cs = getComputedStyle(tileBy)
+        Object.assign(by.style, { left: (a.left - o.left) + 'px', top: (a.top - o.top) + 'px', width: a.width + 'px', fontSize: cs.fontSize, lineHeight: cs.lineHeight })
+      }
+      const placeAll = () => { place(); placeBy() }
+      placeAll()
+      window.addEventListener('resize', placeAll)
       v.muted = true
       const PV = window.PopsyVideo
       const file = PV ? PV.fileFor('assets/intro/popsy-intro.webm') : 'assets/intro/popsy-intro.mp4'
@@ -3455,10 +3492,13 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         return v.play().then(() => {
           window.clearTimeout(guard)
           v.addEventListener('ended', () => {
-            window.removeEventListener('resize', place)
+            window.removeEventListener('resize', placeAll)
             v.removeEventListener('timeupdate', early)
             if (lvReady) toLoop()
             else { boiling = true; v.addEventListener('ended', boil); boil() }
+            // the logo's drawn: sign it
+            by.style.visibility = ''
+            if (window.PopsyWrite) window.PopsyWrite.write(by, 0.1)
             this.finishDraw(overlay)
           }, { once: true })
         })
@@ -3499,7 +3539,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       el.innerHTML = '<svg viewBox="0 0 200 16" aria-hidden="true"><path class="preload__track" d="' + d + '"/><path class="preload__fill" d="' + d + '"/></svg>' +
         '<div class="preload__label">waking up the monsters <span class="preload__pct">0%</span></div>'
       el.style.left = (r.left + r.width / 2) + 'px'
-      el.style.top = (r.top + r.height * 0.9 + 10) + 'px'
+      el.style.top = (r.top + r.height * 0.97 + 8) + 'px'  // below the logo and its byline
       document.body.appendChild(el)
       this.preEl = el
       this.preFill = el.querySelector('.preload__fill')
