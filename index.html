@@ -980,6 +980,16 @@ a {
     object-fit: contain;
   }
   .sv-media video { opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+  /* replay: a little round button by the piece once its animation has played */
+  .sv-replay {
+    position: absolute; right: -4px; bottom: 4px; z-index: 2; width: 42px; height: 42px; padding: 0;
+    display: flex; align-items: center; justify-content: center; color: #000; background: #fff;
+    border: 1.5px solid #000; border-radius: 50%; -webkit-tap-highlight-color: transparent;
+    opacity: 0; transform: scale(.5) rotate(-90deg); pointer-events: none;
+    transition: opacity .25s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .sv-item.--replay .sv-replay { opacity: 1; transform: none; pointer-events: auto; }
+  .sv-replay:active { transform: scale(.9); }
   .sv-item.--playing .sv-media video { opacity: 1; }
   .sv-caption {
     margin-top: 14px;
@@ -3005,27 +3015,42 @@ a {
           const sec = e.target;
           const v = sec.querySelector('video');
           if (e.intersectionRatio >= 0.6) {
+            if (sec.classList.contains('--in')) return;
             sec.classList.add('--in');
-            if (v && el.classList.contains('--open')) {
-              v.loop = true; v.preload = 'auto';
-              v.play().then(() => sec.classList.add('--playing')).catch(() => {});
-            }
+            // settles into view: plays once, then the replay button shows
+            if (v && el.classList.contains('--open')) playOnce(sec, v);
           } else if (sec.classList.contains('--in')) {
-            sec.classList.remove('--in');
-            if (v && !v.paused) {
-              // let the current loop finish, then fade back to the photo
-              v.loop = false;
-              v.addEventListener('ended', () => { if (!sec.classList.contains('--in')) sec.classList.remove('--playing'); }, { once: true });
-            }
+            sec.classList.remove('--in', '--replay');
+            // scrolled away mid-play: it finishes on its own and fades back to the photo
           }
         });
       }, { root: el, threshold: [0, 0.6] });
       el.addEventListener('click', e => {
+        const again = e.target.closest('.sv-replay');
+        if (again) { const sec = again.closest('.sv-item'); playOnce(sec, sec.querySelector('video')); return; }
         const btn = e.target.closest('.sv-btn');
         if (!btn || !window.PiecePopup) return;
         const item = window.items.find(i => i.id === btn.dataset.id);
         if (item) window.PiecePopup.open(item);
       });
+    }
+    const REPLAY_ICON = '<svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M25.6 12.4c-1.6-4.3-5.6-7.1-10.2-6.9-6 .3-10.3 5.3-9.9 11.2.4 5.6 5.3 9.9 10.9 9.6 3.9-.2 7.2-2.6 8.8-6"/><path d="M26.4 5.6l-.7 7-6.8-1.2"/></svg>';
+    function playOnce(sec, v) {
+      if (!v) return;
+      sec.classList.remove('--replay');
+      v.loop = false; v.preload = 'auto';
+      const go = () => {
+        if (!sec.classList.contains('--in')) return;
+        try { v.currentTime = 0; } catch (err) {}
+        v.play().then(() => sec.classList.add('--playing')).catch(() => {});
+      };
+      // play from the in-memory copy when it's ready, so nothing swaps under it mid-play
+      if (window.PopsyVideo && v.dataset.primed !== 'done') window.PopsyVideo.prime(v).then(go, go); else go();
+      v.onended = () => {
+        sec.classList.remove('--playing');                       // fade back to the photo
+        if (sec.classList.contains('--in')) sec.classList.add('--replay');
+      };
     }
     function render() {
       if (!el) build();
@@ -3041,7 +3066,8 @@ a {
         const video = item.video ? '<video muted playsinline preload="none"' + (item.videoZoom ? ' style="transform:scale(' + item.videoZoom + ')"' : '') + '><source src="' + esc(item.video) + '" type="video/webm">' +
           (/^assets\/hover\/.+\.webm$/i.test(item.video) ? '<source src="' + esc(item.video.replace(/\.webm$/i, '.mp4')) + '" type="video/mp4">' : '') + '</video>' : '';
         return '<section class="sv-item">' +
-          '<div class="sv-media"><img src="' + esc(item.img) + '" alt="' + esc(name) + '" loading="lazy">' + video + '</div>' +
+          '<div class="sv-media"><img src="' + esc(item.img) + '" alt="' + esc(name) + '" loading="lazy">' + video +
+          (video ? '<button class="sv-replay" type="button" aria-label="Play ' + esc(name) + ' again">' + REPLAY_ICON + '</button>' : '') + '</div>' +
           '<div class="sv-caption">' +
           '<h3 class="sv-name">' + esc(title) + '</h3>' +
           (nick ? '<p class="sv-nick">' + esc(nick) + '</p>' : '') +

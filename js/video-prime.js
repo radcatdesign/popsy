@@ -100,11 +100,13 @@
     return load(url).then(function (blobUrl) {
       var apply = function () {
         if (v.dataset.primed === 'done') return;
+        if (!v.paused) return v.addEventListener('pause', later, { once: true });
         v.src = blobUrl;
         v.dataset.primed = 'done';
       };
-      if (v.paused) apply();
-      else v.addEventListener('pause', apply, { once: true });
+      // swap a beat after it stops, so a play that just finished still gets its 'ended'
+      var later = function () { setTimeout(apply, 0); };
+      apply();
       return v;
     }).catch(function () { delete v.dataset.primed; return v; });
   }
