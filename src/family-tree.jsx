@@ -61,7 +61,7 @@
       const [edges, setEdges, onEdgesChange] = useEdgesState([]);
       const [isLayouting, setIsLayouting] = useState(true);
       const [filteredItems, setFilteredItems] = useState([]);
-	  	const { zoomTo, setCenter, getViewport, getZoom } = useReactFlow();
+	  	const { zoomTo, setCenter, getViewport, getZoom, fitView } = useReactFlow();
       // phones: a small map in the corner that expands so you can tap where to go
       const isPhone = window.innerWidth <= 600;
       const [mapOpen, setMapOpen] = useState(false);
@@ -152,8 +152,8 @@
                 return originalItem && !originalItem.parent;
               });
               const highestNode = rootNodes.length ? rootNodes.reduce((prev, current) => (prev.y < current.y ? prev : current)) : null;
-              const centerOnLogo = () => {
-                if (!highestNode) return;
+              const logoView = () => {
+                if (!highestNode) return null;
                 // zoomed out enough to watch the branches spread and cascade down from the logo
                 const zoomP = window.innerWidth < 600 ? 0.6 : Math.max(0.5, Math.min(1.15, window.innerWidth / 2900));
                 const nodeEl = document.querySelector(`.react-flow__node[data-id="${highestNode.id}"]`);
@@ -172,20 +172,37 @@
                   const pad = document.documentElement.classList.contains('is-embed') ? 24 : 10;
                   raise = (window.innerHeight / 2 - Math.max(rowY, halfLogo + pad)) / zoomP;
                 }
-                setCenter(highestNode.x + highestNode.width / 2, highestNode.y + mediaOffset + raise, { zoom: zoomP, duration: 0 });
+                return { x: highestNode.x + highestNode.width / 2, y: highestNode.y + mediaOffset + raise, zoom: zoomP };
+              };
+              // First look: the whole tree, zoomed out, building itself; then a slow glide in to
+              // the logo at the top center. Any drag, pinch or scroll before then cancels the glide.
+              const openTree = () => {
+                const view = logoView();
+                const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (!view || reduce) {
+                  if (view) setCenter(view.x, view.y, { zoom: view.zoom, duration: 0 });
+                  return window.familyIntro ? window.familyIntro(reactFlowEdges) : null;
+                }
+                fitView({ padding: 0.06, duration: 0 });
+                const tl = window.familyIntro ? window.familyIntro(reactFlowEdges) : null;
+                const wait = tl && tl.duration ? Math.min(tl.duration() * 0.7, 2.8) * 1000 : 600;
+                const pane = document.querySelector('.react-flow');
+                const cancel = () => { clearTimeout(glide); stop(); };
+                const stop = () => ['pointerdown', 'wheel', 'touchstart'].forEach(t => pane && pane.removeEventListener(t, cancel));
+                ['pointerdown', 'wheel', 'touchstart'].forEach(t => pane && pane.addEventListener(t, cancel, { passive: true }));
+                const glide = setTimeout(() => { stop(); setCenter(view.x, view.y, { zoom: view.zoom, duration: 1900 }); }, wait);
               };
               const waitForTree = (tries = 0) => {
                 const drawn = document.querySelectorAll('.react-flow__edge-path').length;
                 if ((drawn < reactFlowEdges.length || !document.querySelector('.react-flow__node')) && tries < 120) {
                   return requestAnimationFrame(() => waitForTree(tries + 1));
                 }
-                centerOnLogo();
-                if (window.familyIntro) window.familyIntro(reactFlowEdges);
+                openTree();
               };
               requestAnimationFrame(() => waitForTree());
           })
           .catch(console.error);
-      }, [filteredItems, setCenter]);
+      }, [filteredItems, setCenter, fitView]);
       if (isLayouting) {
             return (
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif', color: '#888', backgroundColor: '#fff' }}>
