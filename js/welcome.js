@@ -68,6 +68,7 @@
     root.addEventListener('click', function (e) {
       var card = root.querySelector('.pw-welcome__card');
       var act = e.target.closest('[data-act]');
+      if (act && act.dataset.act === 'go') askMotion();
       if (!card.contains(e.target) || e.target.closest('.pw-welcome__close') || (act && act.dataset.act === 'go')) return close();
       if (act && act.dataset.act === 'story') {
         close();
@@ -82,6 +83,15 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && root.classList.contains('--open')) close();
     });
+  }
+
+  // Phones: "Meet them" is a tap, the one moment iPhones let a site ask for the motion sensors,
+  // so ask here; the eye then tilts with the phone (Android needs no ask)
+  function askMotion() {
+    var D = window.DeviceOrientationEvent;
+    if (!D || typeof D.requestPermission !== 'function') return;
+    if (!window.matchMedia('(pointer: coarse)').matches) return;
+    try { D.requestPermission().catch(function () {}); } catch (e) {}
   }
 
   function open() {
