@@ -960,6 +960,14 @@ a {
     .nav.v--new .filter-list > .filter-toggle { padding: 6px; gap: 5px; }
     .filter-toggle .ft-icon, .filter-toggle .filter-icon { width: 24px; height: 24px; }
   }
+  /* Both corner buttons are the same square: fixed size, icon (and dots) centred */
+  body .nav.v--new, .view-nav { padding: 6px; }
+  .view-btn, .nav.v--new .filter-list > .filter-toggle {
+    box-sizing: border-box; width: 46px; height: 46px; padding: 0; justify-content: center;
+  }
+  @media screen and (min-width: 992px) {
+    .view-btn, .nav.v--new .filter-list > .filter-toggle { width: 40px; height: 40px; }
+  }
   /* Phone scroll feed */
   .scroll-view {
     position: fixed;
