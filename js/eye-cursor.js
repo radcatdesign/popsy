@@ -26,9 +26,6 @@
     '.eye-cursor-el.--on { opacity: 1; }',
     '.eye-cursor-el .ec-size { position: relative; width: 100%; height: 100%; transition: transform .25s cubic-bezier(.34,1.56,.64,1); transform-origin: 50% 50%; }',
     '.eye-cursor-el.--hover .ec-size { transform: scale(1.35); }',
-    /* pressed: eyes wide, and it pops a little bigger */
-    '.eye-cursor-el.--wide .ec-size { transform: scale(1.18); }',
-    '.eye-cursor-el.--hover.--wide .ec-size { transform: scale(1.5); }',
     '.eye-cursor-el canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }',
     /* phones: the eye itself can be tapped (to let it roll / send it home) */
     '.eye-cursor-el.--tap { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }',
@@ -142,6 +139,7 @@
   var MW = 512, MH = 256, COL = null, SHP = null;
   var LID_EDGE = 134;                                // shape alpha above this = the raised lid
   var LID_MAX = 64 * Math.PI / 180;                  // how far the lid slides down for a full blink
+  var OC = [0.001, -0.188, 0.982];                   // the middle of the eye's opening, in the model
   (function loadModel() {
     var base = (document.currentScript && document.currentScript.src) ? document.currentScript.src.replace(/js\/eye-cursor\.js.*$/, '') : '/';
     var got = 0, imgs = [new Image(), new Image()];
@@ -166,7 +164,8 @@
   }
   function renderModel(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
     var edge = N / 2 - 0.5, inv = 1 / edge;
-    var a = lid * LID_MAX, ca = Math.cos(a), sa = Math.sin(a);
+    var a = Math.max(0, lid) * LID_MAX, ca = Math.cos(a), sa = Math.sin(a);
+    var wide = Math.max(0, -lid / -WIDE), reach = wide * 62 * Math.PI / 180, sw = Math.sin(reach);
     var a2 = a + 0.09, ca2 = Math.cos(a2), sa2 = Math.sin(a2);
     for (var j = 0; j < N; j++) {
       var wy = (edge - j) * inv;
@@ -178,7 +177,16 @@
         // the ball's own direction for this pixel
         var dx = m00 * wx + m10 * wy + m20 * wz, dy = m01 * wx + m11 * wy + m21 * wz, dz = m02 * wx + m12 * wy + m22 * wz;
         var t = texel(dx, dy, dz), fromLid = false, shadow = 0, bare = false;
-        if (a > 0.001 || a < -0.001) {
+        if (wide > 0.001 && SHP[t + 3] > LID_EDGE) {
+          // eyes wide: the opening grows in every direction, so the lid shrinks back to the edges.
+          // A lid spot stays lid only if the spot `reach` closer to the eye's centre is still lid.
+          var cd = dx * OC[0] + dy * OC[1] + dz * OC[2], ph = Math.acos(cd > 1 ? 1 : cd < -1 ? -1 : cd);
+          if (ph <= reach) bare = true;
+          else {
+            var sp = Math.sin(ph), f1 = Math.sin(ph - reach) / sp, f2 = sw / sp;
+            if (SHP[texel(dx * f1 + OC[0] * f2, dy * f1 + OC[1] * f2, dz * f1 + OC[2] * f2) + 3] <= LID_EDGE) bare = true;
+          }
+        } else if (a > 0.001) {
           // the lid slides (down to blink, up to open wide): look up where this spot sat on the lid
           var ly = dy * ca + dz * sa, lz = -dy * sa + dz * ca;
           var tl = texel(dx, ly, lz);
@@ -186,8 +194,6 @@
           else {
             var ly2 = dy * ca2 + dz * sa2, lz2 = -dy * sa2 + dz * ca2;
             if (SHP[texel(dx, ly2, lz2) + 3] > LID_EDGE) shadow = 0.32;   // tucked just under the moving lid
-            // opened wide: ball that's normally under the lid shows (the model never painted it)
-            if (a < 0 && SHP[t + 3] > LID_EDGE) bare = true;
           }
         }
         if (bare) {

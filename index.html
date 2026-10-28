@@ -900,8 +900,6 @@ a {
   .filter-toggle .ft-dots { display: flex; flex-direction: column; gap: 3px; }
   .filter-toggle .ft-dots i { display: block; width: 5px; height: 5px; border-radius: 50%; border: 1.3px solid #000; transition: background-color .25s ease; }
   .filter-toggle .ft-dots i.--on { background: #000; }
-  .nav.v--new .filter-list > .shuffle-btn { position: relative; margin-left: 4px; }
-  .nav.v--new .filter-list > .shuffle-btn::before { content: ''; position: absolute; left: -5px; top: 22%; bottom: 22%; width: 1px; background: #d6d6d6; }
   .vt-icon { display: block; }
   /* Desktop: smaller bottom pills, and the buttons respond on hover */
   @media screen and (min-width: 992px) {
@@ -2914,34 +2912,6 @@ a {
     btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
     list.appendChild(btn);
     list.classList.add('--toggle');
-    // Shuffle: deal the pieces into a new order (new feature tiles too) in whatever view you're in
-    const shuf = document.createElement('div');
-    shuf.className = 'filter-btn filter-toggle shuffle-btn';
-    shuf.setAttribute('role', 'button');
-    shuf.setAttribute('aria-label', 'Shuffle the pieces');
-    shuf.title = 'Shuffle';
-    shuf.tabIndex = 0;
-    shuf.innerHTML = '<span class="ft-icon"><svg class="filter-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M4.4 10.3c3.5-.2 6.3.4 8.5 2.3 2.5 2.1 3.6 5.2 5.9 7.2 2 1.7 4.3 2.3 7.6 2.2"/><path d="M4.6 21.9c3.3.1 6-.4 8.2-2.2"/><path d="M18.5 12.2c2.1-1.6 4.4-2.1 7.8-1.9"/>' +
-      '<path d="M23 6.8l3.5 3.4-3.5 3.3"/><path d="M23 18.5l3.6 3.4-3.4 3.4"/></svg></span>';
-    let busy = false;
-    const shuffle = () => {
-      if (busy || !document.getElementById('container').classList.contains('--is-loaded')) return;
-      busy = true; setTimeout(() => { busy = false; }, 1100);
-      gsap.fromTo(shuf.querySelector('svg'), { rotate: 0 }, { rotate: 360, duration: 0.6, ease: 'back.out(1.6)' });
-      // reshuffle everything except the logo, which keeps its centre spot
-      const logo = window.items.find(i => i.id === 'popsy-wolf');
-      const at = window.items.indexOf(logo);
-      const rest = window.items.filter(i => i !== logo);
-      for (let i = rest.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [rest[i], rest[j]] = [rest[j], rest[i]]; }
-      if (logo) rest.splice(at, 0, logo);
-      window.items = rest;
-      if (document.body.dataset.view === 'scroll' && window.ScrollView) return window.ScrollView.render();
-      window.rebuildGrid && window.rebuildGrid();
-    };
-    shuf.addEventListener('click', shuffle);
-    shuf.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); shuffle(); } });
-    list.appendChild(shuf);
   })();
   // View toggle: grid (default) or shelf (one row of large pieces you swipe through)
   (function addViewToggle() {
