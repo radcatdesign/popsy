@@ -667,14 +667,14 @@ a {
   body[data-nav-open="t"] .nav-btn__icon__img[data-nav-btn-icon="h"] { display: none; }
   .details__text-w { flex: 1; }
   /* Phones: "about" and "family tree" sit on the same line as the middle of the parked eye
-     (eye centre is 56px down; the links are 20px tall) */
+     (eye centre is 38px down; the links are 20px tall) */
   @media (hover: none), (pointer: coarse) {
-    body .about-link, body .family-link { top: 46px; }
+    body .about-link, body .family-link { top: 28px; }
   }
   /* Phones: a soft white fade behind the top links so they read over the pieces */
   .top-fade { display: none; }
   @media (hover: none), (pointer: coarse) {
-    .top-fade { display: block; position: fixed; top: 0; left: 0; right: 0; height: 104px; z-index: 15; pointer-events: none;
+    .top-fade { display: block; position: fixed; top: 0; left: 0; right: 0; height: 84px; z-index: 15; pointer-events: none;
       background: linear-gradient(to bottom, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 45%, rgba(255,255,255,0) 100%); }
   }
   /* Family tree link: top right, mirrors "about" top left */
@@ -2668,48 +2668,72 @@ a {
         v.classList.add('--on');
         if (still) still.style.opacity = '0';
       }).catch(() => { v.remove(); if (still) still.style.opacity = ''; });
+      if (window.prepLogoBurst) window.prepLogoBurst(div);
     };
     // Hover or tap the logo: it plays its little burst once, then goes back to the loop.
     // The burst video sits over the loop; they swap on a matching frame so there's no jump.
-    window.logoBurst = function (host) {
-      const loop = host && host.querySelector('.logo-loop');
-      if (!loop || !window.PopsyLogoHover || host.dataset.burst) return;
-      if (loop.classList.contains('logo-loop') && host.closest('.grid') && !loop.classList.contains('--on')) return;
-      host.dataset.burst = '1';
+    // The burst video lives beside the loop, loaded ahead of time so a tap can start it at once
+    // (phones only let a video start straight from the tap itself).
+    const burstVideo = host => {
       let hv = host.querySelector('.logo-hover');
       if (!hv) {
         hv = document.createElement('video');
         hv.className = 'logo-hover';
         hv.muted = true; hv.playsInline = true; hv.preload = 'auto';
-        hv.setAttribute('aria-hidden', 'true');
+        hv.setAttribute('muted', ''); hv.setAttribute('playsinline', ''); hv.setAttribute('aria-hidden', 'true');
         host.appendChild(hv);
       }
-      // crossfade both ways: the burst fades in over the loop, and only then does the loop step
-      // out; at the end the loop comes back underneath before the burst fades off
+      return hv;
+    };
+    window.prepLogoBurst = function (host) {
+      if (!host || !window.PopsyLogoHover) return;
+      window.PopsyLogoHover.then(url => {
+        const hv = burstVideo(host);
+        if (hv.dataset.src !== url) { hv.src = url; hv.dataset.src = url; }
+      }).catch(() => {});
+    };
+    window.logoBurst = function (host) {
+      if (!host || !window.PopsyLogoHover || host.dataset.burst) return;
+      // what's showing underneath: the loop if it's running, else the still logo (phones in
+      // low power mode won't autoplay the loop, but a tap can still play the burst)
+      const loop = host.querySelector('.logo-loop');
+      const live = loop && !loop.paused && (loop.classList.contains('--on') || !host.closest('.grid'));
+      const base = live ? loop : host.querySelector('img');
+      if (!base) return;
+      host.dataset.burst = '1';
+      const hv = burstVideo(host);
+      // crossfade both ways: the burst fades in over what's there, and only then does that step
+      // out; at the end it comes back underneath before the burst fades off
       const FADE = 260;
       let swap;
+      const hideBase = on => {
+        if (base === loop) loop.classList.toggle('--out', on);
+        else { base.style.transition = 'opacity .26s ease'; base.style.opacity = on ? '0' : ''; }
+      };
       const done = () => {
         clearTimeout(swap);
-        try { loop.currentTime = 0; } catch (e) {}
-        loop.classList.remove('--out');
-        loop.play().catch(() => {});
+        if (base === loop) { try { loop.currentTime = 0; } catch (e) {} loop.play().catch(() => {}); }
+        hideBase(false);
         hv.classList.remove('--on');
         setTimeout(() => { delete host.dataset.burst; }, FADE);
       };
+      const fail = () => { hv.classList.remove('--on'); hideBase(false); delete host.dataset.burst; };
       // wait for a real painted frame, so nothing fades in empty
       const painted = () => new Promise(res => {
         if (hv.requestVideoFrameCallback) hv.requestVideoFrameCallback(() => res()); else hv.addEventListener('playing', () => requestAnimationFrame(res), { once: true });
       });
-      window.PopsyLogoHover.then(url => {
-        if (hv.dataset.src !== url) { hv.src = url; hv.dataset.src = url; }
+      const start = () => {
         try { hv.currentTime = 0; } catch (e) {}
         const p = painted();
-        return hv.play().then(() => p);
-      }).then(() => {
-        hv.classList.add('--on');
-        swap = setTimeout(() => { loop.classList.add('--out'); }, FADE);
-        hv.onended = done;
-      }).catch(() => { delete host.dataset.burst; });
+        return hv.play().then(() => p).then(() => {
+          hv.classList.add('--on');
+          swap = setTimeout(() => hideBase(true), FADE);
+          hv.onended = done;
+        });
+      };
+      // already loaded: start right here, inside the tap
+      if (hv.dataset.src) start().catch(fail);
+      else window.PopsyLogoHover.then(url => { hv.src = url; hv.dataset.src = url; return start(); }).catch(fail);
     };
     // Shelf view: the same details the phone feed shows (name, nickname, size, Details button)
     // sit under each piece and rise in as it comes into view. A figcaption, not a div: the
@@ -3102,6 +3126,7 @@ a {
     el.innerHTML = '<img src="assets/popsy-logo-v2.svg" alt="">';
     document.body.appendChild(el);
     const tryLoop = () => {
+      if (window.prepLogoBurst) window.prepLogoBurst(el);
       if (!window.PopsyLogoLoop || el.querySelector('.logo-loop')) return;
       const v = document.createElement('video');
       v.className = 'logo-loop';

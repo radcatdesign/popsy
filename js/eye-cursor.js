@@ -349,7 +349,7 @@
   // tap again while it's rolling to send it back up
   var docked = true;
   var dockX = function () { return (window.visualViewport ? window.visualViewport.width : window.innerWidth) / 2; };
-  var DOCK_Y = 34 + SIZE / 2;
+  var DOCK_Y = 16 + SIZE / 2;
   // UI it bumps into instead of rolling over
   var WALLS = '.nav.v--new, .view-nav, .about-link, .family-link, .sv-btn';
   var walls = [], wallsAt = 0;
