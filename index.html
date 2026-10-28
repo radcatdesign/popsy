@@ -794,11 +794,14 @@ a {
   .grid .product .logo-hover {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 2;
     display: block !important; opacity: 0 !important; transform: scale(var(--logo-scale));
-    mix-blend-mode: multiply; pointer-events: none;
+    mix-blend-mode: multiply; pointer-events: none; transition: opacity .26s ease;
   }
   .grid .product .logo-hover.--on { opacity: 1 !important; }
-  .shelf-logo .logo-hover { opacity: 0; }
+  .grid .product .logo-loop.--on.--out { opacity: 0 !important; }
+  .shelf-logo .logo-hover { opacity: 0; transition: opacity .26s ease; }
   .shelf-logo .logo-hover.--on { opacity: 1; }
+  .shelf-logo .logo-loop { transition: opacity .26s ease; }
+  .shelf-logo .logo-loop.--out { opacity: 0; }
   /* The Popsy logo tile in the middle of the grid sits a little smaller than the pieces */
   :root { --logo-scale: 0.8; }
   .grid .product [data-id="popsy-wolf"] img { transform: scale(var(--logo-scale)); }
@@ -843,7 +846,7 @@ a {
      The outline sits exactly on the lines, which run through the middle of the 5vw gaps. */
   @media (hover: hover) and (pointer: fine) {
     .grid:not(.--shelf) .column .product > div { outline: 1px solid transparent; outline-offset: calc(2.5vw - 1px); transition: outline-color .2s ease; }
-    .grid:not(.--shelf) .column .product:not(.--covered):hover > div { outline-color: #000; }
+    .grid:not(.--shelf) .column .product:not(.--covered):hover > div { outline-color: #9a9a9a; }
   }
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
   .grid .column .product[data-video-state="auto"] video,
@@ -2681,19 +2684,30 @@ a {
         hv.setAttribute('aria-hidden', 'true');
         host.appendChild(hv);
       }
+      // crossfade both ways: the burst fades in over the loop, and only then does the loop step
+      // out; at the end the loop comes back underneath before the burst fades off
+      const FADE = 260;
+      let swap;
       const done = () => {
+        clearTimeout(swap);
         try { loop.currentTime = 0; } catch (e) {}
-        loop.style.visibility = '';
+        loop.classList.remove('--out');
         loop.play().catch(() => {});
-        requestAnimationFrame(() => { hv.classList.remove('--on'); delete host.dataset.burst; });
+        hv.classList.remove('--on');
+        setTimeout(() => { delete host.dataset.burst; }, FADE);
       };
+      // wait for a real painted frame, so nothing fades in empty
+      const painted = () => new Promise(res => {
+        if (hv.requestVideoFrameCallback) hv.requestVideoFrameCallback(() => res()); else hv.addEventListener('playing', () => requestAnimationFrame(res), { once: true });
+      });
       window.PopsyLogoHover.then(url => {
         if (hv.dataset.src !== url) { hv.src = url; hv.dataset.src = url; }
         try { hv.currentTime = 0; } catch (e) {}
-        return hv.play();
+        const p = painted();
+        return hv.play().then(() => p);
       }).then(() => {
         hv.classList.add('--on');
-        loop.style.visibility = 'hidden';
+        swap = setTimeout(() => { loop.classList.add('--out'); }, FADE);
         hv.onended = done;
       }).catch(() => { delete host.dataset.burst; });
     };
@@ -2852,15 +2866,25 @@ a {
       }
       gridEl.classList.remove('--shelf');
     	const isVertical = window.innerWidth < window.innerHeight;
-    	const columns = isVertical ? gridConfig.itemsPerColumn : gridConfig.columns;
-    	const itemsPerColumn = isVertical ? gridConfig.columns : gridConfig.itemsPerColumn;
-    	const arrSize = columns * itemsPerColumn;
+    	let columns = isVertical ? gridConfig.itemsPerColumn : gridConfig.columns;
+    	let itemsPerColumn = isVertical ? gridConfig.columns : gridConfig.itemsPerColumn;
       // Popsy logo appears once, in the center tile, and the filtered pieces fill the rest
       const logoItem = window.items.find(p => p.id === 'popsy-wolf');
       const filteredItems = window.items.filter(p => p.id !== 'popsy-wolf' && (!filter || p.category === filter));
+      const n = filteredItems.length;
+      // a small set (plants, kitchen) gets a repeating pattern where no piece ever touches itself,
+      // even diagonally or across the wrap: piece (2*col + row) mod n, with the grid sized to fit
+      const patterned = n >= 4 && n < 9;
+      if (patterned) {
+        while ((2 * columns) % n) columns++;
+        while (itemsPerColumn % n) itemsPerColumn++;
+      }
+    	const arrSize = columns * itemsPerColumn;
       const productsArray = [];
       for (let i = 0; i < arrSize; i++) {
-        productsArray.push(filteredItems[i % filteredItems.length]);
+        productsArray.push(patterned
+          ? filteredItems[(2 * Math.floor(i / itemsPerColumn) + (i % itemsPerColumn)) % n]
+          : filteredItems[i % n]);
       }
       if (logoItem && (!filter || logoItem.category === filter)) productsArray[centerPos] = logoItem;
       // Feature tiles: a few monsters take up a 2x2 block (top-left cell holds the big piece,
@@ -2889,6 +2913,40 @@ a {
           for (let dc = -1; dc <= 2; dc++) for (let dr = -1; dr <= 2; dr++) mark(c + dc, r + dr);
           productsArray[c * itemsPerColumn + r] = pool[blocks.length];
           blocks.push([c, r]);
+        }
+      }
+      // No piece next to itself: the grid wraps both ways, so neighbours wrap too. Any tile whose
+      // piece already shows within two cells (big tiles count across all four of their cells)
+      // gets the least-used piece that isn't nearby.
+      {
+        const C = columns, R = itemsPerColumn;
+        const at = (c, r) => (((c % C) + C) % C) * R + (((r % R) + R) % R);
+        const anchor = {};
+        blocks.forEach(([c, r]) => { [[1, 0], [0, 1], [1, 1]].forEach(([dc, dr]) => { anchor[at(c + dc, r + dr)] = at(c, r); }); });
+        const owner = i => (anchor[i] !== undefined ? anchor[i] : i);
+        const used = {};
+        productsArray.forEach((p, i) => { if (p && owner(i) === i) used[p.id] = (used[p.id] || 0) + 1; });
+        const nearIds = (i, rad) => {
+          const c = Math.floor(i / R), r = i % R, ids = new Set();
+          for (let dc = -rad; dc <= rad; dc++) for (let dr = -rad; dr <= rad; dr++) {
+            const j = owner(at(c + dc, r + dr));
+            if (j !== i && productsArray[j]) ids.add(productsArray[j].id);
+          }
+          return ids;
+        };
+        for (let pass = 0; pass < 2; pass++) {
+          for (let i = 0; i < productsArray.length; i++) {
+            const p = productsArray[i];
+            if (!p || p.id === 'popsy-wolf' || owner(i) !== i || blocks.some(([c, r]) => at(c, r) === i)) continue;
+            let near = nearIds(i, 2);
+            if (!near.has(p.id)) continue;
+            const byUse = filteredItems.slice().sort((a, b) => (used[a.id] || 0) - (used[b.id] || 0) || Math.random() - 0.5);
+            let pick = byUse.find(q => !near.has(q.id));
+            if (!pick) { near = nearIds(i, 1); if (!near.has(p.id)) continue; pick = byUse.find(q => !near.has(q.id)); }
+            if (!pick) continue;
+            used[p.id]--; used[pick.id] = (used[pick.id] || 0) + 1;
+            productsArray[i] = pick;
+          }
         }
       }
       for (let i = 0; i < columns; i++) {
@@ -3772,11 +3830,29 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         this.draggable.update()
         this.panTo(newX, newY)
       }, { passive: false })
-      // Shelf: arrow keys step one piece at a time
+      // Arrow keys: the shelf steps one piece at a time; the grid moves one tile in any
+      // direction and lands lined up on the tiles
       window.addEventListener('keydown', (e) => {
-        if (!this.layout || !this.layout.isShelf || this.SHOW_DETAILS) return
-        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
-        this.snapShelf(this.draggable.x + (e.key === 'ArrowLeft' ? 1 : -1) * this.layout.colStep)
+        const dir = { ArrowLeft: [1, 0], ArrowRight: [-1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key]
+        if (!dir || !this.layout || !this.draggable || this.SHOW_DETAILS) return
+        if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) return
+        if (document.querySelector('.pp.--open') || document.body.dataset.aboutOpen === 't' || document.body.dataset.familyOpen === 't') return
+        if (document.body.dataset.view === 'scroll') return
+        const L = this.layout
+        if (L.isShelf) {
+          if (!dir[0]) return
+          e.preventDefault()
+          this.snapShelf(this.draggable.x + dir[0] * L.colStep)
+          return
+        }
+        e.preventDefault()
+        // step from where it's heading (so holding a key keeps going), snapped to the tile grid
+        const from = this.target || { x: this.draggable.x, y: this.draggable.y }
+        const x = L.homeX + Math.round((from.x - L.homeX) / L.colStep + dir[0]) * L.colStep
+        const y = L.homeY + Math.round((from.y - L.homeY) / L.rowStep + dir[1]) * L.rowStep
+        gsap.set(this.proxy, { x, y })
+        this.draggable.update()
+        this.panTo(x, y, 200)
       })
       window.addEventListener("resize", () => {
         this.updateBounds()
