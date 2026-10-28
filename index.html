@@ -859,12 +859,12 @@ a {
   .grid .column .product[data-video-state="ending"],
   .grid .column .product[data-video-state="auto"],
   .grid .column .product[data-video-state="focus"] { z-index: 2; mix-blend-mode: multiply; }
-  /* Hovering a piece darkens the four grid lines around it (the whole block for a 2x2 piece).
-     The outline sits exactly on the lines, which run through the middle of the 5vw gaps. */
-  @media (hover: hover) and (pointer: fine) {
-    .grid:not(.--shelf) .column .product > div { outline: 1px solid transparent; outline-offset: calc(2.5vw - 1px); transition: outline-color .2s ease; }
-    .grid:not(.--shelf) .column .product:not(.--covered):hover > div { outline-color: #c2c2c2; }
-  }
+  /* Hovering a piece darkens the actual grid lines around it (the whole block for a 2x2 piece):
+     its own right / bottom lines, and the lines its left and upper neighbours draw. Marked in JS
+     (see markHoverLines), so the highlight is the lines themselves and can't drift off them. */
+  .grid .column .product::before, .grid .product::after { transition: border-color .2s ease; }
+  .grid .column .product.--hl-r::before { border-right-color: #c2c2c2; z-index: 6; }
+  .grid .product.--hl-b::after { border-bottom-color: #c2c2c2; z-index: 6; }
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
   .grid .column .product[data-video-state="auto"] video,
   .grid .column .product[data-video-state="focus"] video { opacity: 1; }
@@ -3182,6 +3182,33 @@ a {
     // start it the first time shelf view opens
     new MutationObserver(() => { if (document.body.dataset.view === 'shelf') tryLoop(); })
       .observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
+  })();
+  // Hover lines: light up the grid lines around the piece under the pointer. A tile draws its
+  // own right and bottom lines; the left and top ones belong to the neighbours (wrapping round).
+  (function markHoverLines() {
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    let lit = [], current = null;
+    const clear = () => { lit.forEach(([el, c]) => el.classList.remove(c)); lit = []; current = null; };
+    const mark = (el, c) => { if (el) { el.classList.add(c); lit.push([el, c]); } };
+    document.addEventListener('mouseover', e => {
+      const pr = e.target.closest && e.target.closest('.grid:not(.--shelf) .column .product');
+      if (pr === current) return;
+      clear();
+      if (!pr || pr.classList.contains('--covered') || (pr.firstElementChild && pr.firstElementChild.dataset.id === 'popsy-wolf')) return;
+      current = pr;
+      const col = pr.parentElement, cols = [...col.parentElement.children], C = cols.length;
+      const c = cols.indexOf(col), r = [...col.children].indexOf(pr), R = col.children.length;
+      const at = (cc, rr) => cols[((cc % C) + C) % C].children[((rr % R) + R) % R];
+      const span = pr.classList.contains('--big') ? 2 : 1;
+      for (let i = 0; i < span; i++) {
+        mark(at(c + span - 1, r + i), '--hl-r');   // right edge
+        mark(at(c - 1, r + i), '--hl-r');          // left edge (the neighbour's right line)
+        mark(at(c + i, r + span - 1), '--hl-b');   // bottom edge
+        mark(at(c + i, r - 1), '--hl-b');          // top edge (the line above)
+      }
+    }, { passive: true });
+    document.addEventListener('mouseleave', clear);
+    window.addEventListener('blur', clear);
   })();
   // The grid's logo tile lets clicks through (so drags start anywhere), so hovers and taps on
   // it are found by position: pointer over it on desktop, or a tap that didn't drag.
