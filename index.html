@@ -1056,7 +1056,7 @@ a {
   .sv-item.--in .sv-caption > :nth-child(3) { transition-delay: 0.14s; }
   .sv-item.--in .sv-caption > :nth-child(4) { transition-delay: 0.21s; }
   .sv-item.--in .sv-caption > :nth-child(5) { transition-delay: 0.28s; }
-  /* a little hand-drawn tag above the name: Available (with an ink dot) or Adopted */
+  /* a little hand-drawn tag above the name: Available, or Adopted (greyed out) */
   .sv-tag { margin: 0 0 6px; }
   .sv-tag > span {
     display: inline-block; font-size: 15px; line-height: 1; padding: 6px 14px 5px; transform: rotate(-3deg);
@@ -1065,10 +1065,8 @@ a {
     border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);
   }
   .sv-tag.--available > span { transform: rotate(2deg); }
-  .sv-tag.--available > span::before {
-    content: ''; display: inline-block; width: 7px; height: 7px; margin: 0 7px 1px 0; vertical-align: middle;
-    border-radius: 50%; background: #000;
-  }
+  /* adopted: the same tag, greyed out (text and hand-drawn border together) */
+  .sv-tag.--adopted > span { opacity: .45; }
   .sv-name { font-size: 26px; line-height: 1.1; margin: 0; font-weight: normal; }
   .sv-nick { font-size: 17px; margin: 0; }
   .sv-size { font-size: 16px; margin: 0; color: #444; }
