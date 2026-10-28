@@ -23,7 +23,10 @@
     'body .about-popup .about-popup-block__scroll.v--scroll { display: block; margin: 0; padding: 4px 8px 16px 0; text-align: left;',
     '  max-height: calc(min(78svh, 720px) - 130px); overflow-y: auto; scrollbar-width: none; }',
     'body .about-popup .about-popup-block__scroll.v--scroll::-webkit-scrollbar { display: none; }',
-    'body .about-popup .about-space { font-size: 18px; line-height: 1.5; }',
+    'body .about-popup .about-space { font-size: 18px; line-height: 1.5; white-space: normal; }',
+    '.about-popup .about-space p { margin: 0 0 1em; font-size: inherit; line-height: inherit; }',
+    'body .about-popup .about-popup-block__scroll.v--scroll { padding-top: 14px; }',
+    '.about-popup .about-space .ap-sign { margin: 1.6em 0 .4em; }',
     '@media (max-width: 760px) {',
     '  .about-popup-w { padding: 12px; align-items: flex-end; }',
     '  body .about-popup-w .about-popup { max-height: calc(100svh - 24px); padding: 22px 20px 16px; }',
@@ -48,7 +51,7 @@
     var title = document.createElement('h2');
     title.className = 'ap-title';
     title.id = 'ap-title';
-    title.textContent = 'Popsy Loves You';
+    title.textContent = 'No problem';
     popup.insertBefore(title, popup.firstChild);
     var btn = document.createElement('button');
     btn.type = 'button';

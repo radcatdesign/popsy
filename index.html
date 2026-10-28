@@ -671,6 +671,12 @@ a {
   @media (hover: none), (pointer: coarse) {
     body .about-link, body .family-link { top: 46px; }
   }
+  /* Phones: a soft white fade behind the top links so they read over the pieces */
+  .top-fade { display: none; }
+  @media (hover: none), (pointer: coarse) {
+    .top-fade { display: block; position: fixed; top: 0; left: 0; right: 0; height: 104px; z-index: 15; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 45%, rgba(255,255,255,0) 100%); }
+  }
   /* Family tree link: top right, mirrors "about" top left */
   .family-link {
     z-index: 20;
@@ -4060,41 +4066,12 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
   }
 </script>
   </div>
+  <div class="top-fade" aria-hidden="true"></div>
   <div class="about">
     <div class="about-link">about</div>
     <div class="about-popup-w">
       <div class="about-popup">
-        <div class="about-popup-c w-dyn-list"><div role="list" class="about-popup-c w-dyn-items"><div role="listitem" class="about-popup-content v--flex w-dyn-item"><div class="about-popup-block v--img v--hide"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68e9924e072523dbebf9fb70_image8.jpeg" loading="lazy" alt="" class="about-popup-img"/></div><div class="about-popup-block v--scroll"><div class="about-popup-block__grad"></div><div class="about-popup-block__grad v--bottom"></div><div class="about-popup-block__scroll v--scroll"><div class="about-space">My therapist told me to get a hobby and Popsy Wolf was born. What started with weird plates, vases, and pots turned into a full-blown family of creatures: The Monsters.
-
-Each monster that crawls out of the kiln arrives with its own story, temperament, and let’s say… unique communication style. Together, they form a sprawling family of beautifully flawed little beings, loud ones, leaky ones, dramatic ones, and quiet ones pretending not to care.
-
-They aren’t just characters, they’re reflections. Each one carries a blend of chaos and sincerity, like the parts of us that are too weird, too sensitive, too much, but still have so much to offer. Their personalities mirror the beautifully messy humans we meet in the world, each with their own gifts, patterns, and blind spots. See yourself, feel the roast, and bask in the humanness of it all.
-
-But somewhere between the laughter and the clay, something else cracked open. The Monsters became little vessels for feeling, grief, love, confusion, whatever refused to stay tidy. They hold the emotions we can’t always name, turning them into something you can actually hold without breaking. They remind us that feeling too much doesn’t make you fragile, it makes you alive.
-
-At its core, Popsy Wolf is about the imperfection of life, the messiness of being human. The Monsters give each person who carries one a place to put their feelings when the world becomes… a lot. 
-
-“Let something else carry it all.” 
-
-It’s about finding the sacred in the stupid, the beautiful in the broken, and the real in the ridiculous.
-
-Every monster is a tiny myth about being human. Together, they remind us: grief and joy live in the same clay, family is messy, feelings are loud, and you’re not broken, you’re just handmade.
-
-*********
-THE MONSTER FAMILY 
-
-The Monsters are what happen when feelings grow limbs. Each one’s a little mirror, sculpted from clay, glazed in emotion, and carrying just enough chaos to feel familiar. Together, they make up a sprawling, dysfunctional, weirdly loving family.
-
-The lineage begins with three ancient elders:
-The Rootkins — descendants of Siddles, the quiet root. Grounded, patient, full of nervous love and unfinished thoughts. They carry the weight of “trying their best,” and somehow make it look good.
-
-The Roarborns — offspring of Druthal, the family’s resident fire hazard. Loud, impulsive, passionate, and occasionally right. They feel first, think later, and refuse to apologize for the smoke.
-
-The Glimmerwicks — children of Janice, the accidental matriarch. Performers, romantics, storytellers, and chaos magnets. They process emotions like it’s theater, and sometimes it actually is.
-
-Every monster has its own story, its own emotional weather system, but they’re all connected by one truth: feeling is messy, and that’s the point.
-
-They’re not here to fix you. They’re here to sit with you while you feel it, and maybe crack a little so you don’t have to. </div></div></div></div></div></div>
+        <div class="about-popup-c w-dyn-list"><div role="list" class="about-popup-c w-dyn-items"><div role="listitem" class="about-popup-content v--flex w-dyn-item"><div class="about-popup-block v--img v--hide"><img src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/68e9924e072523dbebf9fb70_image8.jpeg" loading="lazy" alt="" class="about-popup-img"/></div><div class="about-popup-block v--scroll"><div class="about-popup-block__grad"></div><div class="about-popup-block__grad v--bottom"></div><div class="about-popup-block__scroll v--scroll"><div class="about-space"><p>My grandpa’s answer to everything, big and small, was “no problem.”</p><p>That was the first thing he ever gave me. Friends died when I was young, no problem. My parents split, no problem. A business partner steals all of our money and destroys everything we built for years, no problem. Things kept coming at me and instead of working through any of it, I brushed it off, said I was fine, and kept moving.</p><p>Fast forward to 2023, we’re on the other side of COVID, the house I’d put every dollar of savings into was gone, I’d been to more funerals than I could count, and the relationship was over. “No problem” stopped working.</p><p>That’s when my therapist told me to get a hobby. So I took a ceramics class.</p><p>I made some really shitty mugs and bowls for a while. Then one afternoon something I was working on grew a face, and the face had an expression I recognized, a face of pure panic. WTF is this?? I kept going. Within a few months I had a storage unit full of monsters big and small. Some anxious, some sad, some scared, some that just wanted to play.</p><p>They were me. The parts that showed up every time I said “no problem”. And that’s when I realized that they’d been running the place for years. Making decisions for me. Taking my silence for permission. I had never met them, so I couldn’t even argue. But at the studio, I got to meet them, learn their names, understand their stories, and hear where they came from.</p><p>I knew the world I wanted to build, a world where we could all meet the gremlins that are running us unconsciously and turn them into friendly monsters that could be a part of our story in a much better way.</p><p>It’s starting out with clay, and who knows where we’re headed.</p><p>We are all carrying an enormous amount right now, large and small, and nobody handed us any tools. Every incentive we have says push it down, keep moving, stay in the cycle, be fine.</p><p>F that.</p><p>Face your gremlins. Play with your monsters. Get back to being a kid about it. There’s still plenty of time.</p><p>That’s Popsy Wolf. That’s the whole of it.</p><p class="ap-sign">Brandon Kaufer<br>aka Popsy Wolf</p></div></div></div></div></div></div>
       </div>
       <div class="about-popup-bd">
         <div class="about-popup-close w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewbox="0 0 24 24" fill="none">
