@@ -61,11 +61,13 @@
   // Pieces with a sharper 960px cut (name-hd.webm / name-hd.mp4). Tiles, the big 2x2 tiles and
   // the shelf are drawn well past 480px on desktop and tablet, so those screens get it; phones
   // keep the lighter 480px file.
-  var HD = ['darlene', 'dremmel', 'frillick', 'gorble', 'gumphrey', 'marnie', 'noshik', 'peepers', 'tav', 'tiv', 'ziggo'];
+  var HD = ['darlene', 'dremmel', 'frillick', 'gorble', 'gumphrey', 'marnie', 'noshik', 'peepers', 'tav', 'tiv', 'ziggo', 'tessik',
+    'piece-1', 'piece-3', 'piece-4', 'piece-6', 'piece-7', 'piece-8', 'piece-9', 'piece-10', 'piece-11', 'piece-12', 'piece-13',
+    'piece-14', 'piece-15', 'piece-16', 'piece-17', 'piece-18', 'piece-22', 'piece-23', 'piece-24', 'piece-26', 'piece-27', 'piece-32'];
   var wantHd = !!(window.matchMedia && window.matchMedia('(min-width: 768px)').matches);
   function hd(url) {
     if (!wantHd || !url) return url;
-    var m = url.match(/\/([a-z]+)\.(webm|mp4)$/i);
+    var m = url.match(/\/([a-z0-9-]+?)\.(webm|mp4)$/i);
     return m && HD.indexOf(m[1].toLowerCase()) > -1 ? url.replace(/\.(webm|mp4)$/i, '-hd.$1') : url;
   }
   function fileFor(webm) {
