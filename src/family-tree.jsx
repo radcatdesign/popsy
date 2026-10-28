@@ -42,7 +42,7 @@
                   className="w-25 h-25 object-cover mx-auto"
                 />
                 { data.video && (
-                  <video ref={el => { if (el) el.muted = true; }} muted playsInline preload="metadata" data-hover-video="true">
+                  <video ref={el => { if (el) el.muted = true; }} muted playsInline preload="none" data-hover-video="true">
                     <source src={data.video} type="video/webm" />
                     { /^assets\/hover\/.+\.webm$/i.test(data.video) && <source src={data.video.replace(/\.webm$/i, '.mp4')} type="video/mp4" /> }
                   </video>
@@ -140,7 +140,9 @@
                       target: item.id,
                       label: item.label,
                       /* markerEnd: { type: MarkerType.ArrowClosed, color: '#AAA' }, */
-                      style: { stroke: '#000', strokeWidth: 5, filter: 'url(#chalk-filter)', willChange: 'filter' },
+                      // the chalk filter; phones skip will-change (a graphics layer per branch is too much memory)
+                      style: isPhone ? { stroke: '#000', strokeWidth: 5, filter: 'url(#chalk-filter)' }
+                        : { stroke: '#000', strokeWidth: 5, filter: 'url(#chalk-filter)', willChange: 'filter' },
                   }));
               setNodes(reactFlowNodes);
               setEdges(reactFlowEdges);
@@ -179,18 +181,27 @@
               const openTree = () => {
                 const view = logoView();
                 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                // anything that hands out video players waits on this (see familyIntro)
+                let settle;
+                window.familyCameraSettled = new Promise(res => { settle = res; });
                 if (!view || reduce) {
                   if (view) setCenter(view.x, view.y, { zoom: view.zoom, duration: 0 });
+                  settle();
                   return window.familyIntro ? window.familyIntro(reactFlowEdges) : null;
                 }
-                fitView({ padding: 0.06, duration: 0 });
+                // phones: zoomed out, but not so far the whole page becomes one giant render
+                fitView({ padding: 0.06, duration: 0, minZoom: isPhone ? 0.22 : 0.1 });
                 const tl = window.familyIntro ? window.familyIntro(reactFlowEdges) : null;
                 const wait = tl && tl.duration ? Math.min(tl.duration() * 0.7, 2.8) * 1000 : 600;
                 const pane = document.querySelector('.react-flow');
-                const cancel = () => { clearTimeout(glide); stop(); };
+                const cancel = () => { clearTimeout(glide); stop(); settle(); };
                 const stop = () => ['pointerdown', 'wheel', 'touchstart'].forEach(t => pane && pane.removeEventListener(t, cancel));
                 ['pointerdown', 'wheel', 'touchstart'].forEach(t => pane && pane.addEventListener(t, cancel, { passive: true }));
-                const glide = setTimeout(() => { stop(); setCenter(view.x, view.y, { zoom: view.zoom, duration: 1900 }); }, wait);
+                const glide = setTimeout(() => {
+                  stop();
+                  setCenter(view.x, view.y, { zoom: view.zoom, duration: 1900 });
+                  setTimeout(settle, 2000);
+                }, wait);
               };
               const waitForTree = (tries = 0) => {
                 const drawn = document.querySelectorAll('.react-flow__edge-path').length;

@@ -2244,8 +2244,15 @@ They’re not here to fix you. They’re here to sit with you while you feel it,
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const STEP = 0.55, LINE = 0.6, START = 0.5;
     const tl = gsap.timeline({ onComplete: () => {
-      if (window.PopsyVideo) window.PopsyVideo.watch(document.querySelectorAll('.node-media'));
-      window.startFamilyAmbient();
+      // wait for the camera to land on the logo before handing out video players: zoomed out,
+      // every monster counts as on screen and phones run out of memory. Phones also hand players
+      // back once a monster is well off screen.
+      Promise.resolve(window.familyCameraSettled).then(() => {
+        const touch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const nodes = document.querySelectorAll('.node-media');
+        if (window.PopsyVideo) touch && window.PopsyVideo.watchNear ? window.PopsyVideo.watchNear(nodes) : window.PopsyVideo.watch(nodes);
+        window.startFamilyAmbient();
+      });
     } });
     if (reduce) tl.timeScale(5);
     document.querySelectorAll('.react-flow__node').forEach(n => {
