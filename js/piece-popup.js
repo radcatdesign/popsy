@@ -23,6 +23,14 @@
     '.pp__media img, .pp__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }',
     '.pp__media video { opacity: 0; transition: opacity .4s ease; }',
     '.pp__media video.--playing { opacity: 1; }',
+    /* plays once, then a round replay button pops up by the piece (same as the phone feed) */
+    '.pp__replay { position: absolute; right: 0; bottom: 4px; z-index: 2; width: 42px; height: 42px; padding: 0; display: flex;',
+    '  align-items: center; justify-content: center; color: #000; background: #fff; border: 1.5px solid #000; border-radius: 50%;',
+    '  cursor: pointer; -webkit-tap-highlight-color: transparent; opacity: 0; transform: scale(.5) rotate(-90deg); pointer-events: none;',
+    '  transition: opacity .25s ease, transform .45s cubic-bezier(.34,1.56,.64,1); }',
+    '.pp__media.--replay .pp__replay { opacity: 1; transform: none; pointer-events: auto; }',
+    '.pp__replay:hover { transform: rotate(-20deg); }',
+    '.pp__replay:active { transform: scale(.9); }',
     '.pp__body { position: relative; flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; min-height: 0; }',
     '.pp__view { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }',
     '.pp__view[hidden] { display: none; }',
@@ -84,7 +92,8 @@
     root.innerHTML =
       '<div class="pp__card">' +
       '<button class="pp__close" type="button" aria-label="Close"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"><path d="M18.4 5.8 5.6 18.3"/><path d="M5.7 5.6l12.7 12.9"/></svg></button>' +
-      '<div class="pp__media"><img alt=""><video muted loop playsinline preload="auto"></video></div>' +
+      '<div class="pp__media"><img alt=""><video muted playsinline preload="auto"></video>' +
+      '<button class="pp__replay" type="button" data-action="replay" aria-label="Play again"><svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M25.6 12.4c-1.6-4.3-5.6-7.1-10.2-6.9-6 .3-10.3 5.3-9.9 11.2.4 5.6 5.3 9.9 10.9 9.6 3.9-.2 7.2-2.6 8.8-6"/><path d="M26.4 5.6l-.7 7-6.8-1.2"/></svg></button></div>' +
       '<div class="pp__body">' +
       '<div class="pp__view" data-view="info">' +
       '<h2 class="pp__title" id="pp-title"></h2><div class="pp__meta"></div><div class="pp__text"></div>' +
@@ -126,6 +135,11 @@
     root.addEventListener('click', function (e) {
       if (!card.contains(e.target)) return close();
       var a = e.target.closest('[data-action]');
+      if (a && a.dataset.action === 'replay') {
+        media.classList.remove('--replay');
+        try { videoEl.currentTime = 0; } catch (err) {}
+        videoEl.play().catch(function () {});
+      }
       if (a && a.dataset.action === 'inquire') show('form');
       if (a && a.dataset.action === 'back') show('info');
       if (a && a.dataset.action === 'close') close();
@@ -141,7 +155,12 @@
       if (e.key === 'Tab') trapFocus(e);
     });
     form.addEventListener('submit', submit);
-    videoEl.addEventListener('playing', function () { videoEl.classList.add('--playing'); });
+    videoEl.addEventListener('playing', function () { videoEl.classList.add('--playing'); media.classList.remove('--replay'); });
+    // after one play it fades back to the photo and the replay button shows
+    videoEl.addEventListener('ended', function () {
+      videoEl.classList.remove('--playing');
+      if (root.classList.contains('--open')) media.classList.add('--replay');
+    });
   }
 
   function trapFocus(e) {
@@ -189,6 +208,7 @@
     imgEl.src = item.img || item.image || '';
     imgEl.alt = name;
     videoEl.classList.remove('--playing');
+    media.classList.remove('--replay');
     videoEl.pause();
     videoEl.removeAttribute('src');
     delete videoEl.dataset.primed;
