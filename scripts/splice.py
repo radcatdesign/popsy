@@ -61,9 +61,30 @@ for name in ('index.html', 'family.html'):
     left = sorted(set(re.findall(r'https://(?:cdn\.prod\.website-files\.com|d3e54v103j8qbb\.cloudfront\.net)[^"\'\s)<>`]*', html)))
     print(name, 'remaining remote refs:', left)
 
+# Merge the mirrored files into assets/ (add / update only). Never clear the folder: it also
+# holds everything made by hand (hover and intro videos, the eye, thumbnails, WebP copies).
 src = MIRROR / 'assets'
 dst = ROOT / 'assets'
-if dst.exists():
-    shutil.rmtree(dst)
-shutil.copytree(src, dst)
-print('assets copied')
+shutil.copytree(src, dst, dirs_exist_ok=True)
+print('assets merged')
+
+# Photos are served as WebP (a fraction of the PNG / JPEG size, white backgrounds intact).
+# Convert any new PNG / JPEG the pages now point at and switch the references over.
+from PIL import Image
+for name in ('index.html', 'family.html'):
+    html = (ROOT / name).read_text()
+    for ref in sorted(set(re.findall(r'assets/[^"\'\s)<>`]+?\.(?:png|jpe?g)', html, re.I))):
+        path = ROOT / ref
+        if not path.exists():
+            continue
+        webp = path.with_suffix('.webp')
+        if not webp.exists():
+            im = Image.open(path)
+            if im.mode not in ('RGB', 'RGBA'):
+                im = im.convert('RGBA' if 'A' in im.mode or 'transparency' in im.info else 'RGB')
+            if im.width > 1200:
+                im = im.resize((1200, round(im.height * 1200 / im.width)), Image.LANCZOS)
+            im.save(webp, 'WEBP', quality=82, method=6)
+        html = html.replace(ref, ref[: -len(path.suffix)] + '.webp')
+    (ROOT / name).write_text(html)
+print('photos switched to WebP')

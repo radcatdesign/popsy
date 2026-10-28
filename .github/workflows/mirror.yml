@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: bash scripts/mirror.sh
+      - run: pip install pillow
       - run: python3 scripts/splice.py _mirror
       - run: |
           rm -rf _mirror

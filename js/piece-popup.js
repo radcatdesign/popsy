@@ -17,7 +17,7 @@
        scaled up so arms aren't cropped) can never paint over the line */
     '.pp__card::after { content: ""; position: absolute; inset: -1px; z-index: 6; pointer-events: none; border: 1px solid #000; border-radius: 13px;',
     '  border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;',
-    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png); }',
+    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp); }',
     '.pp.--open .pp__card { transform: none; }',
     '.pp__media { position: relative; flex: 0 0 auto; width: min(46%, 440px); aspect-ratio: 1; align-self: center; }',
     '.pp__media img, .pp__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }',
@@ -42,7 +42,7 @@
     '.pp__btn { appearance: none; font: inherit; font-size: 20px; cursor: pointer; margin-top: 18px; align-self: flex-start;',
     '  padding: 10px 26px; border-radius: 8px; background: #000; color: #fff; border: 1px solid transparent;',
     '  border-image-outset: 3px; border-image-width: 30px; border-image-slice: 15; border-image-repeat: stretch;',
-    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.png); }',
+    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.webp); }',
     '.pp__btn:hover { transform: rotate(-1.5deg); }',
     '.pp__btn[disabled] { opacity: .6; transform: none; }',
     '.pp__btn.--adopted, .pp__btn.--adopted:hover { opacity: .45; cursor: default; transform: none; }',

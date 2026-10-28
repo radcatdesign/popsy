@@ -14,7 +14,7 @@
     '.pw-welcome__card { position: relative; width: min(540px, 100%); max-height: calc(100svh - 48px); overflow-y: auto; scrollbar-width: none;',
     '  background: #fff; border: 1px solid #000; border-radius: 13px; padding: 32px 34px 28px; text-align: left;',
     '  border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;',
-    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);',
+    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);',
     '  transform: translateY(16px) scale(.97); transition: transform .5s cubic-bezier(.22,1,.36,1); }',
     '.pw-welcome.--open .pw-welcome__card { transform: none; }',
     '.pw-welcome__title { font-size: 34px; line-height: 1.1; margin: 0 44px 16px 0; font-weight: normal; }',
@@ -23,7 +23,7 @@
     '.pw-welcome__go { appearance: none; font: inherit; font-size: 20px; cursor: pointer; padding: 10px 26px; border-radius: 8px;',
     '  background: #000; color: #fff; border: 1px solid transparent; transition: transform .2s ease;',
     '  border-image-outset: 3px; border-image-width: 30px; border-image-slice: 15; border-image-repeat: stretch;',
-    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.png); }',
+    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.webp); }',
     '.pw-welcome__go:hover { transform: rotate(-1.5deg); }',
     '.pw-welcome__go:focus:not(:focus-visible) { outline: none; }',
     /* underline drawn as a line under the button, so it runs unbroken under the handwriting */

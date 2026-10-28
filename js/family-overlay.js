@@ -9,7 +9,7 @@
     '.fo.--open { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity .35s ease, visibility 0s; }',
     '.fo__card { position: relative; width: 100%; height: 100%; background: #fff; border: 1px solid #000; border-radius: 13px; overflow: hidden;',
     '  border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;',
-    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);',
+    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);',
     '  transform: translateY(14px) scale(.985); transition: transform .5s cubic-bezier(.22,1,.36,1); }',
     '.fo.--open .fo__card { transform: none; }',
     '.fo__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #fff; }',

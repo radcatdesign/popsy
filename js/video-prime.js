@@ -1,7 +1,7 @@
 /* Instant hover videos: when a monster with a video is on (or near) the screen, download its
    video file into memory once and point every <video> of that piece at the in-memory copy, so
-   playing starts immediately instead of waiting on the network. Safari / iPhone get the MP4
-   (hardware decoded); other browsers get the smaller WebM. */
+   playing starts immediately instead of waiting on the network. Safari / iPhone get MP4 (HEVC
+   where supported, else H.264; both hardware decoded); other browsers get VP9 WebM. */
 (function () {
   var ua = navigator.userAgent;
   var preferMp4 = /iPad|iPhone|iPod/.test(ua) || (/^((?!chrome|android|crios|fxios).)*safari/i.test(ua));
@@ -15,7 +15,7 @@
     var mp4 = list.filter(function (s) { return /mp4/.test(s.type) || /\.mp4$/i.test(s.src); })[0];
     var webm = list.filter(function (s) { return /webm/.test(s.type) || /\.webm$/i.test(s.src); })[0];
     var okWebm = webm && v.canPlayType('video/webm; codecs="vp9"');
-    if (preferMp4 && mp4) return hd(mp4.src);
+    if (preferMp4 && mp4) return hevc(hd(mp4.src));
     if (okWebm) return hd(webm.src);
     return hd((mp4 || list[0]).src);
   }
@@ -27,8 +27,9 @@
         if (!r.ok) throw new Error('video ' + r.status);
         var total = +r.headers.get('content-length') || 0;
         var report = function (n) { var f = progressFns.get(url); if (f) f(n, total); };
-        // stream it so a preloader can show real progress
-        if (!r.body || !r.body.getReader) return r.blob().then(function (b) { report(b.size); return b; });
+        // stream it chunk by chunk only when something is showing progress; otherwise let the
+        // browser read it in one go (no per-chunk JavaScript competing with the page)
+        if (!progressFns.has(url) || !r.body || !r.body.getReader) return r.blob().then(function (b) { report(b.size); return b; });
         var reader = r.body.getReader(), chunks = [], got = 0;
         var type = r.headers.get('content-type') || '';
         var pump = function () {
@@ -40,6 +41,14 @@
         };
         return pump();
       }).then(function (b) { return URL.createObjectURL(b); }).catch(function (e) { cache.delete(url); throw e; }));
+      var queued = waiting.get(url);
+      if (queued) {
+        waiting.delete(url);
+        // once it's in, hand it over one player at a time when the page is idle
+        cache.get(url).then(function () {
+          queued.forEach(function (v) { idle(function () { if (v.isConnected) prime(v); }); });
+        }).catch(function () {});
+      }
     }
     return cache.get(url);
   }
@@ -57,9 +66,15 @@
     var m = url.match(/\/([a-z]+)\.(webm|mp4)$/i);
     return m && HD.indexOf(m[1].toLowerCase()) > -1 ? url.replace(/\.(webm|mp4)$/i, '-hd.$1') : url;
   }
+  // Safari gets HEVC: Apple hardware decodes it, at about half the size of the H.264 file
+  // (name.hevc.mp4 beside every name.mp4). Anything that can't play it keeps the H.264.
+  var canHevc = !!probe.canPlayType('video/mp4; codecs="hvc1"');
+  function hevc(url) {
+    return canHevc && url && /\.mp4$/i.test(url) && !/\.hevc\.mp4$/i.test(url) ? url.replace(/\.mp4$/i, '.hevc.mp4') : url;
+  }
   function fileFor(webm) {
     var mp4 = webm.replace(/\.webm$/i, '.mp4');
-    if (preferMp4 || !canWebm) return hd(mp4);
+    if (preferMp4 || !canWebm) return hevc(hd(mp4));
     return hd(webm);
   }
 
@@ -80,7 +95,7 @@
     var worker = function () {
       var u = queue.shift();
       if (!u) return Promise.resolve();
-      progressFns.set(u, function (got, total) { bytes[u] = got; if (total) totals[u] = total; tick(); });
+      if (onProgress) progressFns.set(u, function (got, total) { bytes[u] = got; if (total) totals[u] = total; tick(); });
       return load(u).catch(function () {}).then(function () {
         progressFns.delete(u); bytes[u] = true; totals[u] = 0; done++; tick();
         return worker();
@@ -92,10 +107,18 @@
   }
 
   // Point a <video> at the in-memory copy (only while it's idle, so nothing mid-play restarts)
-  function prime(v) {
+  var idle = window.requestIdleCallback ? function (f) { window.requestIdleCallback(f, { timeout: 2000 }); } : function (f) { setTimeout(f, 50); };
+  // lazy: don't start a download for this, just take the copy once something else has fetched it
+  var waiting = new Map(); // url -> [video] waiting for that file
+  function prime(v, lazy) {
     if (!v || v.dataset.primed) return Promise.resolve(v);
     var url = pick(v);
     if (!url) return Promise.resolve(v);
+    if (lazy && !cache.has(url)) {
+      if (!waiting.has(url)) waiting.set(url, []);
+      waiting.get(url).push(v);
+      return Promise.resolve(v);
+    }
     v.dataset.primed = 'pending';
     return load(url).then(function (blobUrl) {
       var apply = function () {

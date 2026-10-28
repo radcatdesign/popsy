@@ -11,7 +11,7 @@
     '  display: flex; flex-direction: column; text-align: left; overflow: hidden;',
     '  background: #fff; border: 1px solid #000; border-radius: 13px; padding: 30px 34px 24px;',
     '  border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;',
-    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.png);',
+    '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);',
     '  transform: translateY(14px) scale(.97); transition: transform .45s cubic-bezier(.22,1,.36,1); }',
     'body[data-about-open="t"] .about-popup-w .about-popup { transform: none; }',
     '.about-popup .ap-title { font-size: 34px; line-height: 1.1; margin: 0 44px 14px 0; font-weight: normal; }',
