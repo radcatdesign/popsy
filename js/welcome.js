@@ -14,14 +14,23 @@
     '  background: rgba(255,255,255,.9); opacity: 0; pointer-events: none; transition: opacity .35s ease; }',
     '.pw-welcome.--open { opacity: 1; pointer-events: auto; }',
     '.pw-welcome__card { position: relative; width: min(540px, 100%); max-height: calc(100svh - 48px); overflow-y: auto; scrollbar-width: none;',
-    '  background: #fff; border: 1px solid #000; border-radius: 13px; padding: 32px 34px 28px; text-align: left;',
+    '  background: #fff; border: 1px solid #000; border-radius: 13px; padding: 26px 34px 28px; text-align: center;',
     '  border-image-outset: 1px; border-image-width: 30px; border-image-slice: 25; border-image-repeat: stretch;',
     '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);',
     '  transform: translateY(16px) scale(.97); transition: transform .5s cubic-bezier(.22,1,.36,1); }',
     '.pw-welcome.--open .pw-welcome__card { transform: none; }',
-    '.pw-welcome__title { font-size: 34px; line-height: 1.1; margin: 0 44px 16px 0; font-weight: normal; }',
-    '.pw-welcome__body p { font-size: 18px; line-height: 1.5; margin: 0 0 12px; }',
-    '.pw-welcome__actions { display: flex; align-items: center; gap: 22px; margin-top: 8px; flex-wrap: wrap; }',
+    /* Tav, waving hello: his photo, with his animation looping over it once it's loaded */
+    '.pw-welcome__monster { position: relative; width: 150px; height: 150px; margin: 0 auto 4px; }',
+    '.pw-welcome__monster img, .pw-welcome__monster video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }',
+    '.pw-welcome__monster video { opacity: 0; transform: scale(1.097); transition: opacity .3s ease; }',
+    '.pw-welcome__monster.--moving video { opacity: 1; }',
+    '.pw-welcome__monster img { transition: opacity .3s ease .1s; }',
+    '.pw-welcome__monster.--moving img { opacity: 0; }',
+    '.pw-welcome.--open .pw-welcome__monster { animation: pw-hello .7s cubic-bezier(.34,1.56,.64,1) .1s both; }',
+    '@keyframes pw-hello { from { opacity: 0; transform: translateY(14px) scale(.7) rotate(-6deg); } to { opacity: 1; transform: none; } }',
+    '.pw-welcome__title { font-size: 34px; line-height: 1.1; margin: 0 30px 14px; font-weight: normal; }',
+    '.pw-welcome__body p { font-size: 18px; line-height: 1.5; margin: 0 auto 10px; max-width: 400px; }',
+    '.pw-welcome__actions { display: flex; align-items: center; justify-content: center; gap: 22px; margin-top: 12px; flex-wrap: wrap; }',
     '.pw-welcome__go { appearance: none; font: inherit; font-size: 20px; cursor: pointer; padding: 10px 26px; border-radius: 8px;',
     '  background: #000; color: #fff; border: 1px solid transparent; transition: transform .2s ease;',
     '  border-image-outset: 3px; border-image-width: 30px; border-image-slice: 15; border-image-repeat: stretch;',
@@ -36,7 +45,8 @@
     '.pw-welcome__close:focus:not(:focus-visible) { outline: none; }',
     '@media (max-width: 760px) {',
     '  .pw-welcome { padding: 14px; }',
-    '  .pw-welcome__card { padding: 24px 22px 22px; }',
+    '  .pw-welcome__card { padding: 20px 22px 22px; }',
+    '  .pw-welcome__monster { width: 124px; height: 124px; }',
     '  .pw-welcome__title { font-size: 28px; }',
     '  .pw-welcome__body p { font-size: 16px; }',
     '  .pw-welcome__go { flex: 1 1 auto; text-align: center; }',
@@ -56,11 +66,12 @@
     root.innerHTML =
       '<div class="pw-welcome__card">' +
       '<button class="pw-welcome__close" type="button" aria-label="Close"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"><path d="M18.4 5.8 5.6 18.3"/><path d="M5.7 5.6l12.7 12.9"/></svg></button>' +
+      '<div class="pw-welcome__monster" aria-hidden="true"><img alt="" src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f019faaba6b5564a51d31d_30-Big.webp"><video muted loop playsinline></video></div>' +
       '<h2 class="pw-welcome__title" id="pw-welcome-title">Meet the monsters</h2>' +
       '<div class="pw-welcome__body">' +
-      '<p>Popsy Loves You is an art series by Brandon Kaufer, aka Popsy Wolf.</p>' +
-      '<p>Every piece is a clay monster, and every monster is a feeling we usually push down. The anxious one. The sad one. The scared one. The one that just wants to play.</p>' +
-      '<p>They have names, families and stories, and every one of them is looking to be adopted.</p>' +
+      '<p>An art series by Brandon Kaufer, aka Popsy Wolf.</p>' +
+      '<p>Every clay monster here is a feeling we usually push down. The anxious one, the sad one, the one that just wants to play.</p>' +
+      '<p>And they’re all looking for a home.</p>' +
       '</div>' +
       '<div class="pw-welcome__actions">' +
       '<button class="pw-welcome__go" type="button" data-act="go">Meet them</button>' +
@@ -102,6 +113,15 @@
     if (!root) build();
     try { localStorage.setItem(KEY, '1'); } catch (e) {}
     root.classList.add('--open');
+    var mon = root.querySelector('.pw-welcome__monster'), mv = mon.querySelector('video'), PV = window.PopsyVideo;
+    if (!mv.getAttribute('src')) {
+      mv.muted = true;
+      var file = PV ? PV.fileFor('assets/hover/tav.webm') : 'assets/hover/tav.mp4';
+      Promise.resolve(PV ? PV.load(file) : file).then(function (url) {
+        mv.src = url;
+        return mv.play();
+      }).then(function () { mon.classList.add('--moving'); }).catch(function () {});
+    } else { mv.play().catch(function () {}); }
     var W = window.PopsyWrite;
     if (W) {
       var items = [{ el: root.querySelector('.pw-welcome__title'), title: true }];
@@ -115,6 +135,8 @@
   function close() {
     if (!root) return;
     root.classList.remove('--open');
+    var mv = root.querySelector('.pw-welcome__monster video');
+    if (mv) setTimeout(function () { mv.pause(); }, 400);
   }
 
   // after the grid has built itself (body[data-started="true"]), give it a moment, then say hi
