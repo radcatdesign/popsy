@@ -127,5 +127,26 @@
     });
   }
 
-  window.PopsyVideo = { prime: prime, watch: watch, pick: pick, fileFor: fileFor, preloadAll: preloadAll, load: load };
+  // Phones can only run a handful of video players at once, so there only tiles on or near the
+  // screen get one, and it's handed back once the tile is well off screen (the file itself stays
+  // in memory, so coming back is instant).
+  var near = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var v = e.target.tagName === 'VIDEO' ? e.target : e.target.querySelector('video');
+      if (!v) return;
+      if (e.isIntersecting) { prime(v); return; }
+      if (v.dataset.primed === 'done' && v.paused) {
+        v.removeAttribute('src');
+        v.load();
+        delete v.dataset.primed;
+      }
+    });
+  }, { rootMargin: '60% 0px' }) : null;
+  function watchNear(els) {
+    if (!near) return watch(els);
+    [].forEach.call(els || [], function (el) { near.observe(el); });
+  }
+  function forget(els) { if (near) [].forEach.call(els || [], function (el) { near.unobserve(el); }); }
+
+  window.PopsyVideo = { prime: prime, watch: watch, watchNear: watchNear, forget: forget, pick: pick, fileFor: fileFor, preloadAll: preloadAll, load: load };
 })();

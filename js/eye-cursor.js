@@ -20,8 +20,9 @@
   var SIZE = FINE ? 34 : 44;           // CSS px
   var style = document.createElement('style');
   style.textContent = [
+    /* above the grid and its buttons, behind every popup (piece, about, family tree) */
     '.eye-cursor-el { position: fixed; left: 0; top: 0; width: ' + SIZE + 'px; height: ' + SIZE + 'px; margin: -' + SIZE / 2 + 'px 0 0 -' + SIZE / 2 + 'px;',
-    '  pointer-events: none; z-index: 2147483647; opacity: 0; transition: opacity .2s ease; will-change: transform; }',
+    '  pointer-events: none; z-index: 50000; opacity: 0; transition: opacity .2s ease; will-change: transform; }',
     '.eye-cursor-el.--on { opacity: 1; }',
     '.eye-cursor-el .ec-size { position: relative; width: 100%; height: 100%; transition: transform .25s cubic-bezier(.34,1.56,.64,1); transform-origin: 50% 50%; }',
     '.eye-cursor-el.--hover .ec-size { transform: scale(1.35); }',

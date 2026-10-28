@@ -2752,6 +2752,9 @@ a {
         gsap.to(product, { opacity: 0, duration: 0.5, ease: "power2.in" })
       });
       window.setTimeout(() => {
+        // hand the old tiles' video players back before they go (phones only have a few)
+        grid.querySelectorAll('video').forEach(v => { v.pause(); v.removeAttribute('src'); v.load(); });
+        if (window.PopsyVideo && window.PopsyVideo.forget) window.PopsyVideo.forget(grid.querySelectorAll('.product'));
         Array.from(grid.children).forEach(c => c.remove());
         window.setTimeout(() => {
           initGrid();
@@ -3056,6 +3059,8 @@ a {
       observer.disconnect();
       const filter = document.body.dataset.filter;
       const items = window.items.filter(p => p.id !== 'popsy-wolf' && (!filter || p.category === filter));
+      list.querySelectorAll('video').forEach(v => { v.pause(); v.removeAttribute('src'); v.load(); });
+      if (window.PopsyVideo && window.PopsyVideo.forget) window.PopsyVideo.forget(list.querySelectorAll('.sv-item'));
       list.innerHTML = items.map(item => {
         const name = plain(item.name);
         const m = name.match(/^(.*?)\s*([“"].*[”"])\s*$/);
@@ -3073,7 +3078,11 @@ a {
       }).join('');
       list.querySelectorAll('video').forEach(v => { v.muted = true; });
       list.querySelectorAll('.sv-item').forEach(sec => observer.observe(sec));
-      if (window.PopsyVideo) list.querySelectorAll('video').forEach(v => window.PopsyVideo.prime(v));
+      if (window.PopsyVideo) {
+        // the feed is phones: players only for pieces near the screen
+        list.querySelectorAll('video').forEach(v => { v.pause(); });
+        window.PopsyVideo.watchNear(list.querySelectorAll('.sv-item'));
+      }
       el.scrollTop = 0;
     }
     function show() {
@@ -3259,7 +3268,11 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
         gsap.to(ov, { opacity: 0, duration: 0.3, ease: 'power1.out', onComplete: () => ov.remove() })
       }
       // every video is in memory by now: hand the tiles their copies while the build-out plays
-      if (this.videosReady && window.PopsyVideo) this.grid.querySelectorAll('.product video').forEach(v => window.PopsyVideo.prime(v))
+      if (this.videosReady && window.PopsyVideo) {
+        // phones: players only for tiles near the screen; desktop: every tile, ready to hover
+        if (this.touchMode) window.PopsyVideo.watchNear(this.grid.querySelectorAll('.product'))
+        else this.grid.querySelectorAll('.product video').forEach(v => window.PopsyVideo.prime(v))
+      }
       const vw = window.innerWidth, vh = window.innerHeight
       const lr = this.logoDiv ? this.logoDiv.getBoundingClientRect() : null
       const cx = lr ? lr.left + lr.width / 2 : vw / 2
@@ -3685,7 +3698,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       // once the preloader has them all in memory, hand every tile its copy right away;
       // otherwise grab them as tiles come near the screen
       if (window.PopsyVideo) {
-        if (this.videosReady) this.grid.querySelectorAll('.product video').forEach(v => window.PopsyVideo.prime(v))
+        if (this.touchMode) window.PopsyVideo.watchNear(this.grid.querySelectorAll('.product'))
+        else if (this.videosReady) this.grid.querySelectorAll('.product video').forEach(v => window.PopsyVideo.prime(v))
         else window.PopsyVideo.watch(this.grid.querySelectorAll('.product'))
       }
       // Hover only on devices with a mouse/trackpad (any window width); touch screens skip it
