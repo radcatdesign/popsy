@@ -808,10 +808,17 @@ a {
   /* dragging the grid should never pick up a picture or select text */
   .grid img, .grid video { -webkit-user-drag: none; user-drag: none; }
   .grid { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  /* Grid lines sit above the tile's own content, so a scaled-up video can't paint over them.
+     As the grid builds out they draw in, rippling out from the logo: verticals grow from their
+     middle, horizontals from their middle too. */
   .grid .column .product::before,
   .grid .product::after {
-    opacity: var(--lo, 1);
+    z-index: 5;
+    pointer-events: none;
+    opacity: min(1, calc(var(--lo, 1) * 3));
   }
+  .grid .column .product::before { transform: scaleY(var(--lo, 1)); transform-origin: 50% 50%; }
+  .grid .product::after { transform: scaleX(var(--lo, 1)); transform-origin: 50% 50%; }
   body:not([data-started]) .grid .product { --lo: 0; }
   .about-link, .family-link { transition: opacity 0.6s ease; }
   /* the interface stays hidden until the grid starts building out, then animates in (see animateUI) */
@@ -1032,7 +1039,7 @@ a {
   .sv-item.--in .sv-caption > :nth-child(4) { transition-delay: 0.21s; }
   .sv-item.--in .sv-caption > :nth-child(5) { transition-delay: 0.28s; }
   /* already has a home: a little hand-drawn tag above the Details button */
-  .sv-adopted { margin: 8px 0 0; }
+  .sv-adopted { margin: 0 0 6px; }
   .sv-adopted span {
     display: inline-block; font-size: 15px; line-height: 1; padding: 6px 14px 5px; transform: rotate(-3deg);
     background: #fff; color: #000; border: 1px solid #000; border-radius: 13px;
@@ -3251,10 +3258,10 @@ a {
           '<div class="sv-media"><img src="' + esc(item.img) + '" alt="' + esc(name) + '" loading="lazy">' + video +
           (video ? '<button class="sv-replay" type="button" aria-label="Play ' + esc(name) + ' again">' + REPLAY_ICON + '</button>' : '') + '</div>' +
           '<div class="sv-caption">' +
+          (window.PopsyAdopted && window.PopsyAdopted(name) ? '<p class="sv-adopted"><span>Adopted</span></p>' : '') +
           '<h3 class="sv-name">' + esc(title) + '</h3>' +
           (nick ? '<p class="sv-nick">' + esc(nick) + '</p>' : '') +
           (item.size ? '<p class="sv-size">' + esc(item.size) + '</p>' : '') +
-          (window.PopsyAdopted && window.PopsyAdopted(name) ? '<p class="sv-adopted"><span>Adopted</span></p>' : '') +
           '<button class="sv-btn" type="button" data-id="' + esc(item.id) + '">Details</button>' +
           '</div></section>';
       }).join('');
@@ -3496,7 +3503,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       this.grid.querySelectorAll('.product').forEach(pr => {
         const r = pr.getBoundingClientRect()
         const k = Math.min(Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy) / reach, 1.1)
-        tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.6, ease: 'power2.out' }, k * 0.65)
+        tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.9, ease: 'power3.inOut' }, k * 0.65)
         const div = pr.firstElementChild
         if (!div || div === this.logoDiv) return
         tl.fromTo(div, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)' }, 0.2 + k * 0.8)
@@ -4257,7 +4264,7 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
       }, { x: 0, y: 0, scale: 1, duration: 1.1, ease: 'power3.inOut', onComplete: () => { cols[k].style.zIndex = '' } }, k * 0.06)
     })
     grid.grid.querySelectorAll('.product').forEach(pr => {
-      tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.6, ease: 'power2.out' }, 0.9)
+      tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.9, ease: 'power3.inOut' }, 0.9)
       const d = pr.firstElementChild
       if (!d || placed.has(d)) return
       tl.fromTo(d, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.8 + Math.random() * 0.3)
