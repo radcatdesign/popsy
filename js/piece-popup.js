@@ -37,6 +37,7 @@
     '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3b6987922f881509d_border2.png); }',
     '.pp__btn:hover { transform: rotate(-1.5deg); }',
     '.pp__btn[disabled] { opacity: .6; transform: none; }',
+    '.pp__btn.--adopted, .pp__btn.--adopted:hover { opacity: .45; cursor: default; transform: none; }',
     '.pp__close:focus:not(:focus-visible) { outline: none; }',
     '.pp__close { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;',
     '  cursor: pointer; background: none; border: 0; padding: 0; z-index: 2; }',
@@ -64,6 +65,10 @@
 
   var root, card, media, imgEl, videoEl, titleEl, metaEl, textEl, infoView, formView, doneView, form, note, sendBtn;
   var current = null, onCloseCb = null, lastFocus = null;
+
+  // pieces that already have a home: the button says so and can't be used
+  var ADOPTED = ['Moro', 'Gumphrey', 'Tiv', 'Stubbs', 'Craig', 'Ned', 'Tav', 'Murn', 'Noshik', 'Droozle', 'Dremmel', 'Gabbles', 'Hortencia'];
+  function isAdopted(name) { return ADOPTED.indexOf(String(name).trim().split(/\s+/)[0]) !== -1; }
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function plain(html) { var d = document.createElement('div'); d.innerHTML = html || ''; return d.textContent; }
@@ -167,6 +172,11 @@
     lastFocus = document.activeElement;
     var name = plain(item.name);
     titleEl.textContent = name;
+    var inq = infoView.querySelector('[data-action="inquire"]');
+    var adopted = isAdopted(name);
+    inq.textContent = adopted ? 'Adopted' : 'Inquire';
+    inq.disabled = adopted;
+    inq.classList.toggle('--adopted', adopted);
     root.querySelector('.pp__form-title').textContent = 'Inquire about ' + name.replace(/\s*[“"].*$/, '');
     var meta = [];
     if (item.price) meta.push('$' + esc(item.price));
