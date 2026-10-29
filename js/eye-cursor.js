@@ -387,6 +387,8 @@
     // Keep asking on taps until there's an answer (a tap that doesn't count just fails quietly).
     var D = window.DeviceOrientationEvent, needsAsk = !!(D && typeof D.requestPermission === 'function'), answered = false, sensing = false;
     var pending = false, wantRoll = false;
+    // the welcome popup's "Meet them" asks too; once it's answered, the eye stops asking
+    window.addEventListener('popsy:motion', function (e) { answered = true; if (e.detail !== 'granted') needsAsk = false; });
     el.addEventListener('click', function (e) {
       e.stopPropagation();
       blink();

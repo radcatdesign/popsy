@@ -101,11 +101,16 @@
 
   // Phones: "Meet them" is a tap, the one moment iPhones let a site ask for the motion sensors,
   // so ask here; the eye then tilts with the phone (Android needs no ask)
+  // (only iPhones and iPads have requestPermission, so no other check: iPads with a keyboard or
+  // trackpad don't report a touch pointer and would otherwise never be asked)
   function askMotion() {
     var D = window.DeviceOrientationEvent;
     if (!D || typeof D.requestPermission !== 'function') return;
-    if (!window.matchMedia('(pointer: coarse)').matches) return;
-    try { D.requestPermission().catch(function () {}); } catch (e) {}
+    try {
+      D.requestPermission().then(function (r) {
+        window.dispatchEvent(new CustomEvent('popsy:motion', { detail: r }));
+      }).catch(function () {});
+    } catch (e) {}
   }
 
   function open() {
