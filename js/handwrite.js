@@ -150,16 +150,22 @@
     return t;
   }
 
-  // Text links write themselves out again when you hover them (mouse / trackpad only). Only the
+  // Text links and buttons write themselves out again when you hover them (mouse / trackpad only). Only the
   // link's own words are rewritten, so icons inside a link (the back arrow) stay put.
-  var HOVER = '.about-link, .family-link, .back-link, .pw-welcome__story, .bar a, .scroll-hint, [data-pw-hover]';
+  var HOVER = '.about-link, .family-link, .back-link, .pw-welcome__story, .bar a, .scroll-hint, button, .filter-btn, [data-pw-hover]';
   function hoverTarget(el) {
     if (el._pwTarget) return el._pwTarget;
     var kids = [].slice.call(el.childNodes), elems = kids.filter(function (n) { return n.nodeType === 1; });
     var target = el;
     if (elems.length && !elems.every(function (n) { return n.classList && (n.classList.contains('pw-w') || n.classList.contains('pw-c')); })) {
       var txt = kids.filter(function (n) { return n.nodeType === 3 && n.nodeValue.trim(); })[0];
-      if (!txt) return null;
+      if (!txt) {
+        // label inside a wrapper (a filter pill): use the first element that holds only words
+        var leaf = [].filter.call(el.querySelectorAll('*'), function (n) {
+          return !n.children.length && n.textContent.trim() && !/^(STYLE|SCRIPT|svg|path)$/.test(n.tagName);
+        })[0];
+        return (el._pwTarget = leaf || null);
+      }
       target = document.createElement('span');
       target.className = 'pw-hover';
       txt.parentNode.replaceChild(target, txt);

@@ -36,7 +36,7 @@
       bio: 'Ollie has his hands up before anyone has raised their voice. He surrenders early and often, agrees with whoever spoke last, and has never once won an argument because he has never once started one. Peace at any price, and he is usually the one paying. He is gentle, funny and very good at reading a room, mostly so he can leave it. Somewhere in there is an opinion. It has been waiting a long time for the room to feel safe enough to come out.' },
     { n: 16, id: 'violetta', parent: 'pigpen', name: 'Violetta Glimmerwick “The Reach”',
       bio: 'Violetta is always reaching. For the next thing, the better thing, the thing on the top shelf. Arms up, mouth open, already halfway out of the bowl. She is glamorous and hungry and absolutely sure the good part is just past where she is now. She has had a lot of good parts. She did not stay for most of them. The Glimmerwicks admire her ambition and worry about her a little. What Violetta has not tried yet is putting her arms down and seeing what is already in reach.' },
-    { n: 17, id: 'clatter', parent: 'plink', name: 'Clatter Roarborn “The Loud Yes”',
+    { n: 17, id: 'clatter', file: 'clatter', parent: 'plink', name: 'Clatter Roarborn “The Loud Yes”',
       bio: 'Clatter says yes to everything, loudly, with both arms in the air. Yes to the trip, yes to the favor, yes to the second dessert and the third. He loves being the one who is always up for it. Saying no feels to him like closing a door that might never open again. His calendar is a disaster and his heart is enormous. Every so often Clatter finds himself somewhere he never wanted to be, cheering, because he did not know how to say otherwise.' },
     { n: 18, id: 'grimbly', parent: 'peepers', name: 'Grimbly Dirtle “The Brace”',
       bio: 'Grimbly is always bracing for impact. Teeth clenched, shoulders up, ready for the bad news before anyone opens their mouth. Most days the bad news never comes, and he stays braced anyway, just in case. It is tiring to be ready all the time. He would know. Grimbly is not grumpy, whatever his face says. He is just very, very prepared. The family keeps telling him he can relax. He keeps saying he will, right after this.' },
@@ -60,7 +60,7 @@
   batch.forEach(function (b) {
     if (taken[b.n]) return;
     // img for the grid, image for the family tree; video so the tree plays it too (the grid maps it itself)
-    var photo = PH + b.n + '-Big.webp', video = 'assets/hover/piece-' + b.n + '.webm';
+    var photo = PH + b.n + '-Big.webp', video = 'assets/hover/' + (b.file || 'piece-' + b.n) + '.webm';
     window.items.push({ id: b.id, name: b.name, img: photo, image: photo, price: '', color: '', size: '', description: b.bio,
       category: 'monsters', parent: b.parent, label: '', video: video });
   });
