@@ -5,6 +5,7 @@
    visitor's email app opens with everything filled in so nothing gets lost. */
 (function () {
   var INQUIRY_TO = 'brandonmkaufer@gmail.com';
+  var INQUIRY_CC = 'andre@radcat.design';   // gets a copy of every inquiry
 
   var css = [
     '.pp { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px;',
@@ -251,7 +252,7 @@
 
   function mailtoFallback(data) {
     var body = data.message + '\n\n' + data.name + '\n' + data.email + '\n\nPiece: ' + data.piece + (data.url ? '\n' + data.url : '');
-    window.location.href = 'mailto:' + INQUIRY_TO + '?subject=' + encodeURIComponent('Inquiry: ' + data.piece) + '&body=' + encodeURIComponent(body);
+    window.location.href = 'mailto:' + INQUIRY_TO + '?cc=' + encodeURIComponent(INQUIRY_CC) + '&subject=' + encodeURIComponent('Inquiry: ' + data.piece) + '&body=' + encodeURIComponent(body);
   }
 
   function submit(e) {
@@ -310,6 +311,7 @@
         _replyto: data.email,
         _template: 'table',
         _captcha: 'false',
+        _cc: INQUIRY_CC,
         Piece: data.piece,
         Name: data.name,
         Email: data.email,

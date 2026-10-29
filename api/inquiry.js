@@ -1,6 +1,7 @@
 // Piece inquiries from the site's popup form.
 // Sends an email to Brandon through Resend when RESEND_API_KEY is set in the Vercel project.
-// Optional: INQUIRY_TO (defaults to brandonmkaufer@gmail.com) and INQUIRY_FROM
+// Optional: INQUIRY_TO (defaults to brandonmkaufer@gmail.com), INQUIRY_CC (defaults to
+// andre@radcat.design; comma-separated for more) and INQUIRY_FROM
 // (a sender on a domain verified in Resend, e.g. "Popsy Loves You <hello@popsylovesyou.com>").
 // Without a key it answers 501 and the site falls back to opening the visitor's email app.
 
@@ -32,6 +33,7 @@ module.exports = async (req, res) => {
   if (!key) return res.status(501).json({ ok: false, error: 'not_configured' });
 
   const to = process.env.INQUIRY_TO || 'brandonmkaufer@gmail.com';
+  const cc = (process.env.INQUIRY_CC || 'andre@radcat.design').split(',').map(x => x.trim()).filter(Boolean);
   const from = process.env.INQUIRY_FROM || 'Popsy Loves You <onboarding@resend.dev>';
   const text = `${message}\n\nFrom: ${name} <${email}>\nPiece: ${piece}${url ? `\nPage: ${url}` : ''}`;
 
@@ -39,7 +41,7 @@ module.exports = async (req, res) => {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], reply_to: email, subject: `Inquiry: ${piece}`, text }),
+      body: JSON.stringify({ from, to: [to], cc, reply_to: email, subject: `Inquiry: ${piece}`, text }),
     });
     if (!r.ok) return res.status(502).json({ ok: false, error: 'send_failed' });
     return res.status(200).json({ ok: true });
