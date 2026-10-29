@@ -272,27 +272,53 @@
     }
     sendBtn.disabled = true;
     note.textContent = 'Sending…';
+    var thanks = function () {
+      root.querySelector('.pp__done').textContent = 'Thanks, ' + data.name.split(' ')[0] + '. Brandon will get back to you at ' + data.email + '.';
+      show('done');
+    };
+    var handOff = function () {
+      // nothing could send it: hand it to the visitor's email app
+      note.textContent = 'Opening your email app to send it…';
+      sendBtn.disabled = false;
+      mailtoFallback(data);
+    };
     fetch('/api/inquiry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, status: r.status, j: j }; }); })
       .then(function (res) {
-        if (res.ok && res.j && res.j.ok) {
-          root.querySelector('.pp__done').textContent = 'Thanks, ' + data.name.split(' ')[0] + '. Brandon will get back to you at ' + data.email + '.';
-          show('done');
-        } else if (res.status === 400) {
+        if (res.ok && res.j && res.j.ok) return thanks();
+        if (res.status === 400) {
           note.textContent = (res.j && res.j.error) || 'Check the form and try again.';
           sendBtn.disabled = false;
-        } else {
-          // direct sending isn't set up (or failed): hand it to the visitor's email app
-          note.textContent = 'Opening your email app to send it…';
-          sendBtn.disabled = false;
-          mailtoFallback(data);
+          return;
         }
+        // the site's own sender (Resend) isn't set up: FormSubmit emails it straight to Brandon
+        return viaFormSubmit(data).then(function (sent) { if (sent) thanks(); else handOff(); });
       })
-      .catch(function () {
-        note.textContent = 'Opening your email app to send it…';
-        sendBtn.disabled = false;
-        mailtoFallback(data);
-      });
+      .catch(function () { viaFormSubmit(data).then(function (sent) { if (sent) thanks(); else handOff(); }); });
+  }
+
+  // FormSubmit (formsubmit.co): a free form-to-email service, no account or key. The very first
+  // inquiry sends Brandon an "Activate Form" email; once he clicks it, inquiries land in his inbox.
+  // Resolves true once it's sent; false if it can't (not activated yet, offline, etc.)
+  function viaFormSubmit(data) {
+    if (data.website) return Promise.resolve(true);   // a bot filled the hidden field: pretend
+    return fetch('https://formsubmit.co/ajax/' + INQUIRY_TO, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        _subject: 'Popsy inquiry: ' + data.piece,
+        _replyto: data.email,
+        _template: 'table',
+        _captcha: 'false',
+        Piece: data.piece,
+        Name: data.name,
+        Email: data.email,
+        Message: data.message,
+        Page: data.url
+      })
+    }).then(function (r) { return r.json(); })
+      .then(function (j) { return !!j && (j.success === true || j.success === 'true'); })
+      .catch(function () { return false; });
   }
 
   window.PiecePopup = { open: open, close: close };
