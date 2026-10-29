@@ -2653,7 +2653,7 @@ a {
     '25-Big': { file: 'gorble' }, '19-Big': { file: 'gumphrey' }, '21-Big': { file: 'noshik' },
     'M_F-17': { file: 'marnie' }, 'M_F-21': { file: 'peepers', zoom: 1.169 },
     'M_F-18': { file: 'ziggo', zoom: 1.279 }, '30-Big': { file: 'tav', zoom: 1.097 }, '28-Big': { file: 'tiv', zoom: 1.156 },
-    '20-Big': { file: 'tessik' },
+    '20-Big': { file: 'tessik', zoom: 1.14 },
     // the October 2026 batch: piece-N plays for the photo N-Big (they start working as soon as a
     // CMS item uses that photo)
     '1-Big': { file: 'piece-1' }, '3-Big': { file: 'piece-3' }, '4-Big': { file: 'piece-4' }, '6-Big': { file: 'piece-6' },
@@ -3249,10 +3249,11 @@ a {
     const logoAt = (x, y) => {
       if (document.body.dataset.view !== 'grid' || !document.body.dataset.started) return null;
       if (document.querySelector('.pp.--open') || document.body.dataset.aboutOpen === 't') return null;
+      // anywhere on the logo's whole tile counts, out to its grid lines (2.5vw past the piece)
+      const g = innerWidth * 0.025;
       const hit = logoTiles().find(d => {
-        const r = rectOf(d), k = 0.4; // the drawn logo, not the whole cell
-        return x > r.left + r.width * (0.5 - k) && x < r.right - r.width * (0.5 - k) &&
-          y > r.top + r.height * (0.5 - k) && y < r.bottom - r.height * (0.5 - k);
+        const r = rectOf(d.closest('.product') || d);
+        return x >= r.left - g && x <= r.right + g && y >= r.top - g && y <= r.bottom + g;
       });
       return hit || null;
     };
