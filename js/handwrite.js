@@ -1,8 +1,8 @@
-/* Handwritten text: everything inks in left to right, fast, like a pen racing across the page.
-   Titles write letter by letter; longer text writes a line at a time, each line swept word by
-   word, so a whole bio still lands in under two seconds.
+/* Handwritten text: titles, labels and links ink in left to right, like a pen racing across
+   the page. Titles write letter by letter; short text sweeps word by word; body text (bios,
+   stories, anything longer than a label) just fades up.
      PopsyWrite.write(el, delay)   -> a title, letter by letter; returns the time it ends (s)
-     PopsyWrite.block(el, delay)   -> any text (keeps its markup), line by line; returns the end
+     PopsyWrite.block(el, delay)   -> short text word by word (keeps markup); body text fades
      PopsyWrite.rise(els, delay)   -> a box (a button's outline) fades up as its label writes */
 (function () {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -50,13 +50,25 @@
     return delay + (n - 1) * step + dur;
   }
 
-  // Any text: every word gets wrapped (markup stays), then each line is swept left to right.
+  // Body text (anything longer than a short label): fades up instead of writing itself
+  var BODY = 60, FADE = '.pw-welcome__body p, .pp__text, .about-space, .pp__done, [data-pw-fade]';
+  function fade(el, delay) {
+    el.classList.remove('pw-on');
+    if (el._pwFade) el._pwFade.cancel();
+    el._pwFade = el.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }],
+      { duration: 650, delay: delay * 1000, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });
+    return delay + 0.25;   // what follows starts writing as the fade gets going
+  }
+
+  // Short text (a price line, a tag, a button label): every word gets wrapped (markup stays),
+  // then each line is swept left to right. Longer body text fades instead (see fade).
   // Lines start ~0.1s apart; lines past the first screenful all go at once.
   function block(el, delay, opts) {
     if (!el) return delay || 0;
     delay = delay || 0;
     if (reduce) return delay;
     opts = opts || {};
+    if (el.matches(FADE) || el.textContent.trim().length > BODY) return fade(el, delay);
     if (!el.querySelector('.pw-c') || el.dataset.pwText !== el.textContent) {
       var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
         acceptNode: function (n) { return n.parentNode.closest('input, textarea, select, svg, .pw-c') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
@@ -138,5 +150,34 @@
     return t;
   }
 
-  window.PopsyWrite = { write: write, block: block, rise: rise, sequence: sequence, reduce: reduce };
+  // Text links write themselves out again when you hover them (mouse / trackpad only). Only the
+  // link's own words are rewritten, so icons inside a link (the back arrow) stay put.
+  var HOVER = '.about-link, .family-link, .back-link, .pw-welcome__story, .bar a, .scroll-hint, [data-pw-hover]';
+  function hoverTarget(el) {
+    if (el._pwTarget) return el._pwTarget;
+    var kids = [].slice.call(el.childNodes), elems = kids.filter(function (n) { return n.nodeType === 1; });
+    var target = el;
+    if (elems.length && !elems.every(function (n) { return n.classList && (n.classList.contains('pw-w') || n.classList.contains('pw-c')); })) {
+      var txt = kids.filter(function (n) { return n.nodeType === 3 && n.nodeValue.trim(); })[0];
+      if (!txt) return null;
+      target = document.createElement('span');
+      target.className = 'pw-hover';
+      txt.parentNode.replaceChild(target, txt);
+      target.textContent = txt.nodeValue;
+    }
+    return (el._pwTarget = target);
+  }
+  if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest && e.target.closest(HOVER);
+      if (!el || (e.relatedTarget && el.contains(e.relatedTarget))) return;
+      var now = performance.now();
+      if (el._pwAt && now - el._pwAt < 400) return;   // don't restart it while it's still writing
+      el._pwAt = now;
+      var t = hoverTarget(el);
+      if (t) write(t, 0);
+    });
+  }
+
+  window.PopsyWrite = { write: write, block: block, fade: fade, rise: rise, sequence: sequence, reduce: reduce };
 })();
