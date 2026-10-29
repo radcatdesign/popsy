@@ -4,7 +4,7 @@
    price, size, video. Inquiries POST to /api/inquiry; if that isn't set up yet, the
    visitor's email app opens with everything filled in so nothing gets lost. */
 (function () {
-  var INQUIRY_TO = 'brandon@socialgoodclub.com';
+  var INQUIRY_TO = 'brandonmkaufer@gmail.com';
 
   var css = [
     '.pp { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px;',
