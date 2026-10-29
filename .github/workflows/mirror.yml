@@ -14,6 +14,8 @@ jobs:
       - run: bash scripts/mirror.sh
       - run: pip install pillow
       - run: python3 scripts/splice.py _mirror
+      # the plain-text guides for AI tools (llms.txt, llms-full.txt) follow the new CMS content
+      - run: node scripts/build-llms.js
       - run: |
           rm -rf _mirror
           git config user.name "popsy-sync"

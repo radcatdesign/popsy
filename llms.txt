@@ -1,0 +1,80 @@
+# Popsy Loves You
+
+> Popsy Loves You is an art series by Brandon Kaufer, also known as Popsy Wolf: handmade ceramic (clay) monsters, each one a feeling we usually push down, like the anxious one, the sad one, or the one that just wants to play. Every monster has a name, a family and a story, and they are all looking for a home.
+
+- Artist: Brandon Kaufer (aka Popsy Wolf)
+- Website: https://popsy-neon.vercel.app/
+- Family tree: https://popsy-neon.vercel.app/family
+- Monsters: 57 (44 available to adopt, 13 adopted)
+- Families: Dirtle, Glimmerwick, Roarborn. The family tree starts with Popsy and runs down through the generations.
+- Adopting: open any available monster on the site and use Inquire to message Brandon.
+- Site design and build: RADCAT (https://radcat.design)
+
+## How it started
+
+Brandon took a ceramics class after his therapist told him to get a hobby. A piece he was making grew a face with an expression of pure panic, and within months he had a storage unit full of monsters. He realized they were the parts of himself that showed up every time he said "no problem", his grandfather's answer to everything. The series is about meeting those gremlins and turning them into friendly monsters.
+
+## The monsters
+
+- Bodie Dirtle "The Good Sport" (Dirtle, available), child of Darlene Dirtle
+- Brindle Dirtle "The Holder of Everything" (Dirtle, available), child of Stubbs Dirtle
+- Craig Dirtle "The Reliable Wildcard" (Dirtle, adopted), child of Siddles Dirtle
+- Darlene Dirtle "gimme 5" (Dirtle, available), child of Marnie Dirtle
+- Dremmel Dirtle "The Realization In Progress" (Dirtle, adopted), child of Fennick Dirtle
+- Fennick Dirtle "The Over-Observer" (Dirtle, available), child of Craig Dirtle
+- Frillik Dirtle "The Two-Thought Tango" (Dirtle, available), child of Peepers Dirtle
+- Gabbles Dirtle "The Family Megaphone" (Dirtle, adopted), child of Siddles Dirtle
+- Gribble Dirtle "The Earnest Meddler" (Dirtle, available), child of Gabbles Dirtle
+- Grimbly Dirtle "The Brace" (Dirtle, available), child of Peepers Dirtle
+- Huddle Dirtle "The Self-Hug" (Dirtle, available), child of Brindle Dirtle
+- Marnie Dirtle "The Tender Overthinker" (Dirtle, available), child of Craig Dirtle
+- Murk Dirtle "The Night Shift" (Dirtle, available), child of Fennick Dirtle
+- Ollie Dirtle "The Don’t Shoot" (Dirtle, available), child of Gribble Dirtle
+- Orbin Dirtle "The Detached Charmer" (Dirtle, available), child of Craig Dirtle
+- Peepers Dirtle "The Relentless Observer" (Dirtle, available), child of Gabbles Dirtle
+- Siddles Dirtle "The Calm Before Everyone Else" (Dirtle, available), one of the first generation
+- Stubbs Dirtle "The Blunt Caretaker" (Dirtle, adopted), child of Siddles Dirtle
+- Tobbin Dirtle "The Second Guess" (Dirtle, available), child of Marnie Dirtle
+- Wendel Dirtle "The Polite Grin" (Dirtle, available), child of Orbin Dirtle
+- Candor Glimmerwick "The Host" (Glimmerwick, available), child of Dax Glimmerwick
+- Dax Glimmerwick "The Overthinker with Great Timing" (Glimmerwick, available), child of Janice Glimmerwick
+- Delphine Glimmerwick "The Blush" (Glimmerwick, available), child of Gush Glimmerwick
+- Fratch Glimmerwick "The Performing Storm" (Glimmerwick, available), child of Gush Glimmerwick
+- Gumphrey Glimmerwick "The Beautiful Detour" (Glimmerwick, adopted), child of Pigpen Glimmerwick
+- Gush Glimmerwick "The Overwhelmed Empath" (Glimmerwick, available), child of Janice Glimmerwick
+- Hortencia Glimmerwick "The Show Before the Storm" (Glimmerwick, adopted), child of Janice Glimmerwick
+- Janice Glimmerwick "The Soft Howl" (Glimmerwick, available), one of the first generation
+- Lulu Glimmerwick "The Hand Up" (Glimmerwick, available), child of Fratch Glimmerwick
+- Ned Glimmerwick "The Gentle Panic" (Glimmerwick, adopted), child of Hortencia Glimmerwick
+- Nooks Glimmerwick "The Hideout" (Glimmerwick, available), child of Ned Glimmerwick
+- Ottoline Glimmerwick "The Too Many Hands" (Glimmerwick, available), child of Candor Glimmerwick
+- Pigpen Glimmerwick "The Dirty Charmer" (Glimmerwick, available), child of Ziggo Glimmerwick
+- Smudge Glimmerwick "The Leftover Feeling" (Glimmerwick, available), child of Hortencia Glimmerwick
+- Swish Glimmerwick "The Exit Strategy" (Glimmerwick, available), child of Ziggo Glimmerwick
+- Tessik Glimmerwick "This Way or That" (Glimmerwick, available), child of Ned Glimmerwick
+- Violetta Glimmerwick "The Reach" (Glimmerwick, available), child of Pigpen Glimmerwick
+- Ziggo Glimmerwick "The Shapeshift Kid" (Glimmerwick, available), child of Janice Glimmerwick
+- Bellowan Roarborn "The Echo Chamber" (Roarborn, available), child of Druthal Roarborn
+- Bramble Roarborn "The Thorn" (Roarborn, available), child of Spatter Roarborn
+- Cinder Roarborn "The Overheated Caregiver" (Roarborn, available), child of Druthal Roarborn
+- Clatter Roarborn "The Loud Yes" (Roarborn, available), child of Plink Roarborn
+- Droozle Roarborn "The Joy Emergency" (Roarborn, adopted), child of Sunder Roarborn
+- Druthal Roarborn "The Reluctant Volcano" (Roarborn, available), one of the first generation
+- Frizz Roarborn "The Short Fuse" (Roarborn, available), child of Moro Roarborn
+- Gorble Roarborn "The Big Leap" (Roarborn, available), child of Droozle Roarborn
+- Grax Roarborn "The Charge Ahead" (Roarborn, available), child of Gorble Roarborn
+- Moro Roarborn "The Self-Aware Wildfire" (Roarborn, adopted), child of Druthal Roarborn
+- Murn Roarborn "The Hidden Flame" (Roarborn, adopted), child of Cinder Roarborn
+- Noshik Roarborn "The Backup Miracle" (Roarborn, adopted), child of Plink Roarborn
+- Pip Roarborn "Give It Up" (Roarborn, available), child of Droozle Roarborn
+- Plink Roarborn "The Sparkplug" (Roarborn, available), child of Cinder Roarborn
+- Spatter Roarborn "The Overcorrection" (Roarborn, available), child of Bellowan Roarborn
+- Spindle Roarborn "The Big Reaction" (Roarborn, available), child of Bellowan Roarborn
+- Sunder Roarborn "The Argument in Progress" (Roarborn, available), child of Druthal Roarborn
+- Tav Roarborn (Roarborn, adopted), child of Murn Roarborn
+- Tiv Roarborn "The Gentle Undoing" (Roarborn, adopted), child of Murn Roarborn
+
+## More
+
+- [Full guide with every monster's story](https://popsy-neon.vercel.app/llms-full.txt)
+- [Family tree](https://popsy-neon.vercel.app/family)

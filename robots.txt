@@ -1,0 +1,33 @@
+# Popsy Loves You by Brandon Kaufer. Everyone is welcome, AI tools included.
+# A plain-text guide for AI tools: https://popsy-neon.vercel.app/llms.txt
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://popsy-neon.vercel.app/sitemap.xml
