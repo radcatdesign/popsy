@@ -3223,6 +3223,26 @@ a {
     document.addEventListener('mouseleave', clear);
     window.addEventListener('blur', clear);
   })();
+  // Every now and then the logo plays its hover animation by itself (every 10 to 18 seconds),
+  // as long as nothing else is going on: no popup, no drag, the tab in view, a logo on screen
+  (function logoIdle() {
+    const visible = el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight; };
+    const tick = () => {
+      setTimeout(tick, 10000 + Math.random() * 8000);
+      const b = document.body, g = window.__grid;
+      if (document.hidden || b.dataset.started !== 'true' || !window.logoBurst) return;
+      if (document.querySelector('.pp.--open, .pw-welcome.--open') || b.dataset.aboutOpen === 't' || b.dataset.familyOpen === 't') return;
+      if (b.classList.contains('--logo-hover') || (g && (g.panRaf || (g.draggable && g.draggable.isPressed)))) return;
+      let host = null;
+      if (b.dataset.view === 'shelf') host = document.querySelector('.shelf-logo');
+      else if (b.dataset.view === 'grid') {
+        const tiles = [...document.querySelectorAll('.grid:not(.--shelf) [data-id="popsy-wolf"]')].filter(visible);
+        host = tiles[Math.floor(Math.random() * tiles.length)] || null;
+      }
+      if (host) window.logoBurst(host);
+    };
+    setTimeout(tick, 12000);
+  })();
   // The grid's logo tile lets clicks through (so drags start anywhere), so hovers and taps on
   // it are found by position: pointer over it on desktop, or a tap that didn't drag.
   // the About popup, opened the same way the "about" link does
