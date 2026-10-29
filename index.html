@@ -859,12 +859,17 @@ a {
   .grid .column .product[data-video-state="ending"],
   .grid .column .product[data-video-state="auto"],
   .grid .column .product[data-video-state="focus"] { z-index: 2; mix-blend-mode: multiply; }
-  /* Hovering a piece darkens the actual grid lines around it (the whole block for a 2x2 piece):
-     its own right / bottom lines, and the lines its left and upper neighbours draw. Marked in JS
-     (see markHoverLines), so the highlight is the lines themselves and can't drift off them. */
-  .grid .column .product::before, .grid .product::after { transition: border-color .2s ease; }
-  .grid .column .product.--hl-r::before { border-right-color: #c2c2c2; z-index: 6; }
-  .grid .product.--hl-b::after { border-bottom-color: #c2c2c2; z-index: 6; }
+  /* Hovering a piece puts a dot on each corner of its cell, where the grid lines cross
+     (the lines sit 2.5vw outside the piece). The dots live inside the tile, so they move with it. */
+  .grid .product > .hl-dots { position: absolute; inset: -2.5vw; pointer-events: none; z-index: 7; }
+  /* a big piece covers 2x2 cells from its box: its dots go out to the far corners (one more cell + gutter) */
+  .grid .product.--big > .hl-dots { right: calc(-100% - 7.5vw); bottom: calc(-100% - 7.5vw); }
+  .hl-dots i { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #000;
+    transform: scale(0); transition: transform .22s cubic-bezier(.34,1.56,.64,1); }
+  .hl-dots i:nth-child(2) { left: 100%; }
+  .hl-dots i:nth-child(3) { top: 100%; }
+  .hl-dots i:nth-child(4) { left: 100%; top: 100%; }
+  .grid:not(.--shelf) .product.--hl > .hl-dots i { transform: scale(1); }
   /* Ambient: a monster plays its video once on its own; on phones the centered piece plays */
   .grid .column .product[data-video-state="auto"] video,
   .grid .column .product[data-video-state="focus"] video { opacity: 1; }
@@ -3196,29 +3201,26 @@ a {
     new MutationObserver(() => { if (document.body.dataset.view === 'shelf') tryLoop(); })
       .observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
   })();
-  // Hover lines: light up the grid lines around the piece under the pointer. A tile draws its
-  // own right and bottom lines; the left and top ones belong to the neighbours (wrapping round).
-  (function markHoverLines() {
+  // Hover dots: the piece under the pointer gets a dot on each corner of its cell
+  (function markHoverDots() {
     if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    let lit = [], current = null;
-    const clear = () => { lit.forEach(([el, c]) => el.classList.remove(c)); lit = []; current = null; };
-    const mark = (el, c) => { if (el) { el.classList.add(c); lit.push([el, c]); } };
+    let current = null;
+    const clear = () => { if (current) current.classList.remove('--hl'); current = null; };
     document.addEventListener('mouseover', e => {
       const pr = e.target.closest && e.target.closest('.grid:not(.--shelf) .column .product');
       if (pr === current) return;
       clear();
       if (!pr || pr.classList.contains('--covered') || (pr.firstElementChild && pr.firstElementChild.dataset.id === 'popsy-wolf')) return;
-      current = pr;
-      const col = pr.parentElement, cols = [...col.parentElement.children], C = cols.length;
-      const c = cols.indexOf(col), r = [...col.children].indexOf(pr), R = col.children.length;
-      const at = (cc, rr) => cols[((cc % C) + C) % C].children[((rr % R) + R) % R];
-      const span = pr.classList.contains('--big') ? 2 : 1;
-      for (let i = 0; i < span; i++) {
-        mark(at(c + span - 1, r + i), '--hl-r');   // right edge
-        mark(at(c - 1, r + i), '--hl-r');          // left edge (the neighbour's right line)
-        mark(at(c + i, r + span - 1), '--hl-b');   // bottom edge
-        mark(at(c + i, r - 1), '--hl-b');          // top edge (the line above)
+      if (!pr.querySelector(':scope > .hl-dots')) {
+        const d = document.createElement('span');
+        d.className = 'hl-dots';
+        d.setAttribute('aria-hidden', 'true');
+        d.innerHTML = '<i></i><i></i><i></i><i></i>';
+        pr.appendChild(d);
       }
+      current = pr;
+      void pr.offsetWidth;   // let a fresh set of dots start at zero so they pop in
+      pr.classList.add('--hl');
     }, { passive: true });
     document.addEventListener('mouseleave', clear);
     window.addEventListener('blur', clear);
