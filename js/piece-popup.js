@@ -186,7 +186,8 @@
       var v = view === 'form' ? formView : view === 'done' ? doneView : infoView;
       var items = [{ el: v.querySelector('.pp__title'), title: true }];
       if (view === 'info') items.push({ el: metaEl }, { el: textEl }, { el: v.querySelector('[data-action="inquire"]'), box: true });
-      else if (view === 'form') [].forEach.call(form.querySelectorAll('label, button[type="submit"]'), function (el) { items.push({ el: el, box: el.tagName === 'BUTTON' }); });
+      // the form's labels are simply there; only the title and the Send button write in
+      else if (view === 'form') items.push({ el: form.querySelector('button[type="submit"]'), box: true });
       else items.push({ el: v.querySelector('.pp__done') }, { el: v.querySelector('[data-action="close"]'), box: true });
       W.sequence(items, 0.12);
     }
