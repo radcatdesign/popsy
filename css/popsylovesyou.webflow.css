@@ -805,3 +805,9 @@
     padding-right: 12px;
   }
 }
+
+/* Scrollbars, everywhere they show: thin black bar, no track */
+* { scrollbar-width: thin; scrollbar-color: #000 transparent; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #000; border-radius: 6px; }

@@ -56,7 +56,11 @@
     '.pp__form label { display: flex; flex-direction: column; gap: 4px; font-size: 16px; }',
     '.pp__form input, .pp__form textarea { font: inherit; font-size: 17px; color: #000; background: #fff; border: 1.5px solid #000;',
     '  border-radius: 8px; padding: 10px 12px; outline: none; }',
-    '.pp__form textarea { min-height: 120px; resize: vertical; }',
+    '.pp__form textarea { min-height: 120px; resize: none; }',
+    '.pp__form, .pp__form textarea { scrollbar-width: none; }',
+    '.pp__form::-webkit-scrollbar, .pp__form textarea::-webkit-scrollbar { display: none; }',
+    '.pp__form .pp__human { flex-direction: row; align-items: center; gap: 10px; flex-wrap: wrap; }',
+    '.pp__form .pp__human input { width: 4.5em; text-align: center; }',
     '.pp__form input:focus, .pp__form textarea:focus { box-shadow: 0 0 0 3px rgba(0,0,0,.12); }',
     '.pp__hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }',
     '.pp__note { font-size: 15px; min-height: 1.2em; }',
@@ -107,6 +111,7 @@
       '<label>Name<input name="name" autocomplete="name" required></label>' +
       '<label>Email<input name="email" type="email" autocomplete="email" required></label>' +
       '<label>Message<textarea name="message" required></textarea></label>' +
+      '<label class="pp__human"><span>Human check: what’s <span class="pp__q"></span>?</span><input name="human" inputmode="numeric" autocomplete="off" required></label>' +
       '<input class="pp__hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<div class="pp__note" aria-live="polite"></div>' +
       '<button class="pp__btn" type="submit">Send</button>' +
@@ -174,7 +179,17 @@
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   }
 
+  // Anti-spam: a quick sum only a person bothers to answer, plus two quiet traps for bots (a hidden
+  // field people never see, and a form sent faster than anyone could type it)
+  var human = { a: 0, b: 0, at: 0 };
+  function newQuestion() {
+    human.a = 1 + Math.floor(Math.random() * 8); human.b = 1 + Math.floor(Math.random() * 8); human.at = Date.now();
+    root.querySelector('.pp__q').textContent = human.a + ' + ' + human.b;
+    form.querySelector('[name="human"]').value = '';
+  }
+
   function show(view) {
+    if (view === 'form') newQuestion();
     infoView.hidden = view !== 'info';
     formView.hidden = view !== 'form';
     doneView.hidden = view !== 'done';
@@ -268,6 +283,13 @@
       pieceId: current && current.id,
       url: location.origin + location.pathname
     };
+    var answer = String(fd.get('human') || '').trim();
+    if (data.name && data.message && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) && Number(answer) !== human.a + human.b) {
+      note.textContent = answer ? 'That’s not quite it. Try the sum again.' : 'Answer the human check.';
+      return;
+    }
+    // sent within 3 seconds of opening: a bot. Thank it and send nothing.
+    if (data.website || Date.now() - human.at < 3000) { data.website = data.website || 'fast'; }
     if (!data.name || !data.message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       note.textContent = !data.name ? 'Add your name.' : (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) ? 'Add a valid email.' : 'Add a message.');
       return;

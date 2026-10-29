@@ -15,6 +15,11 @@
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <link rel="preload" href="fonts/UglyDave.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    /* Scrollbars: thin black bar, no track (same as the rest of the site) */
+    * { scrollbar-width: thin; scrollbar-color: #000 transparent; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #000; border-radius: 6px; }
     @font-face { font-family: Uglydave; src: url('fonts/UglyDave.woff2') format('woff2'); font-display: swap; }
     :root {
       --ink: #000; --paper: #fff; --soft: #5a5a5a; --line: #ddd;
