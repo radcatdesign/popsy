@@ -19,6 +19,7 @@
     '  border-image-source: url(assets/cdn.prod.website-files.com/689e729c65f81373b9f2b204/68c9afa3203792c1866df05c_border.webp);',
     '  transform: translateY(16px) scale(.97); transition: transform .5s cubic-bezier(.22,1,.36,1); }',
     '.pw-welcome.--open .pw-welcome__card { transform: none; }',
+    '.pw-welcome__card:focus, .pw-welcome__go:focus:not(:focus-visible) { outline: none; }',
     /* Tav, waving hello: his photo, with his animation looping over it once it's loaded */
     '.pw-welcome__monster { position: relative; width: 150px; height: 150px; margin: 0 auto 4px; }',
     '.pw-welcome__monster img, .pw-welcome__monster video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }',
@@ -64,7 +65,7 @@
     root.setAttribute('aria-modal', 'true');
     root.setAttribute('aria-labelledby', 'pw-welcome-title');
     root.innerHTML =
-      '<div class="pw-welcome__card">' +
+      '<div class="pw-welcome__card" tabindex="-1">' +
       '<button class="pw-welcome__close" type="button" aria-label="Close"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"><path d="M18.4 5.8 5.6 18.3"/><path d="M5.7 5.6l12.7 12.9"/></svg></button>' +
       '<div class="pw-welcome__monster" aria-hidden="true"><img alt="" src="assets/cdn.prod.website-files.com/689e72c8510ebe16954a058e/69f019faaba6b5564a51d31d_30-Big.webp"><video muted loop playsinline></video></div>' +
       '<h2 class="pw-welcome__title" id="pw-welcome-title">Meet the monsters</h2>' +
@@ -129,7 +130,8 @@
       items.push({ el: root.querySelector('[data-act="go"]'), box: true }, { el: root.querySelector('[data-act="story"]') });
       W.sequence(items, 0.2);
     }
-    setTimeout(function () { root.querySelector('[data-act="go"]').focus({ preventScroll: true }); }, 60);
+    // focus the card, not the button: Safari draws a blue ring around a button focused from code
+    setTimeout(function () { root.querySelector('.pw-welcome__card').focus({ preventScroll: true }); }, 60);
   }
 
   function close() {

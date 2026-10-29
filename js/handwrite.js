@@ -1,6 +1,6 @@
 /* Handwritten text: everything inks in left to right, fast, like a pen racing across the page.
    Titles write letter by letter; longer text writes a line at a time, each line swept word by
-   word, so a whole bio still lands in about a second.
+   word, so a whole bio still lands in under two seconds.
      PopsyWrite.write(el, delay)   -> a title, letter by letter; returns the time it ends (s)
      PopsyWrite.block(el, delay)   -> any text (keeps its markup), line by line; returns the end
      PopsyWrite.rise(els, delay)   -> a box (a button's outline) fades up as its label writes */
@@ -24,7 +24,7 @@
   // restart: drop the class, force a reflow, add it back
   var restart = function (el) { el.classList.remove('pw-on'); void el.offsetWidth; el.classList.add('pw-on'); };
 
-  // A title: letter by letter, ~0.03s apart, never longer than ~0.6s
+  // A title: letter by letter, ~0.045s apart, never longer than ~0.85s
   function write(el, delay) {
     if (!el) return delay || 0;
     delay = delay || 0;
@@ -41,7 +41,7 @@
       el.dataset.pw = el.textContent;
     }
     var chars = el.querySelectorAll('.pw-c'), n = chars.length;
-    var step = Math.min(0.03, 0.5 / Math.max(1, n)), dur = Math.max(0.08, step * 3);
+    var step = Math.min(0.045, 0.75 / Math.max(1, n)), dur = Math.max(0.12, step * 3);
     for (var i = 0; i < n; i++) {
       chars[i].style.setProperty('--pw-t', (delay + i * step).toFixed(3) + 's');
       chars[i].style.setProperty('--pw-d', dur.toFixed(3) + 's');
@@ -51,7 +51,7 @@
   }
 
   // Any text: every word gets wrapped (markup stays), then each line is swept left to right.
-  // Lines start ~0.06s apart; lines past the first screenful all go at once.
+  // Lines start ~0.1s apart; lines past the first screenful all go at once.
   function block(el, delay, opts) {
     if (!el) return delay || 0;
     delay = delay || 0;
@@ -87,7 +87,7 @@
       if (!last || Math.abs(top - last.top) > 4) { last = { top: top, words: [] }; lines.push(last); }
       last.words.push(w);
     });
-    var lineStep = opts.lineStep || 0.06, lineDur = opts.lineDur || 0.2, cap = opts.cap || 16;
+    var lineStep = opts.lineStep || 0.1, lineDur = opts.lineDur || 0.32, cap = opts.cap || 16;
     var end = delay;
     lines.forEach(function (line, i) {
       var t0 = delay + Math.min(i, cap) * lineStep;
