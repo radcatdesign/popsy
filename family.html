@@ -53,6 +53,8 @@
     width: 100svw;
     height: 100svh;
   }
+  /* every monster (and the logo) is a link: pointer hand, not React Flow's drag hand */
+  .react-flow__node, .react-flow__node * { cursor: pointer !important; }
   .react-flow__handle {
     background-color: transparent;
     border-color: transparent;

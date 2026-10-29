@@ -1126,6 +1126,8 @@ a {
   .grid.--shelf .product div {
     width: min(52svh, 36vw);
   }
+  /* pieces away from the middle sit smaller (--shelf-s is set as the row moves), standing on the same line */
+  .grid.--shelf .product > div { scale: var(--shelf-s, 1); transform-origin: 50% 100%; }
   .shelf-logo {
     position: fixed; top: 12px; left: 50%; width: 76px; height: 76px; margin-left: -38px; z-index: 20;
     opacity: 0; transform: translateY(-10px); pointer-events: none;
@@ -3816,6 +3818,8 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
             if (on !== pr.classList.contains('--cap-in')) pr.classList.toggle('--cap-in', on)
             const d = Math.abs(left + L.colW / 2 - window.innerWidth / 2)
             if (d < midD) { midD = d; mid = pr }
+            // the middle piece keeps its full size; the rest of the row is smaller, easing as they pass
+            pr.style.setProperty('--shelf-s', (1 - 0.3 * Math.min(1, d / L.colStep)).toFixed(3))
           }
           continue
         }
@@ -4370,81 +4374,47 @@ function(t,e){"object"==typeof module&&module.exports?module.exports=e(t,require
     grid.imageProgress = inst.progressedCount / Math.max(1, inst.images.length);
     grid.updatePreloader();
   });
-  // Grid -> shelf: the pieces on screen slide into one row (in reading order) and the
-  // shelf starts on the first of them, centered; the rest of the collection follows.
+  // Grid -> shelf: the grid fades away, then the shelf fades in with its pieces sliding in from
+  // the right. It starts on the piece you were looking at (nearest the middle of the screen),
+  // with the others that were on screen right after it.
   window.lineUpToShelf = () => {
     const vw = window.innerWidth, vh = window.innerHeight
-    const seen = new Set()
     const mid = o => [o.r.left + o.r.width / 2, o.r.top + o.r.height / 2]
     let onScreen = [...grid.grid.querySelectorAll('.product:not(.--covered) > div')]
       .map(d => ({ d, id: d.dataset.id, r: d.getBoundingClientRect() }))
       .filter(o => o.id !== 'popsy-wolf' && o.r.width > 0 && o.r.right > 0 && o.r.left < vw && o.r.bottom > 0 && o.r.top < vh)
-    // first = the piece closest to the middle of the screen (where you are on the canvas),
-    // picked from those at or left of center so it only ever moves right; the rest follow
-    // in left-to-right order, which keeps every piece moving right as the row assembles
-    const dist = (a, x, y) => Math.hypot(mid(a)[0] - x, mid(a)[1] - y)
-    const byCenter = (a, b) => dist(a, vw / 2, vh / 2) - dist(b, vw / 2, vh / 2)
-    const leftOfMid = onScreen.filter(o => mid(o)[0] <= vw / 2 + 2)
-    const anchor = (leftOfMid.length ? leftOfMid : onScreen).slice().sort(byCenter)[0]
-    if (anchor) {
-      onScreen = [anchor].concat(onScreen.filter(o => o !== anchor)
-        .sort((a, b) => (a.r.left - b.r.left) || (a.r.top - b.r.top)))
-    }
-    const lineup = [], extras = []
-    onScreen.forEach(o => {
-      if (seen.has(o.id)) extras.push(o)
-      else { seen.add(o.id); lineup.push(o) }
-    })
-    // the old grid stays behind as a fading layer: its lines, the logo and any duplicate
-    // tiles dissolve while the pieces in the line slide into the shelf
-    lineup.forEach(o => { o.d.style.opacity = '0' })
+    const dist = o => Math.hypot(mid(o)[0] - vw / 2, mid(o)[1] - vh / 2)
+    const anchor = onScreen.slice().sort((a, b) => dist(a) - dist(b))[0]
+    if (anchor) onScreen = [anchor].concat(onScreen.filter(o => o !== anchor).sort((a, b) => (a.r.left - b.r.left) || (a.r.top - b.r.top)))
+    window.shelfOrder = [...new Set(onScreen.map(o => o.id))]
+    // the old grid moves to a layer of its own and fades away
     const ghost = document.createElement('div')
     ghost.className = 'grid grid-ghost'
     ghost.setAttribute('aria-hidden', 'true')
     Object.assign(ghost.style, { pointerEvents: 'none', transform: 'none' })
     while (grid.grid.firstChild) ghost.appendChild(grid.grid.firstChild)
     grid.grid.parentNode.insertBefore(ghost, grid.grid)
-    gsap.to(ghost, { opacity: 0, duration: 0.55, ease: 'power2.out', onComplete: () => ghost.remove() })
-    window.shelfOrder = lineup.map(o => o.id)
-    window.initGrid()
-    grid.centerGrid()
-    grid.products = [...grid.grid.querySelectorAll('.product div')]
-    const cols = [...grid.grid.querySelectorAll('.column')]
-    const placed = new Set()
-    const tl = gsap.timeline({
-      onComplete: () => {
+    gsap.to(ghost, { opacity: 0, duration: 0.45, ease: 'power2.inOut', onComplete: () => {
+      ghost.remove()
+      window.initGrid()
+      grid.centerGrid()
+      grid.products = [...grid.grid.querySelectorAll('.product div')]
+      // then the shelf: each piece fades in sliding right to left, one after another
+      const shown = [...grid.grid.querySelectorAll('.column')]
+        .map(c => ({ d: c.querySelector('.product > div'), left: c.getBoundingClientRect().left }))
+        .filter(o => o.d)
+        .sort((a, b) => a.left - b.left)
+      const tl = gsap.timeline({ onComplete: () => {
         grid.handleDetails()
         grid.scheduleFocus()
         window.setTimeout(() => grid.observeProducts(), 300)
-      }
-    })
-    const firstX = cols[0] ? cols[0].getBoundingClientRect().left : 0
-    lineup.forEach((o, k) => {
-      const target = cols[k] && cols[k].querySelector('.product > div')
-      if (!target) return
-      // slots far enough along the looping shelf wrap round to the left; those pieces
-      // don't fly (that would be leftward) and just fade out with the old grid
-      if (k > 0 && target.getBoundingClientRect().left <= firstX) {
-        o.d.style.opacity = ''
-        return
-      }
-      placed.add(target)
-      // fly above the other tiles (their photos have white backgrounds)
-      cols[k].style.zIndex = String(200 - k)
-      const tr = target.getBoundingClientRect()
-      tl.fromTo(target, {
-        x: (o.r.left + o.r.width / 2) - (tr.left + tr.width / 2),
-        y: (o.r.top + o.r.height / 2) - (tr.top + tr.height / 2),
-        scale: o.r.width / tr.width,
-        opacity: 1,
-      }, { x: 0, y: 0, scale: 1, duration: 1.1, ease: 'power3.inOut', onComplete: () => { cols[k].style.zIndex = '' } }, k * 0.06)
-    })
-    grid.grid.querySelectorAll('.product').forEach(pr => {
-      tl.fromTo(pr, { '--lo': 0 }, { '--lo': 1, duration: 0.9, ease: 'power3.inOut' }, 0.9)
-      const d = pr.firstElementChild
-      if (!d || placed.has(d)) return
-      tl.fromTo(d, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.8 + Math.random() * 0.3)
-    })
+      } })
+      let k = 0
+      shown.forEach(o => {
+        if (o.left > vw + 40 || o.left < -vw) { gsap.set(o.d, { opacity: 1 }); return }
+        tl.fromTo(o.d, { opacity: 0, x: Math.min(260, vw * 0.18) }, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out', clearProps: 'x' }, k++ * 0.08)
+      })
+    } })
   }
   window.filterTrigger = () => {
   	grid.grid.style.transition = 'none';
